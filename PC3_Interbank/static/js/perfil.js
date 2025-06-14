@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('provincia').value = data.empresa.provincia || '';
                 document.getElementById('distrito').value = data.empresa.distrito || '';
                 document.getElementById('telefono').value = data.empresa.telefono || '';
-            } else if (rol === 'editor' || rol === 'lector') {
+            } else if ((rol === 'editor' || rol === 'lector')) {
                 document.getElementById('nombre').value = data.nombre || '';
                 document.getElementById('dni').value = data.dni || '';
             }
