@@ -1,122 +1,116 @@
+console.log('firmas.js cargado');
 document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM completamente cargado');
     const token = localStorage.getItem('access_token');
+    console.log('Token usado en fetch:', token);
     const rol = localStorage.getItem('rol');
     const titulo = document.getElementById('titulo-firmas');
     const acciones = document.getElementById('acciones-firmas');
-    const listaFirmas = document.getElementById('listaFirmas');
-    const firmarModal = document.getElementById('firmarModal');
-    const firmarForm = document.getElementById('firmarForm');
-    const firmaDocInfo = document.getElementById('firmaDocInfo');
-    const firmaDocId = document.getElementById('firma_doc_id');
-    const claveFirma = document.getElementById('claveFirma');
-    const firmaMensaje = document.getElementById('firmaMensaje');
-    const cerrarFirmarModalBtn = document.getElementById('cerrarFirmarModalBtn');
 
-    if (!token || !rol) return;
+    if (!token || !rol) {
+        alert('No hay token o rol en localStorage. Por favor, inicia sesión.');
+        return;
+    }
 
-    // Título y acciones
-    if (rol === 'editor' || rol === 'lector') {
+    // Ahora editores y lectores pueden firmar
+    if (rol === 'lector' || rol === 'editor') {
         titulo.textContent = 'Firmar documentos asignados';
         acciones.innerHTML = `<li><button id="verFirmasBtn">Actualizar lista</button></li>`;
+        cargarPendientesFirma();
     } else {
         titulo.textContent = 'Gestión de Firmas';
         acciones.innerHTML = '';
+        document.getElementById('pendientesFirma').innerHTML = '<p>No tienes permisos para firmar documentos.</p>';
     }
 
-    // Función para cargar documentos pendientes de firma
-    function cargarFirmas() {
-        listaFirmas.innerHTML = 'Cargando...';
-        fetch('/firmas/pendientes/', {
+    let firmaSeleccionada = null;
+
+    function cargarPendientesFirma() {
+        console.log('Token usado en fetch:', token);
+        fetch('/documentos/firmas/pendientes/', {
+            method: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json'
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
             }
         })
-            .then(r => r.json())
-            .then(data => {
-                if (!Array.isArray(data) || data.length === 0) {
-                    listaFirmas.innerHTML = '<p>No tienes documentos pendientes de firma.</p>';
-                    return;
+            .then(response => {
+                console.log('Status:', response.status);
+                if (response.status === 401) {
+                    alert('No autorizado. Tu sesión ha expirado o no tienes permisos.');
+                    return [];
                 }
-                listaFirmas.innerHTML = '';
-                data.forEach(doc => {
-                    listaFirmas.innerHTML += `
-                    <div class="firma-item">
-                        <strong>${doc.titulo}</strong> (${doc.tipo_documento})<br>
-                        <span>Asignado por: ${doc.asignador}</span><br>
-                        <button class="firmarBtn" data-id="${doc.id}" data-titulo="${doc.titulo}">Firmar</button>
-                        <button class="verPdfBtn" data-id="${doc.id}">Ver PDF</button>
-                    </div>
-                `;
-                });
+                return response.json();
+            })
+            .then(firmas => {
+                console.log('Firmas recibidas:', firmas);
+                let html = '';
+                if (!firmas || firmas.length === 0) {
+                    html = '<p>No tienes documentos pendientes de firma.</p>';
+                } else {
+                    firmas.forEach(firma => {
+                        html += `
+                        <div style="margin-bottom: 1em; border-bottom: 1px solid #eee; padding-bottom: 1em;">
+                            <b>${firma.documento.nombre}</b> (${firma.documento.tipo_documento})<br>
+                            <a href="${firma.documento.archivo}" target="_blank">Ver PDF</a>
+                            <button class="abrirFirmarModalBtn" data-id="${firma.id}" data-nombre="${firma.documento.nombre}">Firmar</button>
+                        </div>
+                    `;
+                    });
+                }
+                document.getElementById('pendientesFirma').innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error al cargar firmas pendientes:', error);
             });
     }
 
-    // Cargar lista al iniciar
-    cargarFirmas();
+    function abrirFirmarModal(firmaId, docNombre) {
+        firmaSeleccionada = firmaId;
+        document.getElementById('firma_doc_id').value = firmaId;
+        document.getElementById('firmaDocInfo').innerText = `Documento: ${docNombre}`;
+        document.getElementById('firmaMensaje').innerText = '';
+        document.getElementById('firmarModal').style.display = 'block';
+    }
 
-    // Botón para actualizar lista
-    acciones.addEventListener('click', function (e) {
+    function cerrarFirmarModal() {
+        document.getElementById('firmarModal').style.display = 'none';
+        document.getElementById('firmaMensaje').innerText = '';
+        document.getElementById('claveFirma').value = '';
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('abrirFirmarModalBtn')) {
+            const firmaId = e.target.getAttribute('data-id');
+            const docNombre = e.target.getAttribute('data-nombre');
+            abrirFirmarModal(firmaId, docNombre);
+        }
+        if (e.target.id === 'cerrarFirmarModalBtn') {
+            cerrarFirmarModal();
+        }
         if (e.target.id === 'verFirmasBtn') {
-            cargarFirmas();
+            cargarPendientesFirma();
         }
     });
 
-    // Abrir modal de firma
-    listaFirmas.addEventListener('click', function (e) {
-        if (e.target.classList.contains('firmarBtn')) {
-            const docId = e.target.getAttribute('data-id');
-            const titulo = e.target.getAttribute('data-titulo');
-            firmaDocId.value = docId;
-            firmaDocInfo.textContent = `Documento: ${titulo}`;
-            claveFirma.value = '';
-            firmaMensaje.textContent = '';
-            firmaMensaje.className = '';
-            firmarModal.style.display = 'block';
-        }
-        // Ver PDF (opcional)
-        if (e.target.classList.contains('verPdfBtn')) {
-            const docId = e.target.getAttribute('data-id');
-            window.open(`/firmas/ver-pdf/${docId}/`, '_blank');
-        }
-    });
-
-    // Cerrar modal
-    cerrarFirmarModalBtn.addEventListener('click', function () {
-        firmarModal.style.display = 'none';
-    });
-
-    // Enviar firma electrónica
-    firmarForm.addEventListener('submit', function (e) {
+    document.getElementById('firmarForm').onsubmit = function (e) {
         e.preventDefault();
-        firmaMensaje.textContent = '';
-        firmaMensaje.className = '';
-        fetch(`/firmas/firmar/${firmaDocId.value}/`, {
+        const firmaId = document.getElementById('firma_doc_id').value;
+        const clave = document.getElementById('claveFirma').value;
+
+        fetch(`/firmas/${firmaId}/firmar/`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ clave: claveFirma.value })
+            body: JSON.stringify({ clave: clave })
         })
-            .then(r => r.json().then(data => ({ status: r.status, data })))
-            .then(res => {
-                if (res.status >= 200 && res.status < 300) {
-                    firmaMensaje.textContent = res.data.mensaje || 'Documento firmado correctamente.';
-                    firmaMensaje.className = 'success';
-                    setTimeout(() => {
-                        firmarModal.style.display = 'none';
-                        cargarFirmas();
-                    }, 1000);
-                } else {
-                    firmaMensaje.textContent = res.data.error || 'Error al firmar.';
-                    firmaMensaje.className = 'error';
-                }
-            })
-            .catch(() => {
-                firmaMensaje.textContent = 'Error de conexión.';
-                firmaMensaje.className = 'error';
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('firmaMensaje').innerText = data.detail || 'Documento firmado.';
+                cargarPendientesFirma();
+                setTimeout(cerrarFirmarModal, 1500);
             });
-    });
+    };
 });

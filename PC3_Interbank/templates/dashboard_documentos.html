@@ -42,25 +42,41 @@
 </div>
 
 <!-- Modal para subir archivo -->
-<form id="subirDocForm" style="display:none;">
-    <label>Archivo</label>
-    <input type="file" id="archivo" required>
-    <label>Título</label>
-    <input type="text" id="tituloArchivo" required>
-    <label>Tipo</label>
-    <input type="text" id="tipoArchivo" required>
-    <label>Etiquetas</label>
-    <input type="text" id="etiquetasArchivo">
+<h2>Subir nuevo documento</h2>
+<form id="subirDocForm" enctype="multipart/form-data">
+    <label>Nombre:</label>
+    <input type="text" id="tituloArchivo" name="nombre" required><br>
+    <label>Tipo de documento:</label>
+    <select id="tipoArchivo" name="tipo_documento" required>
+        <option value="contrato">Contrato</option>
+        <option value="poder">Poder</option>
+        <option value="carta">Carta de presentación</option>
+        <option value="declaracion">Declaración jurada</option>
+    </select><br>
+    <label>Archivo:</label>
+    <input type="file" id="archivo" name="archivo" required><br>
+    <label>Etiquetas:</label>
+    <input type="text" id="etiquetasArchivo" name="etiquetas"><br>
+    <label>Contenido:</label>
+    <textarea id="contenidoArchivo" name="contenido"></textarea><br>
     <button type="submit">Subir</button>
     <button type="button" id="cancelarSubirDocBtn">Cancelar</button>
-    <div id="docMensaje"></div>
 </form>
-
+<div id="docMensaje"></div>
 <!-- Modal para PDF -->
 <div id="pdfModal" style="display:none;">
     <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
     <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
     <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
+</div>
+<!-- Modal para asignar firmantes -->
+<div id="modalFirmantes" style="display:none;">
+    <h3>Seleccionar firmantes</h3>
+    <form id="formFirmantes">
+        <div id="listaUsuarios"></div>
+        <button type="submit">Asignar</button>
+        <button type="button" id="cancelarFirmantesBtn">Cancelar</button>
+    </form>
 </div>
 {% endblock %}
 

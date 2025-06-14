@@ -42,7 +42,20 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('subirDocForm').style.display = 'none';
         document.getElementById('documentoModal').style.display = 'none';
     }
-
+    function renderizarDocumentos(documentos) {
+        let html = '';
+        documentos.forEach(doc => {
+            html += `
+            <div>
+                ${doc.nombre} (${doc.tipo_documento})
+                <button class="eliminarDocBtn" data-id="${doc.id}">Eliminar</button>
+                <a href="${doc.archivo}" target="_blank">PDF</a>
+                <button class="asignarFirmantesBtn" data-id="${doc.id}">Asignar firmantes</button>
+            </div>
+        `;
+        });
+        document.getElementById('listaDocumentos').innerHTML = html;
+    }
     // ===================== LISTAR DOCUMENTOS =====================
     function cargarDocumentos() {
         fetch('/documentos/empresa/', {
@@ -72,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${doc.puede_eliminar ? `<button class="eliminarDocBtn" data-id="${doc.id}">Eliminar</button>` : ''}
                     </div>
                 `;
+                    renderizarDocumentos(data);
                 });
             });
     }
@@ -163,46 +177,96 @@ document.addEventListener('DOMContentLoaded', function () {
     if (subirDocForm) {
         subirDocForm.addEventListener('submit', async function (e) {
             e.preventDefault();
+            const archivoInput = document.getElementById('archivo');
+            const tituloInput = document.getElementById('tituloArchivo');
+            const tipoInput = document.getElementById('tipoArchivo');
+            const etiquetasInput = document.getElementById('etiquetasArchivo');
+            const docMensaje = document.getElementById('docMensaje');
+
+            // Validación básica
+            if (!archivoInput.files.length || !tituloInput.value || !tipoInput.value) {
+                docMensaje.textContent = "Completa todos los campos obligatorios.";
+                return;
+            }
+
             const formData = new FormData();
-            formData.append('archivo', document.getElementById('archivo').files[0]);
-            formData.append('nombre', document.getElementById('tituloArchivo').value);
-            formData.append('tipo_documento', document.getElementById('tipoArchivo').value);
-            formData.append('etiquetas', document.getElementById('etiquetasArchivo').value);
+            formData.append('archivo', archivoInput.files[0]);
+            formData.append('nombre', tituloInput.value);
+            formData.append('tipo_documento', tipoInput.value);
+            formData.append('etiquetas', etiquetasInput.value);
 
-            const mensaje = document.getElementById('docMensaje');
-            mensaje.className = 'mensaje';
-            mensaje.style.display = 'none';
-
+            const token = localStorage.getItem('access_token');
             try {
                 const response = await fetch('/documentos/empresa/', {
                     method: 'POST',
-                    body: formData,
                     headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Accept': 'application/json'
-                    }
+                        'Authorization': 'Bearer ' + token
+                    },
+                    body: formData
                 });
-                const result = await response.json();
+
                 if (response.ok) {
-                    mensaje.textContent = result.mensaje || 'Documento subido correctamente.';
-                    mensaje.classList.add('success');
-                    cargarDocumentos();
-                    setTimeout(() => {
-                        document.getElementById('subirDocForm').reset();
-                        document.getElementById('subirDocForm').style.display = 'none';
-                    }, 1000);
+                    docMensaje.textContent = "Documento subido correctamente.";
+                    subirDocForm.reset();
+                    subirDocForm.style.display = 'none';
+                    cargarDocumentos(); // Refresca la lista
                 } else {
-                    mensaje.textContent = result.error || 'Error al subir.';
-                    mensaje.classList.add('error');
+                    const data = await response.json();
+                    docMensaje.textContent = "Error: " + (data.detail || JSON.stringify(data));
                 }
-                mensaje.style.display = 'block';
-            } catch {
-                mensaje.textContent = 'Error de conexión.';
-                mensaje.classList.add('error');
-                mensaje.style.display = 'block';
+            } catch (err) {
+                docMensaje.textContent = "Error de red o servidor.";
             }
         });
     }
+    let documentoSeleccionado = null;
+
+    // Mostrar modal al hacer clic en "Asignar firmantes"
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('asignarFirmantesBtn')) {
+            documentoSeleccionado = e.target.getAttribute('data-id');
+            // Cambia aquí la URL por '/users/' o la que corresponda en tu API
+            fetch('/users/empresa/', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                }
+            })
+                .then(r => r.json())
+                .then(usuarios => {
+                    let html = '';
+                    usuarios.forEach(u => {
+                        html += `<label><input type="checkbox" name="firmantes" value="${u.id}"> ${u.nombre}</label><br>`;
+                    });
+                    document.getElementById('listaUsuarios').innerHTML = html;
+                    document.getElementById('modalFirmantes').style.display = 'block';
+                });
+        }
+        if (e.target.id === 'cancelarFirmantesBtn') {
+            document.getElementById('modalFirmantes').style.display = 'none';
+        }
+    });
+
+    // Enviar firmantes seleccionados
+    document.getElementById('formFirmantes').onsubmit = function (e) {
+        e.preventDefault();
+        const checkboxes = document.querySelectorAll('input[name="firmantes"]:checked');
+        const firmantes = Array.from(checkboxes).map(cb => cb.value);
+
+        // Enviar un POST por cada firmante (puedes optimizarlo en el backend)
+        Promise.all(firmantes.map(firmanteId =>
+            fetch(`/documentos/empresa/${documentoSeleccionado}/firmantes/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ documento: documentoSeleccionado, firmante: firmanteId })
+            })
+        )).then(() => {
+            alert('Firmantes asignados correctamente.');
+            document.getElementById('modalFirmantes').style.display = 'none';
+        });
+    };
 
     // ===================== GENERAR Y PREVISUALIZAR PDF =====================
     const listaDocumentos = document.getElementById('listaDocumentos');
@@ -210,18 +274,19 @@ document.addEventListener('DOMContentLoaded', function () {
         listaDocumentos.addEventListener('click', function (e) {
             if (e.target.classList.contains('verPdfBtn')) {
                 const docId = e.target.getAttribute('data-id');
-                fetch(`/documentos/generar-pdf/${docId}/`, {
+                // Obtener los datos del documento para acceder a la URL del archivo subido
+                fetch(`/documentos/empresa/${docId}/`, {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + token,
-                        'Accept': 'application/pdf'
+                        'Accept': 'application/json'
                     }
                 })
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = URL.createObjectURL(blob);
-                        document.getElementById('pdfPreview').src = url;
-                        document.getElementById('descargarPdfBtn').href = url;
+                    .then(r => r.json())
+                    .then(doc => {
+                        // Usa la URL del archivo subido
+                        document.getElementById('pdfPreview').src = doc.archivo; // o doc.archivo.url si tu API lo retorna así
+                        document.getElementById('descargarPdfBtn').href = doc.archivo;
                         document.getElementById('pdfModal').style.display = 'flex';
                     });
             }
@@ -285,4 +350,27 @@ document.addEventListener('DOMContentLoaded', function () {
             cargarDocumentos();
         });
     }
+    // ===================== EVENTOS DE ELIMINACIÓN DE DOCUMENTOS =====================
+    document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('eliminarDocBtn')) {
+            const docId = e.target.getAttribute('data-id');
+            if (confirm('¿Seguro que deseas eliminar este documento?')) {
+                fetch(`/documentos/empresa/${docId}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    }
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            alert('Documento eliminado correctamente.');
+                            cargarDocumentos(); // Recarga la lista
+                        } else {
+                            alert('Error al eliminar el documento.');
+                        }
+                    });
+            }
+        }
+    });
+
 });

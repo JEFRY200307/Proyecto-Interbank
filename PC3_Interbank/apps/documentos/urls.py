@@ -5,12 +5,15 @@ from .views import (
     DocumentoEmpresaAPIView, 
     GenerarPDFAPIView,
     DocumentoDetailAPIView,
+    PendientesFirmaAPIView,
+    FirmarDocumentoAPIView,
     dashboard_firmas,
     dashboard_documentos,
     gestionar_firmas, 
     auditoria_firmas,
     api_firmas,
-    asignar_firmantes
+    asignar_firmantes,
+    AsignarFirmantesAPIView
 )
 router = DefaultRouter()
 router.register(r'documentos', DocumentoViewSet, basename='documento')
@@ -25,10 +28,12 @@ urlpatterns = [
     # API Endpoints
     path('empresa/', DocumentoEmpresaAPIView.as_view(), name='documentos_empresa_api'),
     path('empresa/<int:pk>/', DocumentoDetailAPIView.as_view(), name='documento_detalle_api'),
+    path('empresa/<int:documento_id>/firmantes/', AsignarFirmantesAPIView.as_view(), name='asignar_firmantes'),
     path('generar-pdf/<int:pk>/', GenerarPDFAPIView.as_view(), name='generar_pdf_api'),
     
     path('api/firmas/', api_firmas, name='api_firmas'),
-    path('firmas/<int:documento_id>/', gestionar_firmas, name='gestionar_firmas'),
+    path('firmas/pendientes/', PendientesFirmaAPIView.as_view(), name='firmas_pendientes'),
+    path('firmas/<int:pk>/firmar/', FirmarDocumentoAPIView.as_view(), name='firmar_documento'),
     path('documentos/<int:documento_id>/asignar/', asignar_firmantes, name='asignar_firmantes'),
     path('firmas/auditoria/<int:documento_id>/', auditoria_firmas, name='auditoria_firmas'),
 

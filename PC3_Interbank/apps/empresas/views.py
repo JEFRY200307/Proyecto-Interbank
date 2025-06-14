@@ -16,6 +16,7 @@ from django.core.mail import send_mail
 from .serializers import EmpresaRegistroSerializer
 from .models import Empresa
 from apps.users.models import Usuario
+from .services import validar_ruc
 
 class PanelEmpresaView(APIView):
     permission_classes = [IsAuthenticated]
@@ -30,12 +31,49 @@ class EmpresaRegistroView(APIView):
     permission_classes = []  # Público
 
     def post(self, request):
-        serializer = EmpresaRegistroSerializer(data=request.data)
+        ruc = request.data.get('ruc')
+        correo = request.data.get('correo')
+        representante = request.data.get('representante')
+        password = request.data.get('password')
+
+        # Validar campos mínimos
+        if not ruc or not correo or not representante or not password:
+            return Response({'error': 'Todos los campos son obligatorios.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validar si el RUC ya está registrado en la base de datos
+        if Empresa.objects.filter(ruc=ruc).exists():
+            return Response({'error': 'Ya existe una empresa registrada con este RUC.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validar si el correo ya está registrado
+        if Empresa.objects.filter(correo=correo).exists():
+            return Response({'error': 'Ya existe una empresa registrada con este correo.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Consultar y validar RUC
+        resultado = validar_ruc(ruc)
+        if not resultado.get("valido"):
+            return Response({'error': 'RUC inválido o no activo.', 'detalle': resultado.get("error")}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Combina los datos del formulario con los datos de la API
+        empresa_data = {
+            "ruc": ruc,
+            "correo": correo,
+            "representante": representante,
+            "password": password,
+            "razon_social": resultado.get("razon_social"),
+            "direccion": resultado.get("direccion"),
+            "departamento": resultado.get("departamento"),
+            "provincia": resultado.get("provincia"),
+            "distrito": resultado.get("distrito"),
+            # Agrega aquí otros campos de tu modelo si es necesario
+        }
+
+        serializer = EmpresaRegistroSerializer(data=empresa_data)
         if serializer.is_valid():
             empresa = serializer.save()
+            # Crea el usuario asociado si corresponde
             usuario = Usuario.objects.create_user(
                 correo=empresa.correo,
-                password=request.data.get('password'),
+                password=password,
                 nombre=empresa.representante,
                 empresa=empresa,
                 rol='empresa'

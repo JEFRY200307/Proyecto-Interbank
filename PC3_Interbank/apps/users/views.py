@@ -7,9 +7,12 @@ from .models import Usuario
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import generics, permissions
 from django.contrib.auth import get_user_model
+from .serializers import UsuarioSerializer
 from django.shortcuts import render
+
+User = get_user_model()
 
 def dashboard_panel(request):
     rol = getattr(request.user, 'rol', None)
@@ -55,6 +58,12 @@ class UsuarioRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
     serializer_class = UsuarioSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+class UsuariosEmpresaAPIView(generics.ListAPIView):
+    serializer_class = UsuarioSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return User.objects.filter(empresa=self.request.user.empresa)
 # --- CUENTA ---
 @api_view(['GET', 'PUT'])
 @permission_classes([IsAuthenticated])
