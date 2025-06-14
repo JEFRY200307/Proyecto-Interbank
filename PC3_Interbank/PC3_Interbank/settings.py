@@ -173,3 +173,4 @@ ERRORES_VALIDACION = {
     "ruc": ["El RUC debe tener exactamente 11 dígitos numéricos."]
 }
 
+APISPERU_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IkdmZXJuYW5kZXpfMDZAb3V0bG9vay5jb20ifQ.BUVxDzaB9UswLiV5WekQ-jJdQmuV0GCUX_7u-a4EuH4'

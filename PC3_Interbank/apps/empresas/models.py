@@ -10,8 +10,11 @@ class Empresa(models.Model):
     password       = models.CharField(max_length=255)
     direccion      = models.CharField(max_length=255, blank=True, null=True)
     telefono       = models.CharField(max_length=20, blank=True, null=True)
-    fecha_registro = models.DateTimeField(auto_now_add=True)
+    departamento   = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
+    provincia      = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
+    distrito       = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
     estado         = models.CharField(max_length=20, default='pendiente')
+    fecha_registro = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"

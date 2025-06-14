@@ -9,7 +9,14 @@ class EmpresaRegistroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Empresa
-        fields = ['razon_social', 'ruc', 'representante', 'correo', 'password', 'direccion', 'telefono']
+        # Solo los campos que el usuario debe ingresar
+        fields = ['ruc', 'correo', 'representante', 'password']
+        extra_kwargs = {
+            'correo': {'required': True},
+            'ruc': {'required': True},
+            'representante': {'required': True},
+            'password': {'write_only': True, 'required': True, 'min_length': 8},
+        }
 
     def create(self, validated_data):
         password = validated_data.pop('password')
