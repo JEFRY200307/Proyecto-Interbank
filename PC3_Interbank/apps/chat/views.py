@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +14,8 @@ CATEGORY_PROMPTS = {
     "Innovación y Desarrollo de Productos": "Eres un consultor en innovación y desarrollo de productos.",
 }
 
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
 class ChatBotAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -22,10 +25,12 @@ class ChatBotAPIView(APIView):
         system_prompt = CATEGORY_PROMPTS.get(category.name)
         if not system_prompt:
             return Response({"error": "Categoría no soportada."}, status=400)
-        # Usa Gemini-pro y tu API key de Google
+        if not OPENAI_API_KEY:
+            return Response({"error": "API key de OpenAI no configurada."}, status=500)
+        # Usa OpenAI GPT-3.5 Turbo y tu API key de OpenAI
         response = completion(
-            model="gemini-pro",
-            api_key="AIzaSyA1O4tiqeeYeIzP37LHjrvssEj789bhJh4",  # tu clave de Google
+            model="gpt-3.5-turbo",
+            api_key=OPENAI_API_KEY,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_message}
