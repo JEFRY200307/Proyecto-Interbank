@@ -4,8 +4,11 @@ from rest_framework import serializers
 from .models import Usuario
 
 # apps/users/serializers.py
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Usuario
+
+User = get_user_model()
 
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:

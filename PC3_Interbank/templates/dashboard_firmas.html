@@ -1,25 +1,27 @@
 {% extends "dashboard_base.html" %}
 {% load static %}
-{% block title %}Gestión de Firmas{% endblock %}
+{% block title %}Firmas pendientes{% endblock %}
 
 {% block content %}
-<h3 id="titulo-firmas"></h3>
+<h2 id="titulo-firmas"></h2>
 <ul id="acciones-firmas"></ul>
 
-<!-- Lista de documentos para firmar -->
-<div id="listaFirmas"></div>
+<!-- Lista de firmas pendientes -->
+<div id="pendientesFirma"></div>
 
 <!-- Modal para firmar documento -->
-<div id="firmarModal" style="display:none;">
+<div id="firmarModal"
+    style="display:none; position:fixed; top:20%; left:30%; width:40vw; background:#fff; border:1px solid #ccc; z-index:1000; padding:2em;">
+    <h3>Firmar documento</h3>
+    <div id="firmaDocInfo"></div>
     <form id="firmarForm">
-        <input type="hidden" id="firma_doc_id">
-        <p id="firmaDocInfo"></p>
-        <label>Clave de firma:</label>
-        <input type="password" id="claveFirma" required>
+        <input type="hidden" id="firma_doc_id" name="firma_doc_id">
+        <label for="claveFirma">Clave de firma:</label>
+        <input type="password" id="claveFirma" name="claveFirma" required>
         <button type="submit">Firmar</button>
         <button type="button" id="cerrarFirmarModalBtn">Cancelar</button>
-        <div id="firmaMensaje"></div>
     </form>
+    <div id="firmaMensaje"></div>
 </div>
 {% endblock %}
 

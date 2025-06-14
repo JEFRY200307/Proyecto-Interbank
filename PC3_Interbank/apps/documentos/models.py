@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-import hashlib
-import json
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 User = get_user_model()
+
 
 class Documento(models.Model):
     empresa = models.ForeignKey('empresas.Empresa', on_delete=models.CASCADE)
@@ -24,6 +25,11 @@ class Documento(models.Model):
 
     def __str__(self):
         return self.nombre
+
+@receiver(post_delete, sender=Documento)
+def eliminar_archivo_documento(sender, instance, **kwargs):
+    if instance.archivo:
+        instance.archivo.delete(False)
 class Firma(models.Model):
     documento = models.ForeignKey('Documento', on_delete=models.CASCADE, related_name='firmas')
     firmante = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)

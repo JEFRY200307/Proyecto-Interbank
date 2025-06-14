@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from io import BytesIO
 from reportlab.pdfgen import canvas
+
+from apps.users.models import Usuario
 from .models import Documento
 from .serializers import DocumentoSerializer
 from rest_framework import status
@@ -147,6 +149,34 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         serializer.save(creador=self.request.user)
 
 # --- FIRMAS ---
+class AsignarFirmantesAPIView(generics.CreateAPIView):
+    serializer_class = FirmaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class PendientesFirmaAPIView(generics.ListAPIView):
+    serializer_class = FirmaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Firma.objects.filter(
+    documento__empresa=self.request.user.empresa,
+    firmante=self.request.user,
+    estado='pendiente'
+)
+
+class FirmarDocumentoAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            firma = Firma.objects.get(pk=pk, firmante=request.user)
+            firma.firmado = True
+            firma.fecha_firma = timezone.now()
+            firma.save()
+            return Response({'detail': 'Documento firmado correctamente.'})
+        except Firma.DoesNotExist:
+            return Response({'detail': 'No autorizado.'}, status=status.HTTP_403_FORBIDDEN)
+        
 class FirmaViewSet(viewsets.ModelViewSet):
     """
     Ver firmas asignadas al usuario o a documentos que creó.
