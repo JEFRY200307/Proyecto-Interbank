@@ -60,17 +60,19 @@ class UsuarioRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView)
 @permission_classes([IsAuthenticated])
 def cuenta_usuario(request):
     user = request.user
-    if request.method == 'GET':
-        return Response({
-            'nombre': user.nombre,
-            'correo': user.correo,
-            'rol': user.rol,
-        })
-    elif request.method == 'PUT':
-        data = request.data
-        user.nombre = data.get('nombre', user.nombre)
-        user.correo = data.get('correo', user.correo)
-        if data.get('password'):
-            user.set_password(data['password'])
-        user.save()
-        return Response({'detail': 'Cuenta actualizada correctamente.'})
+    data = {
+        "correo": user.correo,
+        "rol": user.rol,
+        "nombre": user.nombre,
+        "dni": user.dni,
+    }
+    # Si es empresa, agrega datos de empresa
+    if user.rol == "empresa" and user.empresa:
+        data["empresa"] = {
+            "razon_social": user.empresa.razon_social,
+            "ruc": user.empresa.ruc,
+            "representante": user.empresa.representante,
+            "direccion": user.empresa.direccion,
+            "telefono": user.empresa.telefono,
+        }
+    return Response(data)

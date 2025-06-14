@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('representante').value = data.empresa.representante || '';
                 document.getElementById('direccion').value = data.empresa.direccion || '';
                 document.getElementById('telefono').value = data.empresa.telefono || '';
-            } else if (rol === 'editor' || rol === 'lector') {
+            } else if ((rol === 'editor' || rol === 'lector')) {
                 document.getElementById('nombre').value = data.nombre || '';
                 document.getElementById('dni').value = data.dni || '';
             }
