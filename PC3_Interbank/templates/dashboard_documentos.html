@@ -1,0 +1,70 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+{% block title %}Gestión de Documentos{% endblock %}
+
+{% block content %}
+<h3 id="titulo-documentos"></h3>
+<ul id="acciones-documentos"></ul>
+
+<!-- Filtros y búsqueda -->
+<div class="filtros-documentos">
+    <input type="text" id="busquedaDocumento" placeholder="Buscar documento...">
+    <select id="tipoDocumentoFiltro">
+        <option value="">Todos los tipos</option>
+        <option value="contrato">Contrato</option>
+        <option value="acuerdo">Acuerdo</option>
+        <option value="otro">Otro</option>
+    </select>
+</div>
+
+<!-- Botón para crear/subir documento (solo para editor/empresa) -->
+<div id="botones-doc"></div>
+
+<!-- Lista de documentos -->
+<div id="listaDocumentos"></div>
+
+<!-- Modal para crear/editar documento -->
+<div id="documentoModal" style="display:none;">
+    <form id="documentoForm">
+        <input type="hidden" id="documento_id">
+        <label>Título</label>
+        <input type="text" id="titulo" required>
+        <label>Tipo</label>
+        <input type="text" id="tipo_documento" required>
+        <label>Contenido</label>
+        <textarea id="contenido"></textarea>
+        <label>Etiquetas</label>
+        <input type="text" id="etiquetas">
+        <button type="submit">Guardar</button>
+        <button type="button" id="cerrarDocumentoModalBtn">Cancelar</button>
+        <div id="documentoMensaje"></div>
+    </form>
+</div>
+
+<!-- Modal para subir archivo -->
+<form id="subirDocForm" style="display:none;">
+    <label>Archivo</label>
+    <input type="file" id="archivo" required>
+    <label>Título</label>
+    <input type="text" id="tituloArchivo" required>
+    <label>Tipo</label>
+    <input type="text" id="tipoArchivo" required>
+    <label>Etiquetas</label>
+    <input type="text" id="etiquetasArchivo">
+    <button type="submit">Subir</button>
+    <button type="button" id="cancelarSubirDocBtn">Cancelar</button>
+    <div id="docMensaje"></div>
+</form>
+
+<!-- Modal para PDF -->
+<div id="pdfModal" style="display:none;">
+    <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
+    <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
+    <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/documentos.js' %}"></script>
+{% endblock %}

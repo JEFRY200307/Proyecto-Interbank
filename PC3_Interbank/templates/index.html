@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>PC3 - Impulsa tu Empresa</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --verde-interbank: #00953b;
+            --verde-oscuro: #007a2f;
+            --gris-claro: #f5f5f5;
+            --blanco: #fff;
+            --gris-texto: #444;
+            --azul: #0074d9;
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: var(--gris-claro);
+            color: var(--gris-texto);
+        }
+        header {
+            background: linear-gradient(90deg, var(--verde-interbank), var(--verde-oscuro));
+            color: var(--blanco);
+            padding: 1.2rem 0 1rem 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            position: relative;
+        }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        nav {
+            position: absolute;
+            right: 2rem;
+            top: 1.5rem;
+        }
+        nav a {
+            color: var(--blanco);
+            text-decoration: none;
+            margin: 0 1rem;
+            font-weight: 500;
+            font-size: 1.05rem;
+            transition: color 0.2s;
+        }
+        nav a:hover {
+            color: #b6ffb6;
+        }
+        .banner {
+            background: #e8fbe9;
+            padding: 2.5rem 1rem 2rem 1rem;
+            text-align: center;
+            border-bottom: 2px solid var(--verde-interbank);
+        }
+        .banner h2 {
+            font-size: 2.1rem;
+            color: var(--verde-interbank);
+            margin-bottom: 0.7rem;
+        }
+        .banner p {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .banner .cta-btns {
+            margin-top: 1.2rem;
+        }
+        .btn {
+            display: inline-block;
+            background: var(--verde-interbank);
+            color: var(--blanco);
+            padding: 0.9rem 2.2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin: 0 0.7rem;
+            transition: background 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: var(--verde-oscuro);
+        }
+        /* Carrusel de frases */
+        .carrusel-frases {
+            max-width: 700px;
+            margin: 2rem auto 1.5rem auto;
+            background: #e8fbe9;
+            border-left: 6px solid var(--verde-interbank);
+            border-radius: 10px;
+            padding: 1.5rem 2rem;
+            min-height: 110px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,149,59,0.06);
+            text-align: center;
+        }
+        .frase {
+            font-size: 1.25rem;
+            color: var(--verde-interbank);
+            font-style: italic;
+            min-height: 40px;
+        }
+        .autor {
+            font-size: 1rem;
+            color: #555;
+            margin-top: 0.7rem;
+        }
+        .carrusel-controles {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .carrusel-btn {
+            background: var(--verde-interbank);
+            color: var(--blanco);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            opacity: 0.8;
+            pointer-events: all;
+            transition: background 0.2s;
+        }
+        .carrusel-btn:hover {
+            background: var(--verde-oscuro);
+        }
+        /* Carrusel de opciones */
+        .carrusel-opciones-container {
+            max-width: 900px;
+            margin: 2.5rem auto 0 auto;
+        }
+        .carrusel-opciones {
+            display: flex;
+            overflow: hidden;
+            position: relative;
+            min-height: 260px;
+        }
+        .opcion-carrusel {
+            flex: 0 0 100%;
+            max-width: 100%;
+            opacity: 0;
+            transition: opacity 0.5s;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 2.2rem 1.5rem 1.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .opcion-carrusel.activa {
+            opacity: 1;
+            position: relative;
+            z-index: 2;
+        }
+        .opcion-carrusel h3 {
+            margin: 0 0 0.7rem 0;
+            color: var(--verde-oscuro);
+            font-size: 1.3rem;
+        }
+        .opcion-carrusel p {
+            font-size: 1.05rem;
+            color: #333;
+            margin-bottom: 0.7rem;
+        }
+        .opcion-carrusel .icono {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .carrusel-opciones-controles {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.2rem;
+        }
+        .carrusel-opciones-btn {
+            background: var(--verde-interbank);
+            color: var(--blanco);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: background 0.2s;
+        }
+        .carrusel-opciones-btn:hover {
+            background: var(--verde-oscuro);
+        }
+        footer {
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+            margin: 2rem 0 1rem 0;
+        }
+        /* Nuevos estilos para las tarjetas de ayuda */
+        .tarjetas-ayuda {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+            padding: 0 1rem;
+        }
+        .tarjeta {
+            background: #fff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tarjeta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+        }
+        @media (max-width: 900px) {
+            nav {
+                position: static;
+                display: block;
+                margin-top: 1rem;
+            }
+        }
+        @media (max-width: 700px) {
+            .carrusel-frases {
+                padding: 1rem 0.5rem;
+            }
+            .carrusel-opciones-container {
+                padding: 0 0.5rem;
+            }
+            .opcion-carrusel {
+                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="logo">Interbank + Manya</span>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="#como-funciona">¿Cómo funciona?</a>
+            <a href="#contacto">Contacto</a>
+            <a href="/login/">Iniciar sesión</a>
+        </nav>
+    </header>
+    <div class="banner">
+        <h2>Crecemos juntos: gestión de documentos, firma digital y asesoría financiera</h2>
+        <p>La plataforma que impulsa el crecimiento de tu empresa con herramientas digitales, asesoría y comunidad.</p>
+        <div class="cta-btns">
+            <a href="/registro-empresa/" class="btn">Regístrate gratis</a>
+            <a href="/login/" class="btn" style="background:var(--azul);">Inicia sesión</a>
+        </div>
+    </div>
+    <!-- Carrusel de frases motivacionales -->
+    <div class="carrusel-frases">
+        <div class="frase" id="frase"></div>
+        <div class="autor" id="autor"></div>
+        <div class="carrusel-controles">
+            <button class="carrusel-btn" id="prevFrase">&#8592;</button>
+            <button class="carrusel-btn" id="nextFrase">&#8594;</button>
+        </div>
+    </div>
+    <main>
+        <h2 style="text-align:center;">¿Cómo podemos ayudarte a crecer?</h2>
+        <div class="tarjetas-ayuda">
+            <div class="tarjeta">
+                <div class="icono">💡</div>
+                <h3>Asesoría Personalizada</h3>
+                <p>Recibe orientación de expertos para potenciar tu negocio y tomar mejores decisiones.</p>
+            </div>
+            <div class="tarjeta">
+                <div class="icono">🌐</div>
+                <h3>Transformación Digital</h3>
+                <p>Te ayudamos a crear tu página web, tienda online o presencia en redes sociales.</p>
+            </div>
+            <div class="tarjeta">
+                <div class="icono">📈</div>
+                <h3>Marketing y Ventas</h3>
+                <p>Accede a estrategias de marketing digital y ventas para llegar a más clientes.</p>
+            </div>
+            <div class="tarjeta">
+                <div class="icono">📄</div>
+                <h3>Gestión de Documentos</h3>
+                <p>Genera, firma y exporta documentos legales y notariales en PDF de forma segura.</p>
+            </div>
+            <div class="tarjeta">
+                <div class="icono">💬</div>
+                <h3>Chat y Comunidad</h3>
+                <p>Resuelve tus dudas, comparte experiencias y recibe sugerencias de crecimiento.</p>
+            </div>
+        </div>
+    </main>
+    <footer>
+        &copy; 2025 PC3. Plataforma de Crecimiento Empresarial.
+    </footer>
+    <script>
+        // Carrusel de frases motivacionales
+        const frases = [
+            {
+                texto: "El éxito en los negocios requiere entrenamiento, disciplina y trabajo duro. Pero si no te asusta estos retos, las oportunidades hoy son tan grandes como siempre lo han sido.",
+                autor: "David Rockefeller"
+            },
+            {
+                texto: "No te preocupes por fracasar. Solo tienes que estar en lo cierto una sola vez.",
+                autor: "Drew Houston"
+            },
+            {
+                texto: "La mejor manera de predecir el futuro es crearlo.",
+                autor: "Peter Drucker"
+            },
+            {
+                texto: "El emprendimiento es vivir unos años de tu vida como nadie quiere, para disfrutar el resto de tu vida como nadie puede.",
+                autor: "Anónimo"
+            },
+            {
+                texto: "Las grandes cosas nunca vienen de zonas de confort.",
+                autor: "Neil Strauss"
+            }
+        ];
+        let fraseActual = 0;
+        let fraseInterval;
+
+        function mostrarFrase(idx) {
+            document.getElementById('frase').textContent = `“${frases[idx].texto}”`;
+            document.getElementById('autor').textContent = `— ${frases[idx].autor}`;
+        }
+        function avanzarFrase() {
+            fraseActual = (fraseActual + 1) % frases.length;
+            mostrarFrase(fraseActual);
+        }
+        function retrocederFrase() {
+            fraseActual = (fraseActual - 1 + frases.length) % frases.length;
+            mostrarFrase(fraseActual);
+        }
+        document.getElementById('prevFrase').onclick = function() {
+            retrocederFrase();
+            reiniciarFraseInterval();
+        };
+        document.getElementById('nextFrase').onclick = function() {
+            avanzarFrase();
+            reiniciarFraseInterval();
+        };
+        function iniciarFraseInterval() {
+            fraseInterval = setInterval(avanzarFrase, 5000);
+        }
+        function reiniciarFraseInterval() {
+            clearInterval(fraseInterval);
+            iniciarFraseInterval();
+        }
+        mostrarFrase(fraseActual);
+        iniciarFraseInterval();
+
+        // Carrusel de opciones de ayuda (ahora como tarjetas)
+        const opciones = document.querySelectorAll('.tarjeta');
+        let opcionActual = 0;
+        let opcionInterval;
+
+        function mostrarOpcion(idx) {
+            opciones.forEach((op, i) => {
+                op.classList.toggle('activa', i === idx);
+            });
+        }
+        function avanzarOpcion() {
+            opcionActual = (opcionActual + 1) % opciones.length;
+            mostrarOpcion(opcionActual);
+        }
+        function retrocederOpcion() {
+            opcionActual = (opcionActual - 1 + opciones.length) % opciones.length;
+            mostrarOpcion(opcionActual);
+        }
+        document.getElementById('prevOpcion').onclick = function() {
+            retrocederOpcion();
+            reiniciarOpcionInterval();
+        };
+        document.getElementById('nextOpcion').onclick = function() {
+            avanzarOpcion();
+            reiniciarOpcionInterval();
+        };
+        function iniciarOpcionInterval() {
+            opcionInterval = setInterval(avanzarOpcion, 5000);
+        }
+        function reiniciarOpcionInterval() {
+            clearInterval(opcionInterval);
+            iniciarOpcionInterval();
+        }
+        mostrarOpcion(opcionActual);
+        iniciarOpcionInterval();
+    </script>
+</body>
+</html>

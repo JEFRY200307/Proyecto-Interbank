@@ -1,0 +1,29 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+{% block title %}Gestión de Firmas{% endblock %}
+
+{% block content %}
+<h3 id="titulo-firmas"></h3>
+<ul id="acciones-firmas"></ul>
+
+<!-- Lista de documentos para firmar -->
+<div id="listaFirmas"></div>
+
+<!-- Modal para firmar documento -->
+<div id="firmarModal" style="display:none;">
+    <form id="firmarForm">
+        <input type="hidden" id="firma_doc_id">
+        <p id="firmaDocInfo"></p>
+        <label>Clave de firma:</label>
+        <input type="password" id="claveFirma" required>
+        <button type="submit">Firmar</button>
+        <button type="button" id="cerrarFirmarModalBtn">Cancelar</button>
+        <div id="firmaMensaje"></div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/firmas.js' %}"></script>
+{% endblock %}

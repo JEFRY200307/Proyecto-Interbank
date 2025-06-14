@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Empresas registradas</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+        th, td { border: 1px solid #ccc; padding: 0.7rem; text-align: left; }
+        th { background: #e8fbe9; }
+        .btn-eliminar {
+            background: #b30000; color: #fff; border: none; padding: 0.5rem 1.2rem;
+            border-radius: 6px; cursor: pointer; font-weight: 600;
+        }
+        .btn-eliminar:hover { background: #ff4444; }
+    </style>
+</head>
+<body>
+    <h2>Empresas registradas</h2>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Razón Social</th>
+            <th>RUC</th>
+            <th>Correo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        {% for empresa in empresas %}
+        <tr>
+            <td>{{ empresa.id }}</td>
+            <td>{{ empresa.razon_social }}</td>
+            <td>{{ empresa.ruc }}</td>
+            <td>{{ empresa.correo }}</td>
+            <td>{{ empresa.estado }}</td>
+            <td>
+                <form method="post" action="{% url 'eliminar_empresa' empresa.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-eliminar" onclick="return confirm('¿Eliminar esta empresa?');">Eliminar</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

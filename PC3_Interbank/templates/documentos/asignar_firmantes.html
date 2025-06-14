@@ -1,0 +1,20 @@
+<!-- templates/documentos/asignar_firmantes.html -->
+{% extends "dashboard_documentos.html" %}
+{% load static %}
+{% block content %}
+<h3>Asignar firmantes para: {{ documento.nombre }}</h3>
+<form method="post" class="form-asignar-firmantes">
+    {% csrf_token %}
+    <label>Selecciona firmantes:</label><br>
+    <div class="firmantes-lista">
+        {% for usuario in usuarios %}
+        <label>
+            <input type="checkbox" name="firmantes" value="{{ usuario.id }}">
+            {{ usuario.username }}
+        </label><br>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn">Asignar</button>
+    <a href="{% url 'gestionar_firmas' documento.id %}" class="btn btn-cancel">Volver</a>
+</form>
+{% endblock %}

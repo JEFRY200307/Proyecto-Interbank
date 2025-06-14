@@ -1,0 +1,40 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+{% block content %}
+<h3>Gestión de Perfil y Cuenta</h3>
+<div class="perfil-tabs" id="perfil-tabs"></div>
+<div class="perfil-content">
+    {% block perfil_content %}
+    <form id="perfilForm">
+        <!-- Campos para empresa -->
+        <div id="empresaFields" style="display:none;">
+            <label>Razón Social</label>
+            <input type="text" id="razon_social" name="razon_social">
+            <label>RUC</label>
+            <input type="text" id="ruc" name="ruc">
+            <label>Representante</label>
+            <input type="text" id="representante" name="representante">
+            <label>Dirección</label>
+            <input type="text" id="direccion" name="direccion">
+            <label>Teléfono</label>
+            <input type="text" id="telefono" name="telefono">
+        </div>
+        <!-- Campos para editor/lector -->
+        <div id="usuarioFields" style="display:none;">
+            <label>Nombre</label>
+            <input type="text" id="nombre" name="nombre">
+            <label>DNI</label>
+            <input type="text" id="dni" name="dni">
+        </div>
+        <label>Correo</label>
+        <input type="email" id="correo" name="correo">
+        <button type="submit">Guardar cambios</button>
+        <div id="perfilMensaje"></div>
+    </form>
+    {% endblock %}
+</div>
+{% endblock %}
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/perfil.js' %}"></script>
+{% endblock %}
