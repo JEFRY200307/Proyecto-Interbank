@@ -10,12 +10,21 @@ class EmpresaRegistroSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa
         # Solo los campos que el usuario debe ingresar
-        fields = ['ruc', 'correo', 'representante', 'password']
+        fields = [
+            'ruc', 'correo', 'representante', 'password',
+            'razon_social', 'direccion', 'departamento', 'provincia', 'distrito', 'telefono'
+        ]
         extra_kwargs = {
             'correo': {'required': True},
             'ruc': {'required': True},
             'representante': {'required': True},
             'password': {'write_only': True, 'required': True, 'min_length': 8},
+            'razon_social': {'required': False},
+            'direccion': {'required': False},
+            'departamento': {'required': False},
+            'provincia': {'required': False},
+            'distrito': {'required': False},
+            'telefono': {'required': False},
         }
 
     def create(self, validated_data):
@@ -24,3 +33,13 @@ class EmpresaRegistroSerializer(serializers.ModelSerializer):
         empresa.password = make_password(password)
         empresa.save()
         return empresa
+    
+
+class EmpresaPerfilSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empresa
+        fields = [
+            'razon_social', 'ruc', 'representante', 'correo', 'direccion',
+            'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro'
+        ]
+        read_only_fields = fields

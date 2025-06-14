@@ -6,7 +6,7 @@
   <h2>Seleccione un Chatbot</h2>
   <div class="chat-buttons">
     {% for category in categories %}
-      <button class="chat-select-btn" onclick="seleccionarCategoria({{ category.id }}, '{{ category.name }}');">
+      <button class="chat-select-btn" onclick="seleccionarCategoria({{ category.id }}, '{{ category.name|escapejs }}')">
         {{ category.name }}
       </button>
     {% endfor %}
