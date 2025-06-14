@@ -1,31 +1,21 @@
 # apps/chat/models.py
 
 from django.db import models
-from apps.empresas.models import Empresa
-from apps.users.models import Usuario
+from django.contrib.auth import get_user_model
 
-class FAQ(models.Model):
-    pregunta = models.TextField()
-    respuesta = models.TextField()
-    etiqueta  = models.CharField(max_length=50, blank=True, null=True)
+User = get_user_model()
 
-    def __str__(self):
-        return f"FAQ #{self.id} – {self.etiqueta or 'sin etiqueta'}"
-
-
-class MensajeChat(models.Model):
-    empresa   = models.ForeignKey(
-        Empresa,
-        on_delete=models.CASCADE,
-        related_name='mensajes'
-    )
-    emisor    = models.ForeignKey(
-        Usuario,
-        on_delete=models.CASCADE,
-        related_name='mensajes_enviados'
-    )
-    contenido = models.TextField()
-    fechaHora = models.DateTimeField(auto_now_add=True)
+class ChatCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
-        return f"Mensaje #{self.id} de {self.emisor.nombre} a {self.empresa.razon_social}"
+        return self.name
+
+class ChatMessage(models.Model):
+    category = models.ForeignKey(ChatCategory, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.category}: {self.message[:20]}"

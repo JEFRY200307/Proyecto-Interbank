@@ -1,0 +1,57 @@
+{% extends "dashboard_base.html" %}
+
+{% block content %}
+  <h2>Categorías de Chat</h2>
+  <ul>
+    {% for category in categories %}
+      <li>
+        <a href="#" onclick="seleccionarCategoria({{ category.id }}, '{{ category.name }}'); return false;">{{ category.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div id="chat-section" style="display:none;">
+    <h3 id="chat-category-title"></h3>
+    <div id="chat-log" style="border:1px solid #ccc;min-height:200px;padding:1rem;margin-bottom:1rem;"></div>
+    <input type="text" id="user-message" placeholder="Escribe tu mensaje...">
+    <button onclick="enviarMensaje()">Enviar</button>
+  </div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+  <script>
+    let categoriaSeleccionada = null;
+    let categoriaNombre = "";
+
+    function seleccionarCategoria(id, nombre) {
+      categoriaSeleccionada = id;
+      categoriaNombre = nombre;
+      document.getElementById('chat-section').style.display = '';
+      document.getElementById('chat-category-title').textContent = nombre;
+      document.getElementById('chat-log').innerHTML = '';
+    }
+
+    function enviarMensaje() {
+      const mensaje = document.getElementById('user-message').value;
+      if (!mensaje || !categoriaSeleccionada) return;
+      const token = localStorage.getItem('access_token');
+      fetch(`/users/dashboard/chat/api/chatbot/${categoriaSeleccionada}/`, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ message: mensaje })
+      })
+      .then(response => response.json())
+      .then(data => {
+          const log = document.getElementById('chat-log');
+          log.innerHTML += `<div><b>Tú:</b> ${mensaje}</div>`;
+          log.innerHTML += `<div><b>Bot:</b> ${data.response}</div>`;
+          document.getElementById('user-message').value = '';
+      })
+      .catch(error => console.error("Error en el chatbot:", error));
+    }
+  </script>
+{% endblock %}

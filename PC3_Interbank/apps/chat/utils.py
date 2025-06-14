@@ -1,6 +1,8 @@
 from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
 from google.adk.runners import Runner
+from django.urls import path
+from . import views
 
 agent = Agent(
     name="agente_empresa",

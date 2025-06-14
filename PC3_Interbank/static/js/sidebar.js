@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (rol === 'empresa') {
             menu += `<li style="list-style:none;"><h3>Mi empresa</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil y Cuenta</a></li>
+                <li><a href="/users/dashboard/usuarios/">Usuarios</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
                 <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
