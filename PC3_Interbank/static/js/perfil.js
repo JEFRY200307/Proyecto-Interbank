@@ -26,6 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('ruc').value = data.empresa.ruc || '';
                 document.getElementById('representante').value = data.empresa.representante || '';
                 document.getElementById('direccion').value = data.empresa.direccion || '';
+                document.getElementById('departamento').value = data.empresa.departamento || '';
+                document.getElementById('provincia').value = data.empresa.provincia || '';
+                document.getElementById('distrito').value = data.empresa.distrito || '';
                 document.getElementById('telefono').value = data.empresa.telefono || '';
             } else if (rol === 'editor' || rol === 'lector') {
                 document.getElementById('nombre').value = data.nombre || '';
@@ -48,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 ruc: document.getElementById('ruc').value,
                 representante: document.getElementById('representante').value,
                 direccion: document.getElementById('direccion').value,
+                departamento: document.getElementById('departamento').value,
+                provincia: document.getElementById('provincia').value,
+                distrito: document.getElementById('distrito').value,
                 telefono: document.getElementById('telefono').value
             };
         } else if (rol === 'editor' || rol === 'lector') {

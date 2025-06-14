@@ -97,9 +97,6 @@
         <h2>Registro de Empresa</h2>
         <div id="mensaje" class="mensaje"></div>
         <form id="registroForm" autocomplete="off">
-            <label for="razon_social">Razón Social *</label>
-            <input type="text" id="razon_social" required maxlength="100">
-
             <label for="ruc">RUC *</label>
             <input type="text" id="ruc" required maxlength="11" pattern="\d{11}">
 
@@ -115,12 +112,6 @@
             <label for="confirm_password">Confirmar contraseña *</label>
             <input type="password" id="confirm_password" required minlength="8">
 
-            <label for="direccion">Dirección</label>
-            <input type="text" id="direccion" maxlength="150">
-
-            <label for="telefono">Teléfono</label>
-            <input type="text" id="telefono" maxlength="15">
-
             <button type="submit" class="btn">Registrar empresa</button>
         </form>
         <div class="enlace-login">
@@ -134,9 +125,10 @@
             mensaje.className = 'mensaje';
             mensaje.style.display = 'none';
 
-            // Validaciones frontend (ya las tienes)
+            // Validaciones frontend
             const ruc = document.getElementById('ruc').value.trim();
             const correo = document.getElementById('correo').value.trim();
+            const representante = document.getElementById('representante').value.trim();
             const password = document.getElementById('password').value;
             const confirm_password = document.getElementById('confirm_password').value;
 
@@ -164,15 +156,18 @@
                 mensaje.style.display = 'block';
                 return;
             }
+            if (!representante) {
+                mensaje.textContent = 'El representante es obligatorio.';
+                mensaje.classList.add('error');
+                mensaje.style.display = 'block';
+                return;
+            }
 
             const data = {
-                razon_social: document.getElementById('razon_social').value,
-                ruc: document.getElementById('ruc').value,
-                representante: document.getElementById('representante').value,
-                correo: document.getElementById('correo').value,
-                password: document.getElementById('password').value,
-                direccion: document.getElementById('direccion').value,
-                telefono: document.getElementById('telefono').value
+                ruc: ruc,
+                representante: representante,
+                correo: correo,
+                password: password
             };
 
             try {
