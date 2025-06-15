@@ -3,8 +3,9 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import Conversacion, ChatCategory, ChatMessage
+from .models import ChatCategory, ChatMessage
 from django.utils import timezone
+import openai
 
 # Prompts personalizados por categoría
 CATEGORY_PROMPTS = {
@@ -14,65 +15,61 @@ CATEGORY_PROMPTS = {
     "Innovación y Desarrollo de Productos": "Eres un consultor de innovación y desarrollo de productos para pymes. Acompaña al usuario en la ideación de nuevos productos o servicios, validación de mercado (encuestas, pruebas de concepto), metodologías ágiles (Design Thinking, Lean Startup) y gestión de proyectos. Ofrece plantillas de roadmap, ejemplos de prototipos mínimos viables (MVP) y métricas para medir el éxito de la innovación",
 }
 
+# Configuración de la API de OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
+
 
 class ChatBotAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, category_id):
-        user_message = request.data.get("message", "")
-        category = ChatCategory.objects.get(id=category_id)
-        system_prompt = CATEGORY_PROMPTS.get(category.name)
-        if not system_prompt:
-            return Response({"error": "Categoría no soportada."}, status=400)
-        if not OPENAI_API_KEY:
-            return Response({"error": "API key de OpenAI no configurada."}, status=500)
-        # Usa OpenAI GPT-3.5 Turbo y tu API key de OpenAI
-        response = completion(
-            model="gpt-4",
-            api_key=OPENAI_API_KEY,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_message}
-            ]
-        )
-        respuesta = response['choices'][0]['message']['content']
-        return Response({"response": respuesta})
+        try:
+            # Obtener el mensaje del usuario
+            user_message = request.data.get("message", "")
+            if not user_message:
+                return Response({"error": "El mensaje no puede estar vacío."}, status=400)
 
-    def post(self, request, chatbot_id):
-        mensaje_usuario = request.data.get('mensaje')
-        respuesta_chatbot = "Aquí va la respuesta del chatbot"  # Genera la respuesta del chatbot
+            # Obtener la categoría del chatbot
+            category = ChatCategory.objects.get(id=category_id)
+            system_prompt = CATEGORY_PROMPTS.get(category.name)
+            if not system_prompt:
+                return Response({"error": "Categoría no soportada."}, status=400)
 
-        # Guarda la conversación en la base de datos
-        guardar_conversacion(
-            user=request.user,
-            category=ChatCategory.objects.get(id=chatbot_id),
-            mensaje=mensaje_usuario,
-            respuesta=respuesta_chatbot
-        )
+            # Verificar la API key de OpenAI
+            if not OPENAI_API_KEY:
+                return Response({"error": "API key de OpenAI no configurada."}, status=500)
 
-        return Response({"respuesta": respuesta_chatbot})
+            # Llamar a la API de OpenAI
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ]
+            )
+            respuesta_chatbot = response['choices'][0]['message']['content']
 
-def chat_dashboard(request):
-    categories = ChatCategory.objects.all()
-    return render(request, 'dashboard_chat.html', {'categories': categories})
+            # Guardar la conversación en la base de datos
+            guardar_conversacion(
+                user=request.user,
+                category=category,
+                mensaje=user_message,
+                respuesta=respuesta_chatbot
+            )
 
-class ConversacionesUsuarioAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+            return Response({"response": respuesta_chatbot})
 
-    def get(self, request, chatbot_id):
-        conversaciones = Conversacion.objects.filter(usuario=request.user, chatbot=chatbot_id).order_by('-fecha_creacion')
-        data = [
-            {
-                "mensaje_usuario": conv.mensaje_usuario,
-                "respuesta_chatbot": conv.respuesta_chatbot,
-                "fecha_creacion": conv.fecha_creacion
-            }
-            for conv in conversaciones
-        ]
-        return Response(data)
+        except ChatCategory.DoesNotExist:
+            return Response({"error": "Categoría no encontrada."}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
+
 
 def guardar_conversacion(user, category, mensaje, respuesta):
+    """
+    Guarda el mensaje del usuario y la respuesta del chatbot en la base de datos.
+    """
     ChatMessage.objects.create(
         user=user,
         category=category,
@@ -85,4 +82,38 @@ def guardar_conversacion(user, category, mensaje, respuesta):
         message=respuesta,
         timestamp=timezone.now()
     )
+
+
+def chat_dashboard(request):
+    """
+    Renderiza el dashboard del chat con las categorías disponibles.
+    """
+    categories = ChatCategory.objects.all()
+    return render(request, 'dashboard_chat.html', {'categories': categories})
+
+
+class ConversacionesUsuarioAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, category_id):
+        """
+        Devuelve las conversaciones del usuario autenticado para una categoría específica.
+        """
+        try:
+            conversaciones = ChatMessage.objects.filter(
+                user=request.user,
+                category_id=category_id
+            ).order_by('-timestamp')
+
+            data = [
+                {
+                    "message": conv.message,
+                    "timestamp": conv.timestamp
+                }
+                for conv in conversaciones
+            ]
+            return Response(data)
+
+        except ChatCategory.DoesNotExist:
+            return Response({"error": "Categoría no encontrada."}, status=404)
 
