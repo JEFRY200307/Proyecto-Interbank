@@ -1,408 +1,374 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>PC3 - Impulsa tu Empresa</title>
+    <title>PC3 – Impulsa tu Empresa</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-        :root {
-            --verde-interbank: #00953b;
-            --verde-oscuro: #007a2f;
-            --gris-claro: #f5f5f5;
-            --blanco: #fff;
-            --gris-texto: #444;
-            --azul: #0074d9;
-        }
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: var(--gris-claro);
-            color: var(--gris-texto);
-        }
         header {
-            background: linear-gradient(90deg, var(--verde-interbank), var(--verde-oscuro));
-            color: var(--blanco);
-            padding: 1.2rem 0 1rem 0;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-            position: relative;
+            background: #05be50;
+            color: #fff;
         }
-        .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            display: inline-block;
-            vertical-align: middle;
+        .navbar {
+            background: #fff !important;
         }
-        nav {
-            position: absolute;
-            right: 2rem;
-            top: 1.5rem;
+        .navbar .navbar-brand,
+        .navbar .nav-link,
+        .navbar .btn-outline-light {
+            color: #00953b !important;
         }
-        nav a {
-            color: var(--blanco);
-            text-decoration: none;
-            margin: 0 1rem;
-            font-weight: 500;
-            font-size: 1.05rem;
-            transition: color 0.2s;
+        .navbar .nav-link.active,
+        .navbar .nav-link:hover,
+        .navbar .btn-outline-light:hover {
+            background: #00953b !important;
+            color: #fff !important;
         }
-        nav a:hover {
-            color: #b6ffb6;
-        }
-        .banner {
-            background: #e8fbe9;
-            padding: 2.5rem 1rem 2rem 1rem;
-            text-align: center;
-            border-bottom: 2px solid var(--verde-interbank);
-        }
-        .banner h2 {
-            font-size: 2.1rem;
-            color: var(--verde-interbank);
-            margin-bottom: 0.7rem;
-        }
-        .banner p {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
-        .banner .cta-btns {
-            margin-top: 1.2rem;
-        }
-        .btn {
-            display: inline-block;
-            background: var(--verde-interbank);
-            color: var(--blanco);
-            padding: 0.9rem 2.2rem;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            margin: 0 0.7rem;
-            transition: background 0.2s;
+        .btn-success {
+            background-color: #00a859;
             border: none;
-            cursor: pointer;
         }
-        .btn:hover {
-            background: var(--verde-oscuro);
+        .btn-success:hover {
+            background-color: #007b5e;
         }
-        /* Carrusel de frases */
-        .carrusel-frases {
-            max-width: 700px;
-            margin: 2rem auto 1.5rem auto;
-            background: #e8fbe9;
-            border-left: 6px solid var(--verde-interbank);
-            border-radius: 10px;
-            padding: 1.5rem 2rem;
-            min-height: 110px;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0,149,59,0.06);
-            text-align: center;
+        .card h5 {
+            color: #00a859;
         }
-        .frase {
-            font-size: 1.25rem;
-            color: var(--verde-interbank);
+        footer {
+            background-color: #f8f9fa;
+            border-top: 2px solid #00a859;
+        }
+        blockquote {
             font-style: italic;
-            min-height: 40px;
-        }
-        .autor {
-            font-size: 1rem;
             color: #555;
-            margin-top: 0.7rem;
         }
-        .carrusel-controles {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            transform: translateY(-50%);
-            pointer-events: none;
+        .tarjetas-ayuda {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
         }
-        .carrusel-btn {
-            background: var(--verde-interbank);
-            color: var(--blanco);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            opacity: 0.8;
-            pointer-events: all;
-            transition: background 0.2s;
+        .tarjeta {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s;
         }
-        .carrusel-btn:hover {
-            background: var(--verde-oscuro);
+        .tarjeta:hover {
+            transform: translateY(-5px);
         }
-        /* Carrusel de opciones */
-        .carrusel-opciones-container {
-            max-width: 900px;
-            margin: 2.5rem auto 0 auto;
-        }
-        .carrusel-opciones {
-            display: flex;
-            overflow: hidden;
-            position: relative;
-            min-height: 260px;
-        }
-        .opcion-carrusel {
-            flex: 0 0 100%;
-            max-width: 100%;
-            opacity: 0;
-            transition: opacity 0.5s;
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 2.2rem 1.5rem 1.5rem 1.5rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .opcion-carrusel.activa {
-            opacity: 1;
-            position: relative;
-            z-index: 2;
-        }
-        .opcion-carrusel h3 {
-            margin: 0 0 0.7rem 0;
-            color: var(--verde-oscuro);
-            font-size: 1.3rem;
-        }
-        .opcion-carrusel p {
-            font-size: 1.05rem;
-            color: #333;
-            margin-bottom: 0.7rem;
-        }
-        .opcion-carrusel .icono {
+        .icono {
             font-size: 2.5rem;
             margin-bottom: 1rem;
         }
-        .carrusel-opciones-controles {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 1.2rem;
-        }
-        .carrusel-opciones-btn {
-            background: var(--verde-interbank);
-            color: var(--blanco);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            font-size: 1.3rem;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: background 0.2s;
-        }
-        .carrusel-opciones-btn:hover {
-            background: var(--verde-oscuro);
-        }
-        footer {
-            text-align: center;
-            color: #888;
-            font-size: 0.95rem;
-            margin: 2rem 0 1rem 0;
-        }
-        /* Nuevos estilos para las tarjetas de ayuda */
-        .tarjetas-ayuda {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-            padding: 0 1rem;
-        }
-        .tarjeta {
+        /* Nuestro equipo */
+        .equipo-section {
             background: #fff;
+            padding: 2.5rem 1rem;
+            margin: 2rem 0;
+        }
+        .equipo-section h2 {
+            color: #00953b;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .equipo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .miembro {
+            background: #f8f9fa;
             border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
         }
-        .tarjeta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+        .miembro img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 3px solid #00953b;
         }
-        @media (max-width: 900px) {
-            nav {
-                position: static;
-                display: block;
-                margin-top: 1rem;
-            }
+        .miembro h4 {
+            margin: 0.5rem 0 0.2rem 0;
+            color: #007b5e;
+        }
+        .miembro p {
+            margin: 0;
+            font-size: 1rem;
+            color: #555;
         }
         @media (max-width: 700px) {
-            .carrusel-frases {
-                padding: 1rem 0.5rem;
+            .tarjetas-ayuda {
+                display: flex;
+                overflow: hidden;
+                position: relative;
+                min-height: 320px;
             }
-            .carrusel-opciones-container {
-                padding: 0 0.5rem;
+            .tarjeta {
+                min-width: 90%;
+                max-width: 90%;
+                margin: 0 auto;
+                opacity: 0;
+                position: absolute;
+                left: 0; right: 0; top: 0; bottom: 0;
+                transition: opacity 0.5s;
+                z-index: 1;
             }
-            .opcion-carrusel {
-                padding: 1.2rem 0.5rem 1rem 0.5rem;
+            .tarjeta.activa {
+                opacity: 1;
+                position: relative;
+                z-index: 2;
             }
+        }
+        @media (max-width: 767px) {
+            header .container {
+                flex-direction: column !important;
+                text-align: center !important;
+            }
+            header .container > div {
+                justify-content: center !important;
+                align-items: center !important;
+            }
+            header img {
+                margin-top: 2rem;
+                max-width: 70vw;
+                max-height: 180px;
+            }
+        }
+        .btn-azul {
+            background: #0036A6;
+            color: #fff;
+            border: none;
+        }
+        .btn-azul:hover, .btn-azul:focus {
+            background: #0050e0; /* Un azul más claro relacionado */
+            color: #fff;
+        }
+        .btn-azul-secundario {
+            background: #0050e0;
+            color: #fff;
+            border: none;
+        }
+        .btn-azul-secundario:hover, .btn-azul-secundario:focus {
+            background: #0036A6;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <header>
-        <span class="logo">Interbank + Manya</span>
-        <nav>
-            <a href="/">Inicio</a>
-            <a href="#como-funciona">¿Cómo funciona?</a>
-            <a href="#contacto">Contacto</a>
-            <a href="/login/">Iniciar sesión</a>
-        </nav>
-    </header>
-    <div class="banner">
-        <h2>Crecemos juntos: gestión de documentos, firma digital y asesoría financiera</h2>
-        <p>La plataforma que impulsa el crecimiento de tu empresa con herramientas digitales, asesoría y comunidad.</p>
-        <div class="cta-btns">
-            <a href="/registro-empresa/" class="btn">Regístrate gratis</a>
-            <a href="/login/" class="btn" style="background:var(--azul);">Inicia sesión</a>
-        </div>
+  <!-- Navbar Bootstrap -->
+  <nav class="navbar navbar-expand-lg shadow">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">Tu Marido Interbank</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#como-funciona">¿Cómo funciona?</a></li>
+          <li class="nav-item"><a class="nav-link" href="#equipo">Nuestro equipo</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
+          <li class="nav-item"><a class="btn btn-outline-light ms-lg-3" href="/login/">Iniciar sesión</a></li>
+        </ul>
+      </div>
     </div>
-    <!-- Carrusel de frases motivacionales -->
-    <div class="carrusel-frases">
-        <div class="frase" id="frase"></div>
-        <div class="autor" id="autor"></div>
-        <div class="carrusel-controles">
-            <button class="carrusel-btn" id="prevFrase">&#8592;</button>
-            <button class="carrusel-btn" id="nextFrase">&#8594;</button>
+  </nav>
+
+  <!-- Header -->
+  <header class="text-center py-5 border-bottom border-success">
+    <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between" style="min-height: 320px;">
+      <div class="text-start" style="flex:1;">
+        <h1 class="display-5">Crecemos juntos</h1>
+        <p class="lead">Gestión de documentos, firma digital y asesoría financiera para tu empresa</p>
+        <div class="mt-4">
+          <a href="/registro-empresa/" class="btn btn-azul btn-lg me-2">Regístrate gratis</a>
+          <a href="/login/" class="btn btn-azul-secundario btn-lg">Inicia sesión</a>
         </div>
+      </div>
+      <div class="d-none d-md-block" style="flex:1; min-height: 250px; display: flex; align-items: center; justify-content: flex-end;">
+        <img src="{% static 'img/tu-imagen.png' %}" alt="Imagen decorativa" style="max-width: 90%; max-height: 260px; object-fit: contain;">
+      </div>
     </div>
-    <main>
-        <h2 style="text-align:center;">¿Cómo podemos ayudarte a crecer?</h2>
-        <div class="tarjetas-ayuda">
-            <div class="tarjeta">
-                <div class="icono">💡</div>
-                <h3>Asesoría Personalizada</h3>
-                <p>Recibe orientación de expertos para potenciar tu negocio y tomar mejores decisiones.</p>
-            </div>
-            <div class="tarjeta">
-                <div class="icono">🌐</div>
-                <h3>Transformación Digital</h3>
-                <p>Te ayudamos a crear tu página web, tienda online o presencia en redes sociales.</p>
-            </div>
-            <div class="tarjeta">
-                <div class="icono">📈</div>
-                <h3>Marketing y Ventas</h3>
-                <p>Accede a estrategias de marketing digital y ventas para llegar a más clientes.</p>
-            </div>
-            <div class="tarjeta">
-                <div class="icono">📄</div>
-                <h3>Gestión de Documentos</h3>
-                <p>Genera, firma y exporta documentos legales y notariales en PDF de forma segura.</p>
-            </div>
-            <div class="tarjeta">
-                <div class="icono">💬</div>
-                <h3>Chat y Comunidad</h3>
-                <p>Resuelve tus dudas, comparte experiencias y recibe sugerencias de crecimiento.</p>
-            </div>
+  </header>
+
+  <!-- Carrusel de frases motivacionales -->
+  <section class="py-5 bg-white">
+    <div class="container text-center">
+      <div id="fraseCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          {% for f in frases %}
+          <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            <blockquote class="blockquote">
+              <p class="fs-4 text-success">“{{ f.texto }}”</p>
+              <footer class="blockquote-footer">{{ f.autor }}</footer>
+            </blockquote>
+          </div>
+          {% endfor %}
         </div>
-    </main>
-    <footer>
-        &copy; 2025 PC3. Plataforma de Crecimiento Empresarial.
-    </footer>
-    <script>
-        // Carrusel de frases motivacionales
-        const frases = [
-            {
-                texto: "El éxito en los negocios requiere entrenamiento, disciplina y trabajo duro. Pero si no te asusta estos retos, las oportunidades hoy son tan grandes como siempre lo han sido.",
-                autor: "David Rockefeller"
-            },
-            {
-                texto: "No te preocupes por fracasar. Solo tienes que estar en lo cierto una sola vez.",
-                autor: "Drew Houston"
-            },
-            {
-                texto: "La mejor manera de predecir el futuro es crearlo.",
-                autor: "Peter Drucker"
-            },
-            {
-                texto: "El emprendimiento es vivir unos años de tu vida como nadie quiere, para disfrutar el resto de tu vida como nadie puede.",
-                autor: "Anónimo"
-            },
-            {
-                texto: "Las grandes cosas nunca vienen de zonas de confort.",
-                autor: "Neil Strauss"
-            }
-        ];
-        let fraseActual = 0;
-        let fraseInterval;
+        <button class="carousel-control-prev" type="button" data-bs-target="#fraseCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#fraseCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    </div>
+  </section>
 
-        function mostrarFrase(idx) {
-            document.getElementById('frase').textContent = `“${frases[idx].texto}”`;
-            document.getElementById('autor').textContent = `— ${frases[idx].autor}`;
-        }
-        function avanzarFrase() {
-            fraseActual = (fraseActual + 1) % frases.length;
-            mostrarFrase(fraseActual);
-        }
-        function retrocederFrase() {
-            fraseActual = (fraseActual - 1 + frases.length) % frases.length;
-            mostrarFrase(fraseActual);
-        }
-        document.getElementById('prevFrase').onclick = function() {
-            retrocederFrase();
-            reiniciarFraseInterval();
-        };
-        document.getElementById('nextFrase').onclick = function() {
-            avanzarFrase();
-            reiniciarFraseInterval();
-        };
-        function iniciarFraseInterval() {
-            fraseInterval = setInterval(avanzarFrase, 5000);
-        }
-        function reiniciarFraseInterval() {
-            clearInterval(fraseInterval);
-            iniciarFraseInterval();
-        }
-        mostrarFrase(fraseActual);
-        iniciarFraseInterval();
+  <!-- Tarjetas de ayuda -->
+  <section id="como-funciona" class="py-5 bg-light">
+    <div class="container">
+      <h2 class="text-center text-success mb-4">¿Cómo podemos ayudarte a crecer?</h2>
+      <div class="tarjetas-ayuda">
+        <div class="tarjeta">
+          <div class="icono">💡</div>
+          <h3>Asesoría Personalizada</h3>
+          <p>Recibe orientación de expertos para potenciar tu negocio y tomar mejores decisiones.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">🌐</div>
+          <h3>Transformación Digital</h3>
+          <p>Te ayudamos a crear tu página web, tienda online o presencia en redes sociales.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">📈</div>
+          <h3>Marketing y Ventas</h3>
+          <p>Accede a estrategias de marketing digital y ventas para llegar a más clientes.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">📄</div>
+          <h3>Gestión de Documentos</h3>
+          <p>Genera, firma y exporta documentos legales y notariales en PDF de forma segura.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">💬</div>
+          <h3>Chat y Comunidad</h3>
+          <p>Resuelve tus dudas, comparte experiencias y recibe sugerencias de crecimiento.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">🔔</div>
+          <h3>Alertas Inteligentes</h3>
+          <p>Recibe notificaciones sobre vencimientos, oportunidades y alertas financieras.</p>
+        </div>
+        <div class="tarjeta">
+          <div class="icono">📊</div>
+          <h3>Reportes y Analítica</h3>
+          <p>Visualiza KPIs, exporta reportes y toma decisiones basadas en datos.</p>
+        </div>
+      </div>
 
-        // Carrusel de opciones de ayuda (ahora como tarjetas)
-        const opciones = document.querySelectorAll('.tarjeta');
-        let opcionActual = 0;
-        let opcionInterval;
+      <div class="carrusel-opciones-controles" id="controlesTarjetas" style="display:none;">
+        <button class="carrusel-opciones-btn" id="prevOpcion">&#8592;</button>
+        <button class="carrusel-opciones-btn" id="nextOpcion">&#8594;</button>
+      </div>
+    </div>
+  </section>
 
-        function mostrarOpcion(idx) {
-            opciones.forEach((op, i) => {
-                op.classList.toggle('activa', i === idx);
-            });
-        }
-        function avanzarOpcion() {
-            opcionActual = (opcionActual + 1) % opciones.length;
-            mostrarOpcion(opcionActual);
-        }
-        function retrocederOpcion() {
-            opcionActual = (opcionActual - 1 + opciones.length) % opciones.length;
-            mostrarOpcion(opcionActual);
-        }
-        document.getElementById('prevOpcion').onclick = function() {
-            retrocederOpcion();
-            reiniciarOpcionInterval();
-        };
-        document.getElementById('nextOpcion').onclick = function() {
-            avanzarOpcion();
-            reiniciarOpcionInterval();
-        };
-        function iniciarOpcionInterval() {
-            opcionInterval = setInterval(avanzarOpcion, 5000);
-        }
-        function reiniciarOpcionInterval() {
-            clearInterval(opcionInterval);
-            iniciarOpcionInterval();
-        }
-        mostrarOpcion(opcionActual);
-        iniciarOpcionInterval();
-    </script>
+  <!-- Nuestro equipo -->
+  <section class="equipo-section" id="equipo">
+    <h2>Nuestro equipo</h2>
+    <div class="equipo-grid">
+      <div class="miembro">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Juan Pérez">
+        <h4>Juan Pérez</h4>
+        <p>CEO & Co-Fundador</p>
+      </div>
+      <div class="miembro">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="María López">
+        <h4>María López</h4>
+        <p>CTO & Co-Fundadora</p>
+      </div>
+      <div class="miembro">
+        <img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Carlos Ruiz">
+        <h4>Carlos Ruiz</h4>
+        <p>Desarrollador Full Stack</p>
+      </div>
+      <div class="miembro">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Ana Torres">
+        <h4>Ana Torres</h4>
+        <p>Especialista en Finanzas</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-4 text-center text-muted">
+    &copy; 2025 PC3. Plataforma de Crecimiento Empresarial.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Inicializa el carrusel de frases
+    const fraseCarousel = new bootstrap.Carousel('#fraseCarousel', {
+      interval: 5000,
+      ride: 'carousel',
+      pause: 'hover',
+      wrap: true
+    });
+
+    function esMovil() {
+        return window.innerWidth <= 700;
+    }
+    const tarjetas = document.querySelectorAll('.tarjeta');
+    let tarjetaActual = 0;
+    let tarjetaInterval;
+
+    function mostrarTarjeta(idx) {
+        tarjetas.forEach((t, i) => {
+            t.classList.toggle('activa', i === idx);
+        });
+    }
+    function avanzarTarjeta() {
+        tarjetaActual = (tarjetaActual + 1) % tarjetas.length;
+        mostrarTarjeta(tarjetaActual);
+    }
+    function retrocederTarjeta() {
+        tarjetaActual = (tarjetaActual - 1 + tarjetas.length) % tarjetas.length;
+        mostrarTarjeta(tarjetaActual);
+    }
+    function iniciarTarjetaInterval() {
+        tarjetaInterval = setInterval(avanzarTarjeta, 5000);
+    }
+    function reiniciarTarjetaInterval() {
+        clearInterval(tarjetaInterval);
+        iniciarTarjetaInterval();
+    }
+    function activarCarruselTarjetas() {
+        document.getElementById('controlesTarjetas').style.display = 'flex';
+        mostrarTarjeta(tarjetaActual);
+        iniciarTarjetaInterval();
+    }
+    function desactivarCarruselTarjetas() {
+        document.getElementById('controlesTarjetas').style.display = 'none';
+        tarjetas.forEach(t => t.classList.add('activa'));
+        clearInterval(tarjetaInterval);
+    }
+    if (esMovil()) activarCarruselTarjetas();
+    else desactivarCarruselTarjetas();
+
+    window.addEventListener('resize', () => {
+        if (esMovil()) activarCarruselTarjetas();
+        else desactivarCarruselTarjetas();
+    });
+    document.getElementById('prevOpcion').onclick = function() {
+        retrocederTarjeta();
+        reiniciarTarjetaInterval();
+    };
+    document.getElementById('nextOpcion').onclick = function() {
+        avanzarTarjeta();
+        reiniciarTarjetaInterval();
+    };
+  </script>
 </body>
 </html>

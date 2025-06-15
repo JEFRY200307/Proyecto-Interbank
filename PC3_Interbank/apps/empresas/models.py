@@ -28,4 +28,17 @@ class Estrategia(models.Model):
 
     def __str__(self):
         return f"Estrategia {self.id} para {self.empresa.razon_social}"
+    
+
+class TicketSoporte(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    estado = models.CharField(max_length=20, choices=[('abierto', 'Abierto'), ('cerrado', 'Cerrado')])
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+class MovimientoFinanciero(models.Model):
+    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=10, choices=[('ingreso', 'Ingreso'), ('gasto', 'Gasto')])
+    monto = models.DecimalField(max_digits=12, decimal_places=2)
+    estado = models.CharField(max_length=20, default='ok')  # 'ok' o 'mora'
+    fecha = models.DateField()
 

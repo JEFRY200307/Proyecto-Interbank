@@ -13,8 +13,10 @@ from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 
-from .serializers import EmpresaRegistroSerializer
-from .models import Empresa
+from .serializers import EmpresaRegistroSerializer, EmpresaPerfilSerializer
+from .models import Empresa, TicketSoporte
+from apps.documentos.models import Documento, Firma
+from django.db.models import Avg, F, ExpressionWrapper, DurationField
 from apps.users.models import Usuario
 from .services import validar_ruc
 
@@ -64,9 +66,11 @@ class EmpresaRegistroView(APIView):
             "departamento": resultado.get("departamento"),
             "provincia": resultado.get("provincia"),
             "distrito": resultado.get("distrito"),
+            "telefono": resultado.get("telefono"),
             # Agrega aquí otros campos de tu modelo si es necesario
         }
 
+        print("Datos que se enviarán al serializer:", empresa_data)
         serializer = EmpresaRegistroSerializer(data=empresa_data)
         if serializer.is_valid():
             empresa = serializer.save()
@@ -115,12 +119,12 @@ class PerfilEmpresaAPIView(APIView):
 
     def get(self, request):
         empresa = request.user.empresa
-        serializer = EmpresaRegistroSerializer(empresa)
+        serializer = EmpresaPerfilSerializer(empresa)
         return Response(serializer.data)
 
     def put(self, request):
         empresa = request.user.empresa
-        serializer = EmpresaRegistroSerializer(empresa, data=request.data, partial=True)
+        serializer = EmpresaPerfilSerializer(empresa, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -166,3 +170,52 @@ def registro_empresa(request):
 def login_empresa(request):
     return render(request, 'login.html')
 
+
+
+#analiticas y reportes
+
+class KPIsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        empresa = request.user.empresa
+
+        # Número de documentos generados
+        total_docs = Documento.objects.filter(empresa=empresa).count()
+
+        # Número de documentos firmados (al menos una firma en estado 'firmado')
+        firmados = Documento.objects.filter(
+            empresa=empresa,
+            firmas__estado='firmado'
+        ).distinct().count()
+
+        # Tiempo medio de firma (en minutos)
+        firmas_firmadas = Firma.objects.filter(
+            documento__empresa=empresa,
+            estado='firmado',
+            fecha_firma__isnull=False
+        ).annotate(
+            tiempo_firma=ExpressionWrapper(
+                F('fecha_firma') - F('documento__fecha_subida'),
+                output_field=DurationField()
+            )
+        )
+        if firmas_firmadas.exists():
+            tiempo_medio = firmas_firmadas.aggregate(
+                promedio=Avg('tiempo_firma')
+            )['promedio']
+            tiempo_medio_min = round(tiempo_medio.total_seconds() / 60, 2) if tiempo_medio else 0
+        else:
+            tiempo_medio_min = 0
+
+        # Tickets soporte abiertos vs cerrados (si tienes el modelo)
+        abiertos = TicketSoporte.objects.filter(empresa=empresa, estado='abierto').count() if 'TicketSoporte' in globals() else 0
+        cerrados = TicketSoporte.objects.filter(empresa=empresa, estado='cerrado').count() if 'TicketSoporte' in globals() else 0
+
+        return Response({
+            "total_documentos": total_docs,
+            "documentos_firmados": firmados,
+            "tiempo_medio_firma": tiempo_medio_min,
+            "tickets_abiertos": abiertos,
+            "tickets_cerrados": cerrados
+        })
