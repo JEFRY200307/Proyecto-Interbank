@@ -19,6 +19,9 @@ from apps.documentos.models import Documento, Firma
 from django.db.models import Avg, F, ExpressionWrapper, DurationField
 from apps.users.models import Usuario
 from .services import validar_ruc
+from rest_framework import generics, permissions
+from .models import Estrategia, Actividad
+from .serializers import EstrategiaSerializer
 
 class PanelEmpresaView(APIView):
     permission_classes = [IsAuthenticated]
@@ -219,3 +222,16 @@ class KPIsView(APIView):
             "tickets_abiertos": abiertos,
             "tickets_cerrados": cerrados
         })
+
+class EstrategiaListCreateView(generics.ListCreateAPIView):
+    serializer_class = EstrategiaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Estrategia.objects.filter(usuario=self.request.user).order_by('-fecha_registro')
+
+    def perform_create(self, serializer):
+        actividades_data = self.request.data.get('actividades', [])
+        estrategia = serializer.save(usuario=self.request.user)
+        for actividad_data in actividades_data:
+            Actividad.objects.create(estrategia=estrategia, **actividad_data)

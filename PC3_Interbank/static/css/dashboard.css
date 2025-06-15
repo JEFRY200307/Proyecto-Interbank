@@ -277,6 +277,45 @@ body {
   margin-bottom: 8px;
 }
 
+/* Nuevos estilos para estrategias */
+.estrategias-container {
+  padding: 20px;
+}
+
+.estrategias-title {
+  text-align: center;
+  font-size: 2em;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+.estrategias-list {
+  margin-bottom: 30px;
+}
+
+.estrategias-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.estrategias-table th, .estrategias-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.estrategias-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
+.estrategia-detalle {
+  background: #f7fafd;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(79,140,255,0.08);
+}
+
 @media (max-width: 600px) {
   #chat-section {
     max-width: 98vw;

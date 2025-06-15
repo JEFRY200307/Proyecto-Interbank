@@ -1,7 +1,7 @@
 # apps/empresas/serializers.py
 
 from rest_framework import serializers
-from .models import Empresa
+from .models import Empresa, Estrategia, Actividad
 from django.contrib.auth.hashers import make_password
 
 class EmpresaRegistroSerializer(serializers.ModelSerializer):
@@ -43,3 +43,24 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
             'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro'
         ]
         read_only_fields = fields
+
+
+class ActividadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actividad
+        fields = ['id', 'descripcion', 'fecha_limite', 'completada']
+
+class EstrategiaSerializer(serializers.ModelSerializer):
+    actividades = ActividadSerializer(many=True, required=False)
+
+    class Meta:
+        model = Estrategia
+        fields = ['id', 'usuario', 'empresa', 'titulo', 'descripcion', 'fecha_registro', 'fecha_cumplimiento', 'categoria', 'estado', 'actividades']
+        read_only_fields = ['usuario', 'fecha_registro']
+
+    def create(self, validated_data):
+        actividades_data = validated_data.pop('actividades', [])
+        estrategia = Estrategia.objects.create(**validated_data)
+        for actividad_data in actividades_data:
+            Actividad.objects.create(estrategia=estrategia, **actividad_data)
+        return estrategia

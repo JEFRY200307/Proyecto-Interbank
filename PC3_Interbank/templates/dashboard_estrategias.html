@@ -1,7 +1,45 @@
 <!-- templates/dashboard_documentos.html -->
-{% extends "dashboard_base.html" %}
-{% load static %}
+{% extends 'dashboard_base.html' %}
+
 {% block content %}
-<h3>Estrategias</h3>
-<p>Esta sección estará disponible próximamente.</p>
+<div class="estrategias-container">
+  <h2 class="estrategias-title">Estrategias</h2>
+
+  <!-- Lista de estrategias -->
+  <div class="estrategias-list">
+    <h3>Mis Estrategias</h3>
+    <table class="estrategias-table">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Empresa</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Fecha de Creación</th>
+          <th>Fecha de Cumplimiento</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="estrategias-tbody">
+        <!-- Estrategias se cargarán dinámicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Detalle de estrategia -->
+  <div class="estrategia-detalle" id="estrategia-detalle" style="display: none;">
+    <h3 id="detalle-titulo">Detalle de Estrategia</h3>
+    <p><strong>Descripción:</strong> <span id="detalle-descripcion"></span></p>
+    <p><strong>Estado:</strong> <span id="detalle-estado"></span></p>
+    <p><strong>Fecha de Creación:</strong> <span id="detalle-fecha-creacion"></span></p>
+    <p><strong>Fecha de Cumplimiento:</strong> <span id="detalle-fecha-cumplimiento"></span></p>
+
+    <h4>Actividades</h4>
+    <ul id="detalle-actividades">
+      <!-- Actividades se cargarán dinámicamente -->
+    </ul>
+
+    <button onclick="volverALaLista()">Volver a la lista</button>
+  </div>
+</div>
 {% endblock %}

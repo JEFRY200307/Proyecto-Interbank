@@ -20,6 +20,5 @@ class EmpresaAdmin(admin.ModelAdmin):
 
 @admin.register(Estrategia)
 class EstrategiaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'empresa', 'descripcion', 'estado', 'fecha_registro')
-    search_fields = ('empresa__razon_social', 'descripcion')
-    list_filter = ('estado',)
+    list_display = ('id', 'titulo', 'usuario', 'empresa', 'categoria', 'estado', 'fecha_registro', 'fecha_cumplimiento')
+    list_filter = ('empresa', 'categoria', 'estado', 'fecha_registro')

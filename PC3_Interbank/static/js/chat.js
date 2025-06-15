@@ -68,7 +68,78 @@ function enviarMensaje() {
 
 function enviarMensajeRoadmap() {
   if (!categoriaSeleccionada) return;
-  document.getElementById('user-message').value = "Estoy listo para que me des el roadmap";
+
+  let mensaje = "";
+
+  // Generar el prompt según el chatbot seleccionado
+  switch (categoriaNombre) {
+    case "Acceso a Financiamiento":
+      mensaje = `
+        Por favor, genera un roadmap estructurado en formato JSON para el acceso a financiamiento. Incluye las siguientes etapas:
+        1. Identificar las fuentes de financiamiento.
+        2. Preparar la documentación necesaria.
+        3. Calcular costos y tasas de interés.
+        4. Mejorar el perfil crediticio.
+        Cada etapa debe incluir:
+        - Una descripción breve.
+        - Actividades específicas con fechas límite (puedes usar fechas ficticias).
+        - Estado inicial de "pendiente".
+        El formato debe ser JSON para facilitar su procesamiento.
+      `;
+      break;
+
+    case "Marketing Digital":
+      mensaje = `
+        Por favor, genera un roadmap estructurado en formato JSON para una campaña de marketing digital. Incluye las siguientes etapas:
+        1. Definir objetivos de la campaña.
+        2. Identificar el público objetivo.
+        3. Crear contenido para redes sociales.
+        4. Configurar anuncios PPC y SEO.
+        Cada etapa debe incluir:
+        - Una descripción breve.
+        - Actividades específicas con fechas límite (puedes usar fechas ficticias).
+        - Estado inicial de "pendiente".
+        El formato debe ser JSON para facilitar su procesamiento.
+      `;
+      break;
+
+    case "Legal y Tributario":
+      mensaje = `
+        Por favor, genera un roadmap estructurado en formato JSON para cumplir con las obligaciones legales y tributarias de una empresa en Perú. Incluye las siguientes etapas:
+        1. Constitución de la empresa.
+        2. Registro en SUNAT.
+        3. Declaración de impuestos.
+        4. Cumplimiento de obligaciones laborales.
+        Cada etapa debe incluir:
+        - Una descripción breve.
+        - Actividades específicas con fechas límite (puedes usar fechas ficticias).
+        - Estado inicial de "pendiente".
+        El formato debe ser JSON para facilitar su procesamiento.
+      `;
+      break;
+
+    case "Innovación y Desarrollo de Productos":
+      mensaje = `
+        Por favor, genera un roadmap estructurado en formato JSON para el desarrollo de un nuevo producto. Incluye las siguientes etapas:
+        1. Ideación y validación de concepto.
+        2. Desarrollo del prototipo.
+        3. Pruebas de mercado.
+        4. Lanzamiento del producto.
+        Cada etapa debe incluir:
+        - Una descripción breve.
+        - Actividades específicas con fechas límite (puedes usar fechas ficticias).
+        - Estado inicial de "pendiente".
+        El formato debe ser JSON para facilitar su procesamiento.
+      `;
+      break;
+
+    default:
+      mensaje = "Por favor, genera un roadmap estructurado para esta categoría.";
+      break;
+  }
+
+  // Enviar el mensaje al chatbot
+  document.getElementById('user-message').value = mensaje;
   enviarMensaje();
 }
 
@@ -78,4 +149,101 @@ function volverATarjetas() {
   document.getElementById('roadmap-btn').style.display = 'none';
   document.getElementById('volver-btn').style.display = 'none';
 }
+
+function guardarRoadmap(titulo, descripcion, actividades) {
+  const token = localStorage.getItem('access_token');
+  fetch('/empresas/api/estrategias/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({
+      titulo: titulo,
+      descripcion: descripcion,
+      actividades: actividades
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    alert('¡Roadmap guardado en Estrategias!');
+  })
+  .catch(error => {
+    console.error('Error al guardar el roadmap:', error);
+  });
+}
+
+// Procesar la respuesta del chatbot
+function procesarRespuestaChatbot(data) {
+  try {
+    // Parsear la respuesta como JSON
+    const respuesta = JSON.parse(data.response);
+
+    // Extraer el título y descripción del roadmap
+    const titulo = "Roadmap para Acceso a Financiamiento";
+    const descripcion = "Pasos esenciales para obtener financiamiento para tu empresa.";
+
+    // Extraer las actividades de todas las etapas
+    const actividades = [];
+    respuesta.RoadmapFinanciamiento.Etapas.forEach(etapa => {
+      etapa.Actividades.forEach(actividad => {
+        actividades.push({
+          descripcion: actividad.Actividad,
+          fecha_limite: actividad.FechaLimite,
+          estado: actividad.Estado.toLowerCase() // Convertir a minúsculas para coincidir con el modelo
+        });
+      });
+    });
+
+    // Guardar el roadmap en el backend
+    guardarRoadmap(titulo, descripcion, actividades);
+  } catch (error) {
+    console.error("Error al procesar la respuesta del chatbot:", error);
+    alert("La respuesta del chatbot no está en el formato esperado.");
+  }
+}
+
+function extraerActividades(texto) {
+  // Aquí puedes implementar lógica para extraer actividades del texto generado
+  // Por ejemplo, buscar pasos enumerados o palabras clave como "Paso 1", "Paso 2", etc.
+  const actividades = [];
+  const regex = /Paso (\d+): (.+)/g;
+  let match;
+  while ((match = regex.exec(texto)) !== null) {
+    actividades.push({
+      descripcion: match[2],
+      fecha_limite: null, // Puedes agregar lógica para calcular fechas
+      estado: "pendiente",
+    });
+  }
+  return actividades;
+}
+
+function cargarConversaciones(chatbotId) {
+  const token = localStorage.getItem('access_token');
+  fetch(`/users/dashboard/chat/api/conversaciones/${chatbotId}/`, {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      const log = document.getElementById('chat-log');
+      log.innerHTML = '';
+      data.forEach(conversacion => {
+        log.innerHTML += `
+          <div><strong>Tú:</strong> ${conversacion.mensaje_usuario}</div>
+          <div><strong>Chatbot:</strong> ${conversacion.respuesta_chatbot}</div>
+        `;
+      });
+    })
+    .catch(error => console.error('Error al cargar conversaciones:', error));
+}
+
+// Llamar a cargar conversaciones al iniciar el chat
+document.addEventListener('DOMContentLoaded', () => {
+  const chatbotId = categoriaSeleccionada; // Ajusta según tu lógica
+  cargarConversaciones(chatbotId);
+});
 

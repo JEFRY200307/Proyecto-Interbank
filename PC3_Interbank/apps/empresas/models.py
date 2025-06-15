@@ -1,6 +1,7 @@
 # apps/empresas/models.py
 
 from django.db import models
+from django.contrib.auth import get_user_model
 
 class Empresa(models.Model):
     razon_social   = models.CharField(max_length=255)
@@ -21,14 +22,28 @@ class Empresa(models.Model):
 
 
 class Estrategia(models.Model):
-    empresa= models.ForeignKey(Empresa,on_delete=models.CASCADE,related_name='estrategias')
-    descripcion= models.TextField()
-    fecha_registro= models.DateTimeField(auto_now_add=True)
-    estado = models.CharField(max_length=20, default='pendiente')
+    usuario = models.ForeignKey('users.Usuario', on_delete=models.CASCADE,null=True, blank=True)
+    empresa = models.ForeignKey('empresas.Empresa', on_delete=models.CASCADE, null=True, blank=True)
+    titulo = models.CharField(max_length=255,null=True, blank=True)
+    descripcion = models.TextField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_cumplimiento = models.DateField(null=True, blank=True)
+    categoria = models.CharField(max_length=100, null=True, blank=True)
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('en_progreso', 'En progreso'),
+        ('completada', 'Completada'),
+    ]
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
 
     def __str__(self):
-        return f"Estrategia {self.id} para {self.empresa.razon_social}"
-    
+        return self.titulo
+
+class Actividad(models.Model):
+    estrategia = models.ForeignKey(Estrategia, related_name='actividades', on_delete=models.CASCADE)
+    descripcion = models.CharField(max_length=255)
+    fecha_limite = models.DateField(null=True, blank=True)
+    completada = models.BooleanField(default=False)
 
 class TicketSoporte(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
@@ -41,4 +56,5 @@ class MovimientoFinanciero(models.Model):
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     estado = models.CharField(max_length=20, default='ok')  # 'ok' o 'mora'
     fecha = models.DateField()
+
 

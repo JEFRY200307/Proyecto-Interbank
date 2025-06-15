@@ -3,8 +3,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from litellm import completion
-from .models import ChatCategory
+from .models import Conversacion, ChatCategory, ChatMessage
+from django.utils import timezone
 
 # Prompts personalizados por categoría
 CATEGORY_PROMPTS = {
@@ -39,7 +39,50 @@ class ChatBotAPIView(APIView):
         respuesta = response['choices'][0]['message']['content']
         return Response({"response": respuesta})
 
+    def post(self, request, chatbot_id):
+        mensaje_usuario = request.data.get('mensaje')
+        respuesta_chatbot = "Aquí va la respuesta del chatbot"  # Genera la respuesta del chatbot
+
+        # Guarda la conversación en la base de datos
+        guardar_conversacion(
+            user=request.user,
+            category=ChatCategory.objects.get(id=chatbot_id),
+            mensaje=mensaje_usuario,
+            respuesta=respuesta_chatbot
+        )
+
+        return Response({"respuesta": respuesta_chatbot})
+
 def chat_dashboard(request):
     categories = ChatCategory.objects.all()
     return render(request, 'dashboard_chat.html', {'categories': categories})
+
+class ConversacionesUsuarioAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, chatbot_id):
+        conversaciones = Conversacion.objects.filter(usuario=request.user, chatbot=chatbot_id).order_by('-fecha_creacion')
+        data = [
+            {
+                "mensaje_usuario": conv.mensaje_usuario,
+                "respuesta_chatbot": conv.respuesta_chatbot,
+                "fecha_creacion": conv.fecha_creacion
+            }
+            for conv in conversaciones
+        ]
+        return Response(data)
+
+def guardar_conversacion(user, category, mensaje, respuesta):
+    ChatMessage.objects.create(
+        user=user,
+        category=category,
+        message=mensaje,
+        timestamp=timezone.now()
+    )
+    ChatMessage.objects.create(
+        user=user,
+        category=category,
+        message=respuesta,
+        timestamp=timezone.now()
+    )
 
