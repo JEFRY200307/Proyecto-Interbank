@@ -7,8 +7,8 @@
   <h2>Seleccione un Chatbot</h2>
   <div class="chat-buttons">
     {% for cat in categories %}
-      <button class="chatbot-btn" onclick="seleccionarCategoria({{ cat.id }}, '{{ cat.name }}')">
-        {{ cat.name }}
+      <button class="chatbot-btn" onclick="seleccionarCategoria('{{ cat.id }}', '{{ cat.name|escapejs }}')">
+    {{ cat.name }}
       </button>
       <button class="roadmap-btn" onclick="enviarMensajeRoadmap('{{ cat.id }}')">
         Estoy listo para que me des el roadmap
