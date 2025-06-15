@@ -84,31 +84,32 @@ def guardar_conversacion(user, category, mensaje, respuesta):
     )
 
 
-def chat_dashboard(request):
+def chat_dashboard(request, chatbot_id):
     """
     Renderiza el dashboard del chat con las categorías disponibles.
     """
-    categories = ChatCategory.objects.all()
-    return render(request, 'dashboard_chat.html', {'categories': categories})
+    try:
+        category = ChatCategory.objects.get(id=chatbot_id)
+        return render(request, 'dashboard_chat.html', {'category': category, 'chatbot_id': chatbot_id})
+    except ChatCategory.DoesNotExist:
+        return render(request, '404.html', status=404)  # Muestra una página 404 si el chatbot no existe
 
 
 class ConversacionesUsuarioAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, category_id):
-        """
-        Devuelve las conversaciones del usuario autenticado para una categoría específica.
-        """
+    def get(self, request, chatbot_id):
         try:
             conversaciones = ChatMessage.objects.filter(
                 user=request.user,
-                category_id=category_id
+                category_id=chatbot_id
             ).order_by('-timestamp')
 
             data = [
                 {
-                    "message": conv.message,
-                    "timestamp": conv.timestamp
+                    "mensaje_usuario": conv.message,
+                    "respuesta_chatbot": conv.message,  # Ajusta según tu modelo
+                    "fecha_creacion": conv.timestamp
                 }
                 for conv in conversaciones
             ]
@@ -116,4 +117,12 @@ class ConversacionesUsuarioAPIView(APIView):
 
         except ChatCategory.DoesNotExist:
             return Response({"error": "Categoría no encontrada."}, status=404)
+
+
+def chat_list(request):
+    """
+    Muestra la lista de todos los chatbots disponibles.
+    """
+    categories = ChatCategory.objects.all()  # Obtiene todas las categorías de chatbots
+    return render(request, 'dashboard_chat.html', {'categories': categories})
 

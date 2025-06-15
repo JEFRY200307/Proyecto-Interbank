@@ -220,6 +220,11 @@ function extraerActividades(texto) {
 }
 
 function cargarConversaciones(chatbotId) {
+  if (!chatbotId) {
+    console.error("Error: chatbotId es null o undefined.");
+    return;
+  }
+
   const token = localStorage.getItem('access_token');
   fetch(`/users/dashboard/chat/api/conversaciones/${chatbotId}/`, {
     method: 'GET',
@@ -227,23 +232,59 @@ function cargarConversaciones(chatbotId) {
       'Authorization': 'Bearer ' + token
     }
   })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
-      const log = document.getElementById('chat-log');
-      log.innerHTML = '';
+      const chatLog = document.getElementById('chat-log');
+      chatLog.innerHTML = ''; // Limpia el historial del chat
       data.forEach(conversacion => {
-        log.innerHTML += `
+        chatLog.innerHTML += `
           <div><strong>Tú:</strong> ${conversacion.mensaje_usuario}</div>
           <div><strong>Chatbot:</strong> ${conversacion.respuesta_chatbot}</div>
         `;
       });
     })
-    .catch(error => console.error('Error al cargar conversaciones:', error));
+    .catch(error => {
+      console.error('Error al cargar conversaciones:', error);
+    });
 }
 
 // Llamar a cargar conversaciones al iniciar el chat
 document.addEventListener('DOMContentLoaded', () => {
-  const chatbotId = categoriaSeleccionada; // Ajusta según tu lógica
-  cargarConversaciones(chatbotId);
+  const chatbotId = categoriaSeleccionada; // Asegúrate de que esta variable tenga un valor válido
+  if (chatbotId) {
+    cargarConversaciones(chatbotId);
+  } else {
+    console.error("Error: chatbotId es null o undefined.");
+  }
+
+  const chatbotCards = document.querySelectorAll('.chatbot-card');
+
+  chatbotCards.forEach(card => {
+    card.addEventListener('click', () => {
+      chatbotCards.forEach(c => c.classList.remove('selected')); // Quita la selección de otras cartas
+      card.classList.add('selected'); // Agrega la clase seleccionada a la carta actual
+    });
+  });
+
+  document.getElementById('enviar-btn').addEventListener('click', () => {
+    const userMessage = document.getElementById('user-message').value;
+    if (userMessage.trim() === '') return;
+
+    const chatLog = document.getElementById('chat-log');
+    chatLog.innerHTML += `<div><strong>Tú:</strong> ${userMessage}</div>`;
+
+    // Simula la respuesta del chatbot
+    setTimeout(() => {
+      chatLog.innerHTML += `<div><strong>Chatbot:</strong> Esta es una respuesta automática.</div>`;
+      chatLog.scrollTop = chatLog.scrollHeight; // Desplaza hacia abajo
+    }, 1000);
+
+    document.getElementById('user-message').value = ''; // Limpia el input
+  });
 });
 

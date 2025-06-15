@@ -1,8 +1,29 @@
-<!-- templates/dashboard_documentos.html -->
+<!-- templates/dashboard_chat.html -->
 {% extends "dashboard_base.html" %}
 {% load static %}
 
 {% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat y Soporte</title>
+    <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+</head>
+<body>
+    <h1>Selecciona un Chatbot</h1>
+    <div id="chatbots-container">
+        {% for cat in categories %}
+            <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card">
+                <img src="{% static 'img/chatbot_{{ cat.id }}.png' %}" alt="{{ cat.name }}" class="chatbot-img">
+                <div class="chatbot-title">{{ cat.name }}</div>
+            </a>
+        {% endfor %}
+    </div>
+</body>
+</html>
 
 <h2 id="chatbot-title" style="text-align:center; margin-top:32px; color:#2563eb; font-size:2em; font-weight:bold;">
   Bienvenido a Banky
@@ -13,21 +34,18 @@
   <button id="volver-btn" onclick="volverATarjetas()" style="display:none;">Volver a los chatbots</button>
 </div>
 
-<div id="chatbots-container">
-  {% for cat in categories %}
-    <div class="chatbot-card" onclick="seleccionarCategoria({{ cat.id }}, '{{ cat.name|escapejs }}')">
-      <img src="{% static 'img/chatbot_{{ cat.id }}.png' %}" alt="{{ cat.name }}" class="chatbot-img">
-      <div class="chatbot-title">{{ cat.name }}</div>
-    </div>
-  {% endfor %}
-</div>
-
-<div id="chat-section">
-  <div id="chat-category-title" style="font-size: 1.3em; font-weight: bold; margin-bottom: 12px;"></div>
+<div id="chat-section" class="visible">
   <div id="chat-log"></div>
-  <input id="user-message" type="text" placeholder="Escribe tu mensaje...">
-  <button id="enviar-btn" onclick="enviarMensaje()">Enviar</button>
+  <div id="chat-input">
+    <input type="text" id="user-message" placeholder="Escribe tu mensaje aquí..." />
+    <button id="enviar-btn">Enviar</button>
+  </div>
 </div>
+<h1>Chatbot: {{ category.name }}</h1>
+<script>
+  const chatbotId = "{{ chatbot_id }}";
+  console.log("Chatbot ID:", chatbotId);
+</script>
 <script src="{% static 'js/chat.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 {% endblock %}

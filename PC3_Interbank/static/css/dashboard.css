@@ -75,13 +75,13 @@ body {
 
 /* Contenedor principal del chatbot */
 #chat-section {
-  display: none;
+  display: block;
   width: 95vw;
   max-width: 1400px;
-  margin: 0 auto 0 auto;
+  margin: 20px auto;
   background: #f7fafd;
   border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(79,140,255,0.08);
+  box-shadow: 0 4px 24px rgba(79, 140, 255, 0.08);
   padding: 48px 4vw 40px 4vw;
   min-height: 70vh;
   animation: aparecerChat 0.5s;
@@ -93,8 +93,8 @@ body {
 }
 
 @keyframes aparecerChat {
-  from { opacity: 0; transform: translateY(40px);}
-  to   { opacity: 1; transform: translateY(0);}
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* Área de conversación */
@@ -106,7 +106,7 @@ body {
   overflow-y: auto;
   padding: 18px;
   margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(79,140,255,0.06);
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.06);
   font-size: 1.08em;
 }
 
@@ -119,13 +119,18 @@ body {
 }
 
 /* Input y botón de enviar */
+#chat-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 #user-message {
-  width: 70%;
+  width: 80%;
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #b6c7e3;
   font-size: 1em;
-  margin-right: 8px;
   outline: none;
   transition: border 0.2s;
 }
@@ -162,7 +167,7 @@ body {
   font-size: 1.08em;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(255,140,104,0.12);
+  box-shadow: 0 2px 8px rgba(255, 140, 104, 0.12);
   transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
   outline: none;
 }
@@ -170,7 +175,7 @@ body {
 .chatbot-btn:hover, .roadmap-btn:hover {
   background: linear-gradient(90deg, #ffb347 0%, #ff8c68 100%);
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 16px rgba(255,179,71,0.18);
+  box-shadow: 0 4px 16px rgba(255, 179, 71, 0.18);
 }
 
 /* Nuevos estilos para los chatbots */
@@ -179,6 +184,9 @@ body {
   justify-content: center;
   gap: 24px;
   margin-top: 40px;
+  flex-wrap: wrap; /* Permite que los chatbots se ajusten en pantallas pequeñas */
+  opacity: 1; /* Asegúrate de que sea visible */
+  pointer-events: auto; /* Habilita la interacción */
   transition: opacity 0.5s;
 }
 
@@ -188,25 +196,32 @@ body {
   transition: opacity 0.5s;
 }
 
+/* Animación al seleccionar una carta */
 .chatbot-card {
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 4px 24px rgba(79,140,255,0.10);
+  box-shadow: 0 4px 24px rgba(79, 140, 255, 0.10);
   padding: 28px 18px 22px 18px;
   width: 210px;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+.chatbot-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px rgba(79, 140, 255, 0.15);
+}
+
 .chatbot-card.selected {
   border: 2.5px solid #7ed957;
-  box-shadow: 0 8px 32px rgba(126,217,87,0.18);
+  box-shadow: 0 8px 32px rgba(126, 217, 87, 0.18);
   transform: scale(1.06);
+  background-color: #f0fff4;
 }
 
 .chatbot-img {
@@ -331,9 +346,5 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 18px;
-  }
-  #chatbots-container.mover {
-    transform: none;
-    opacity: 0.5;
   }
 }
