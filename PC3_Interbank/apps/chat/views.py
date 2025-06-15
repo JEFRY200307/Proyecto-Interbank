@@ -29,7 +29,7 @@ class ChatBotAPIView(APIView):
             return Response({"error": "API key de OpenAI no configurada."}, status=500)
         # Usa OpenAI GPT-3.5 Turbo y tu API key de OpenAI
         response = completion(
-            model="gpt-4o",
+            model="gpt-4",
             api_key=OPENAI_API_KEY,
             messages=[
                 {"role": "system", "content": system_prompt},
