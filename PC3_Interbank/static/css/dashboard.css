@@ -75,7 +75,7 @@ body {
 
 /* Contenedor principal del chatbot */
 #chat-section {
-  display: block;
+  display: none;
   width: 95vw;
   max-width: 1400px;
   margin: 20px auto;
@@ -205,11 +205,13 @@ body {
   width: 210px;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+  transition: transform 0.3s, box-shadow 0.3s;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-decoration: none; /* Elimina el subrayado del enlace */
+  color: inherit; /* Usa el color del texto por defecto */
 }
 
 .chatbot-card:hover {

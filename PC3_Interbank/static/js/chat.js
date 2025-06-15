@@ -286,5 +286,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('user-message').value = ''; // Limpia el input
   });
+
+  function seleccionarChatbot(chatbotId, chatbotName) {
+    // Oculta el contenedor de chatbots
+    document.getElementById('chatbots-container').style.display = 'none';
+
+    // Muestra la caja de mensajes
+    const chatSection = document.getElementById('chat-section');
+    chatSection.classList.add('visible');
+
+    // Agrega el título del chatbot seleccionado
+    const chatLog = document.getElementById('chat-log');
+    chatLog.innerHTML = `<h2>Chatbot: ${chatbotName}</h2>`;
+  }
+
+  // Botón para volver a los chatbots
+  document.getElementById('volver-btn').addEventListener('click', () => {
+    document.getElementById('chat-section').classList.remove('visible');
+    document.getElementById('chatbots-container').style.display = 'flex';
+  });
+
+  const volverBtn = document.getElementById('volver-btn');
+  if (volverBtn) {
+    volverBtn.addEventListener('click', () => {
+      window.location.href = '/users/dashboard/chat/';
+    });
+  }
 });
 

@@ -9,11 +9,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat y Soporte</title>
+    <title>Bienvenido a Banky</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
 <body>
-    <h1>Selecciona un Chatbot</h1>
+    <h1>Bienvenido a Banky</h1>
     <div id="chatbots-container">
         {% for cat in categories %}
             <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card">
@@ -22,6 +22,18 @@
             </a>
         {% endfor %}
     </div>
+    <div id="chat-section" class="hidden">
+        <div id="chat-log"></div>
+        <div id="chat-input">
+            <input type="text" id="user-message" placeholder="Escribe tu mensaje aquí..." />
+            <button id="enviar-btn">Enviar</button>
+        </div>
+        <div id="chat-buttons">
+            <button id="roadmap-btn">Estoy listo para que me des el roadmap</button>
+            <button id="volver-btn">Volver a los chatbots</button>
+        </div>
+    </div>
+    <script src="{% static 'js/chat.js' %}"></script>
 </body>
 </html>
 
