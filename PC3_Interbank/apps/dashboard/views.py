@@ -75,7 +75,7 @@ class DashboardEstrategiasView(LoginRequiredMixin, TemplateView):
     template_name = "dashboard_estrategias.html"
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['active_section'] = 'reportes'
+        context['active_section'] = 'estrategias'
         return context
 # Firmas
 class DashboardFirmasView(LoginRequiredMixin, TemplateView):

@@ -15,7 +15,7 @@
 
 <div id="chatbots-container">
   {% for cat in categories %}
-    <div class="chatbot-card" onclick="seleccionarCategoria({{ cat.id }}, '{{ cat.name }}')">
+    <div class="chatbot-card" onclick="seleccionarCategoria({{ cat.id }}, '{{ cat.name|escapejs }}')">
       <img src="{% static 'img/chatbot_{{ cat.id }}.png' %}" alt="{{ cat.name }}" class="chatbot-img">
       <div class="chatbot-title">{{ cat.name }}</div>
     </div>

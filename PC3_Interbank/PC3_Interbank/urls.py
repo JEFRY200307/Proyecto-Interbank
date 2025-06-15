@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from apps.dashboard.views import DashboardEstrategiasView
 
 urlpatterns = [
     path('', include('apps.empresas.urls')),  # <-- según tu estructura
@@ -17,6 +18,7 @@ urlpatterns = [
     path('dashboard/', include('apps.dashboard.urls')),
     path('empresas/', include('apps.empresas.urls')),
     path('documentos/', include('apps.documentos.urls')),
+    path('users/dashboard/estrategias/', DashboardEstrategiasView.as_view(), name='dashboard_estrategias'),
 ]
 
 if settings.DEBUG:
