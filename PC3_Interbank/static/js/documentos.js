@@ -251,21 +251,27 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         const checkboxes = document.querySelectorAll('input[name="firmantes"]:checked');
         const firmantes = Array.from(checkboxes).map(cb => cb.value);
-
-        // Enviar un POST por cada firmante (puedes optimizarlo en el backend)
-        Promise.all(firmantes.map(firmanteId =>
-            fetch(`/documentos/empresa/${documentoSeleccionado}/firmantes/`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ documento: documentoSeleccionado, firmante: firmanteId })
-            })
-        )).then(() => {
-            alert('Firmantes asignados correctamente.');
-            document.getElementById('modalFirmantes').style.display = 'none';
+        console.log({
+            documento: documentoSeleccionado,
+            firmantes: firmantes
         });
+        // Enviar un solo POST con todos los firmantes
+        fetch(`/documentos/empresa/${documentoSeleccionado}/firmantes/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                documento: documentoSeleccionado, // debe ser un número (ID)
+                firmantes: firmantes              // debe ser un array de IDs, ej: [2,3,4]
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert('Firmantes asignados correctamente.');
+                document.getElementById('modalFirmantes').style.display = 'none';
+            });
     };
 
     // ===================== GENERAR Y PREVISUALIZAR PDF =====================

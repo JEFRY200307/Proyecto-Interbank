@@ -7,10 +7,10 @@ document.addEventListener('DOMContentLoaded', function () {
         let menu = '';
         if (rol === 'empresa') {
             menu += `<li style="list-style:none;"><h3>Mi empresa</h3></li>
-                <li><a href="/users/dashboard/perfil/">Perfil y Cuenta</a></li>
+                <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/users/dashboard/usuarios/">Usuarios</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
-                <li><a href="/documentos/firmas/pendientes/">Firma Electrónica</a></li>
+                <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
                 <li><a href="/users/dashboard/estrategias/">Estrategias</a></li>
                 <li><a href="/users/dashboard/reportes/">Reportes y Analíticas</a></li>
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
             menu += `<li style="list-style:none;"><h3>Bienvenido ${nombre}</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
-                <li><a href="/documentos/firmas/pendientes/">Firma Electrónica</a></li>
+                <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/estrategias/">Estrategias</a></li>
                 <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
                 <li><a href="/users/dashboard/notificaciones/">Notificaciones</a></li>
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             menu += `<li style="list-style:none;"><h3>Bienvenido ${nombre}</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
-                <li><a href="/documentos/firmas/pendientes/">Firma Electrónica</a></li>
+                <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
                 <li><a href="/users/dashboard/notificaciones/">Notificaciones</a></li>
                 <li><a href="/users/dashboard/configuracion/">Configuración</a></li>

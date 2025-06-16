@@ -11,6 +11,9 @@ from rest_framework import generics, permissions
 from django.contrib.auth import get_user_model
 from .serializers import UsuarioSerializer
 from django.shortcuts import render
+from django.core.mail import send_mail
+import random
+from django.utils.crypto import get_random_string
 
 User = get_user_model()
 
@@ -21,6 +24,10 @@ def dashboard_panel(request):
 def dashboard_perfil(request):
     rol = getattr(request.user, 'rol', None)
     return render(request, 'perfil_y_usuarios/perfil.html', {'rol': rol})
+
+def dashboard_usuarios(request):
+    rol = getattr(request.user, 'rol', None)
+    return render(request, 'perfil_y_usuarios/usuarios.html', {'rol': rol})
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -43,6 +50,7 @@ class DashboardUsuariosView(LoginRequiredMixin, TemplateView):
     
 class UsuarioListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = UsuarioSerializer
+    queryset = Usuario.objects.all()
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
@@ -50,8 +58,21 @@ class UsuarioListCreateAPIView(generics.ListCreateAPIView):
         return Usuario.objects.filter(empresa=empresa).exclude(rol='superadmin')
 
     def perform_create(self, serializer):
-        # Asocia el usuario a la empresa del usuario autenticado
-        serializer.save(empresa=self.request.user.empresa)
+        password = self.request.data.get('password')
+        # Generar PIN aleatorio de 6 dígitos
+        pin = str(random.randint(100000, 999999))
+        usuario = serializer.save(empresa=self.request.user.empresa)
+        usuario.set_password(password)
+        usuario.set_clave_firma(pin)
+        usuario.save()
+        # Enviar correo con ambos datos
+        send_mail(
+            'Tus credenciales de acceso',
+            f'Hola {usuario.nombre},\n\nTu contraseña inicial es: {password}\nTu PIN de firma electrónica es: {pin}\n\nPor favor, cambia tu contraseña después de iniciar sesión.',
+            'no-reply@tuapp.com',
+            [usuario.correo],
+            fail_silently=False,
+        )
 
 class UsuarioRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Usuario.objects.all()

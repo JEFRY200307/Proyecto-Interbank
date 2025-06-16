@@ -1,18 +1,15 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import DocumentoViewSet, FirmaViewSet, firmar_documento
+from .views import DocumentoViewSet, FirmaViewSet
 from .views import (
     DocumentoEmpresaAPIView, 
     GenerarPDFAPIView,
     DocumentoDetailAPIView,
     PendientesFirmaAPIView,
     FirmarDocumentoAPIView,
+    HistorialFirmasAPIView,
     dashboard_firmas,
     dashboard_documentos,
-    gestionar_firmas, 
-    auditoria_firmas,
-    api_firmas,
-    asignar_firmantes,
     AsignarFirmantesAPIView
 )
 router = DefaultRouter()
@@ -31,17 +28,14 @@ urlpatterns = [
     path('empresa/<int:documento_id>/firmantes/', AsignarFirmantesAPIView.as_view(), name='asignar_firmantes'),
     path('generar-pdf/<int:pk>/', GenerarPDFAPIView.as_view(), name='generar_pdf_api'),
     
-    path('api/firmas/', api_firmas, name='api_firmas'),
     path('firmas/pendientes/', PendientesFirmaAPIView.as_view(), name='firmas_pendientes'),
+    path('documentos/firmas/historial/', HistorialFirmasAPIView.as_view()),
     path('firmas/<int:pk>/firmar/', FirmarDocumentoAPIView.as_view(), name='firmar_documento'),
-    path('documentos/<int:documento_id>/asignar/', asignar_firmantes, name='asignar_firmantes'),
-    path('firmas/auditoria/<int:documento_id>/', auditoria_firmas, name='auditoria_firmas'),
+    # apps/documentos/urls.py
+    path('firmas/historial/', HistorialFirmasAPIView.as_view(), name='firmas_historial'),
 
     # CRUD de documentos y firmas (RESTful)
     path('api/', include(router.urls)),
-
-    # Firmar documento (solo POST)
-    path('api/firmar/<int:firma_id>/', firmar_documento, name='firmar_documento'),
 
    
 ]

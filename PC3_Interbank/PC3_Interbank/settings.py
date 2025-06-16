@@ -88,7 +88,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'interbank_db',          
         'USER': 'postgres',          
-        'PASSWORD': '1234',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',          
         'PORT': '5432',               
     }
@@ -163,8 +163,13 @@ CHANNEL_LAYERS = {
 # Custom user model
 AUTH_USER_MODEL = 'users.Usuario'
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'no-reply@pc3.com'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jefferson.flores.m@uni.pe'
+EMAIL_HOST_PASSWORD = 'jgpw wudq ehgv gtqy'
+DEFAULT_FROM_EMAIL = 'no-reply@tuapp.com'
 
 MENSAJE_EMPRESA_REGISTRADA = "Empresa registrada correctamente."
 

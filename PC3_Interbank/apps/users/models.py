@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.hashers import make_password, check_password
+
 
 class UsuarioManager(BaseUserManager):
     def create_user(self, correo, password=None, **extra_fields):
@@ -35,6 +37,14 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    clave_firma = models.CharField(max_length=128, blank=True, null=True)  # hash del PIN
+
+    def set_clave_firma(self, raw_pin):
+        self.clave_firma = make_password(raw_pin)
+        self.save(update_fields=['clave_firma'])
+
+    def check_clave_firma(self, raw_pin):
+        return check_password(raw_pin, self.clave_firma)
 
     USERNAME_FIELD = 'correo'
     REQUIRED_FIELDS = []

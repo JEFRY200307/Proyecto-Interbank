@@ -1,6 +1,6 @@
-{% extends "dashboard_perfil.html" %}
+{% extends "dashboard_base.html" %}
 {% load static %}
-{% block perfil_content %}
+{% block content %}
 <h4>Usuarios de la Empresa</h4>
 <div id="usuarios-lista">
     <!-- Aquí se cargará la lista de usuarios vía JS -->
@@ -9,7 +9,7 @@
 
 <!-- Modal para agregar/editar usuario -->
 <div id="usuarioModal" class="modal" style="display:none;">
-    <form id="usuarioForm" class="modal-form">
+    <form id="usuarioForm" class="modal-form" autocomplete="off">
         <input type="hidden" id="usuario_id" name="usuario_id">
         <label>Nombre</label>
         <input type="text" id="nombre" name="nombre" required>
@@ -33,6 +33,7 @@
 {% endblock %}
 
 {% block extra_js %}
+{{ block.super }}
 <style>
     /* Usuarios lista */
     #usuarios-lista {
@@ -141,5 +142,5 @@
         border: 1px solid #f5c6cb;
     }
 </style>
-<script src="{% static 'js/usuarios.js' %}"></script>
+<script src="{% static 'js/usuarios.js' %}" defer></script>
 {% endblock %}
