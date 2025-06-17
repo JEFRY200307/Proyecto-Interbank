@@ -4,9 +4,9 @@ from .models import Documento,Firma
 class DocumentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Documento
-        fields = ['id', 'empresa', 'nombre', 'archivo', 'fecha_subida', 'tipo_documento', 'etiquetas', 'contenido']
+        fields = ['id', 'empresa', 'nombre', 'archivo', 'archivo_firmado', 'fecha_subida', 'tipo_documento', 'etiquetas', 'contenido']
         read_only_fields = ['empresa', 'fecha_subida']
-
+        
 class FirmaSerializer(serializers.ModelSerializer):
     documento = DocumentoSerializer(read_only=True)
 
