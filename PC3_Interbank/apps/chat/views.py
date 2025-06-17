@@ -69,13 +69,16 @@ class ChatBotAPIView(APIView):
 
 def guardar_conversacion(user, category, mensaje, respuesta):
     from .models import Conversacion
-    Conversacion.objects.create(
-        usuario=user,
-        chatbot=category.name,
-        mensaje_usuario=mensaje,
-        respuesta_chatbot=respuesta
-    )
-
+    try:
+        Conversacion.objects.create(
+            usuario=user,
+            chatbot=category.name,
+            mensaje_usuario=mensaje,
+            respuesta_chatbot=respuesta
+        )
+        print("Conversación guardada correctamente.")
+    except Exception as e:
+        print("Error al guardar conversación:", e)
 
 def chat_list(request):
     """
