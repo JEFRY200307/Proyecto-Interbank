@@ -1,5 +1,5 @@
 import os
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -84,15 +84,25 @@ def guardar_conversacion(user, category, mensaje, respuesta):
     )
 
 
+def chat_list(request):
+    """
+    Muestra la lista de todos los chatbots disponibles.
+    """
+    categories = ChatCategory.objects.all()  # Obtiene todas las categorías de chatbots
+    return render(request, 'dashboard_chat.html', {'categories': categories})
+
 def chat_dashboard(request, chatbot_id):
     """
     Renderiza el dashboard del chat con las categorías disponibles.
     """
-    try:
-        category = ChatCategory.objects.get(id=chatbot_id)
-        return render(request, 'dashboard_chat.html', {'category': category, 'chatbot_id': chatbot_id})
-    except ChatCategory.DoesNotExist:
-        return render(request, '404.html', status=404)  # Muestra una página 404 si el chatbot no existe
+    category = get_object_or_404(ChatCategory, id=chatbot_id)
+    prompt = CATEGORY_PROMPTS.get(category.name, "")
+    return render(request, 'dashboard_chat.html', {
+        'categories': ChatCategory.objects.all(),
+        'category': category,
+        'chatbot_id': chatbot_id,
+        'prompt': prompt,
+    })
 
 
 class ConversacionesUsuarioAPIView(APIView):
@@ -117,12 +127,4 @@ class ConversacionesUsuarioAPIView(APIView):
 
         except ChatCategory.DoesNotExist:
             return Response({"error": "Categoría no encontrada."}, status=404)
-
-
-def chat_list(request):
-    """
-    Muestra la lista de todos los chatbots disponibles.
-    """
-    categories = ChatCategory.objects.all()  # Obtiene todas las categorías de chatbots
-    return render(request, 'dashboard_chat.html', {'categories': categories})
 
