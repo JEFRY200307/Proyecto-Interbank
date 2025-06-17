@@ -255,62 +255,36 @@ function cargarConversaciones(chatbotId) {
 
 // Llamar a cargar conversaciones al iniciar el chat
 document.addEventListener('DOMContentLoaded', () => {
-  const chatbotId = categoriaSeleccionada; // Asegúrate de que esta variable tenga un valor válido
-  if (chatbotId) {
-    cargarConversaciones(chatbotId);
-  } else {
-    console.error("Error: chatbotId es null o undefined.");
-  }
+  if (!chatbotId) return; // Solo ejecuta si hay un chatbot seleccionado
 
-  const chatbotCards = document.querySelectorAll('.chatbot-card');
+  const enviarBtn = document.getElementById('enviar-btn');
+  const userMessageInput = document.getElementById('user-message');
+  const chatLog = document.getElementById('chat-log');
 
-  chatbotCards.forEach(card => {
-    card.addEventListener('click', () => {
-      chatbotCards.forEach(c => c.classList.remove('selected')); // Quita la selección de otras cartas
-      card.classList.add('selected'); // Agrega la clase seleccionada a la carta actual
+  enviarBtn.addEventListener('click', () => {
+    const mensaje = userMessageInput.value.trim();
+    if (!mensaje) return;
+
+    chatLog.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
+    userMessageInput.value = '';
+
+    fetch(`/users/dashboard/chat/api/chatbot/${chatbotId}/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // Si usas autenticación, agrega aquí el header Authorization
+      },
+      body: JSON.stringify({ message: mensaje })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.response) {
+        chatLog.innerHTML += `<div><strong>${categoriaNombre} Bot:</strong> ${data.response}</div>`;
+      } else if (data.error) {
+        chatLog.innerHTML += `<div style="color:red;"><strong>Error:</strong> ${data.error}</div>`;
+      }
+      chatLog.scrollTop = chatLog.scrollHeight;
     });
   });
-
-  document.getElementById('enviar-btn').addEventListener('click', () => {
-    const userMessage = document.getElementById('user-message').value;
-    if (userMessage.trim() === '') return;
-
-    const chatLog = document.getElementById('chat-log');
-    chatLog.innerHTML += `<div><strong>Tú:</strong> ${userMessage}</div>`;
-
-    // Simula la respuesta del chatbot
-    setTimeout(() => {
-      chatLog.innerHTML += `<div><strong>Chatbot:</strong> Esta es una respuesta automática.</div>`;
-      chatLog.scrollTop = chatLog.scrollHeight; // Desplaza hacia abajo
-    }, 1000);
-
-    document.getElementById('user-message').value = ''; // Limpia el input
-  });
-
-  function seleccionarChatbot(chatbotId, chatbotName) {
-    // Oculta el contenedor de chatbots
-    document.getElementById('chatbots-container').style.display = 'none';
-
-    // Muestra la caja de mensajes
-    const chatSection = document.getElementById('chat-section');
-    chatSection.classList.add('visible');
-
-    // Agrega el título del chatbot seleccionado
-    const chatLog = document.getElementById('chat-log');
-    chatLog.innerHTML = `<h2>Chatbot: ${chatbotName}</h2>`;
-  }
-
-  // Botón para volver a los chatbots
-  document.getElementById('volver-btn').addEventListener('click', () => {
-    document.getElementById('chat-section').classList.remove('visible');
-    document.getElementById('chatbots-container').style.display = 'flex';
-  });
-
-  const volverBtn = document.getElementById('volver-btn');
-  if (volverBtn) {
-    volverBtn.addEventListener('click', () => {
-      window.location.href = '/users/dashboard/chat/';
-    });
-  }
 });
 

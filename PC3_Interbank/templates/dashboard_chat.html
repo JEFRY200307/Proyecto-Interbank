@@ -7,7 +7,7 @@
 
 <div id="chatbots-container">
     {% for cat in categories %}
-        <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card {% if chatbot_id and cat.id == chatbot_id %}selected{% endif %}">
+        <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card">
             <img src="{% static 'img/chatbot_{{ cat.id }}.png' %}" alt="{{ cat.name }}" class="chatbot-img">
             <div class="chatbot-title">{{ cat.name }}</div>
         </a>
@@ -33,6 +33,11 @@
 </div>
 {% endif %}
 
+<script>
+  window.chatbotId = "{{ chatbot_id|default:'' }}";
+  window.categoriaNombre = "{{ category.name|default:'' }}";
+</script>
 <script src="{% static 'js/chat.js' %}"></script>
+
 {% endblock %}
 
