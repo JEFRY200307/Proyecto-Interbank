@@ -126,3 +126,5 @@ def chat_list(request):
     categories = ChatCategory.objects.all()  # Obtiene todas las categorías de chatbots
     return render(request, 'dashboard_chat.html', {'categories': categories})
 
+
+
