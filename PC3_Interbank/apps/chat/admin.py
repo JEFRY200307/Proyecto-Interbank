@@ -12,3 +12,8 @@ class ChatMessageAdmin(admin.ModelAdmin):
         total = ChatMessage.objects.all().delete()
         self.message_user(request, f"Se han eliminado todas las conversaciones ({total[0]} registros).")
     borrar_todas_conversaciones.short_description = "Borrar todas las conversaciones"
+
+@admin.register(ChatCategory)
+class ChatCategoryAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name')
+    search_fields = ('name',)
