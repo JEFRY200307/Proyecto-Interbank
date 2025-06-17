@@ -24,47 +24,40 @@ class ChatBotAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, category_id):
-        try:
-            # Obtener el mensaje del usuario
-            user_message = request.data.get("message", "")
-            if not user_message:
-                return Response({"error": "El mensaje no puede estar vacío."}, status=400)
+        user = request.user
+        message = request.data.get('message')
+        if not message:
+            return Response({"error": "El mensaje no puede estar vacío."}, status=400)
 
-            # Obtener la categoría del chatbot
-            category = ChatCategory.objects.get(id=category_id)
-            system_prompt = CATEGORY_PROMPTS.get(category.name)
-            if not system_prompt:
-                return Response({"error": "Categoría no soportada."}, status=400)
+        # Obtener la categoría del chatbot
+        category = get_object_or_404(ChatCategory, id=category_id)
+        system_prompt = CATEGORY_PROMPTS.get(category.name)
+        if not system_prompt:
+            return Response({"error": "Categoría no soportada."}, status=400)
 
-            # Verificar la API key de OpenAI
-            if not OPENAI_API_KEY:
-                return Response({"error": "API key de OpenAI no configurada."}, status=500)
+        # Verificar la API key de OpenAI
+        if not OPENAI_API_KEY:
+            return Response({"error": "API key de OpenAI no configurada."}, status=500)
 
-            # Llamar a la API de OpenAI
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
-                ]
-            )
-            respuesta_chatbot = response['choices'][0]['message']['content']
+        # Llamar a la API de OpenAI
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": message}
+            ]
+        )
+        respuesta_chatbot = response['choices'][0]['message']['content']
 
-            # Guardar la conversación en la base de datos
-            guardar_conversacion(
-                user=request.user,
-                category=category,
-                mensaje=user_message,
-                respuesta=respuesta_chatbot
-            )
+        # Guardar la conversación en la base de datos
+        guardar_conversacion(
+            user=request.user,
+            category=category,
+            mensaje=message,
+            respuesta=respuesta_chatbot
+        )
 
-            return Response({"response": respuesta_chatbot})
-
-        except ChatCategory.DoesNotExist:
-            return Response({"error": "Categoría no encontrada."}, status=404)
-        except Exception as e:
-            return Response({"error": str(e)}, status=500)
-
+        return Response({"response": respuesta_chatbot})
 
 def guardar_conversacion(user, category, mensaje, respuesta):
     """
