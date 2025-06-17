@@ -117,6 +117,19 @@ class EmpresaLoginView(APIView):
                 return Response({'error': 'Tu empresa aún no está activa o no tienes empresa asociada.'}, status=403)
         else:
             return Response({'error': 'Credenciales incorrectas.'}, status=400)
+        
+class EmpresaLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Agrega el token a la blacklist
+            return Response({"mensaje": "Sesión cerrada correctamente."}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": "Token inválido o ya fue cerrado."}, status=status.HTTP_400_BAD_REQUEST)
+        
 class PerfilEmpresaAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
