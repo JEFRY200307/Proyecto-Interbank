@@ -7,7 +7,7 @@
 
 <div id="chatbots-container">
     {% for cat in categories %}
-        <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card">
+        <a href="/users/dashboard/chat/{{ cat.id }}/" class="chatbot-card {% if chatbot_id and cat.id == chatbot_id %}selected{% endif %}">
             <img src="{% static 'img/chatbot_{{ cat.id }}.png' %}" alt="{{ cat.name }}" class="chatbot-img">
             <div class="chatbot-title">{{ cat.name }}</div>
         </a>
@@ -24,12 +24,8 @@
     </div>
     <div id="chat-buttons">
         <button id="roadmap-btn">Estoy listo para que me des el roadmap</button>
-        <button id="volver-btn" onclick="window.location.href='/users/dashboard/chat/'">Volver a los chatbots</button>
     </div>
-    <div id="prompt-box">
-        <strong>Prompt:</strong>
-        <div>{{ prompt }}</div>
-    </div>
+
 </div>
 {% endif %}
 

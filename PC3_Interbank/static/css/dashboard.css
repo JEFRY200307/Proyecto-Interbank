@@ -178,6 +178,82 @@ body {
   box-shadow: 0 4px 16px rgba(255, 179, 71, 0.18);
 }
 
+/* Cartas de chatbots */
+#chatbots-container {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 40px;
+  flex-wrap: wrap;
+}
+
+.chatbot-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(79, 140, 255, 0.10);
+  padding: 28px 18px 22px 18px;
+  width: 210px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s, border 0.3s, background 0.3s;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+}
+
+.chatbot-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px rgba(79, 140, 255, 0.15);
+  border: 2px solid #4f8cff;
+}
+
+.chatbot-card.selected {
+  border: 2.5px solid #7ed957;
+  box-shadow: 0 8px 32px rgba(126, 217, 87, 0.18);
+  transform: scale(1.06);
+  background-color: #f0fff4;
+}
+
+.chatbot-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin-bottom: 16px;
+}
+
+.chatbot-title {
+  font-weight: bold;
+  color: #2563eb;
+  font-size: 1.1em;
+  margin-top: 8px;
+}
+
+/* Botón roadmap */
+#roadmap-btn {
+  background: linear-gradient(90deg, #4f8cff 0%, #1cb5e0 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1.08em;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.12);
+  transition: background 0.3s, transform 0.2s, box-shadow 0.2s;
+  outline: none;
+  margin-top: 12px;
+}
+
+#roadmap-btn:hover {
+  background: linear-gradient(90deg, #1cb5e0 0%, #4f8cff 100%);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 16px rgba(79, 140, 255, 0.18);
+}
+
 /* Nuevos estilos para los chatbots */
 #chatbots-container {
   display: flex;
