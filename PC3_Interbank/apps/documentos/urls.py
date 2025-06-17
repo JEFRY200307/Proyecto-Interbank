@@ -7,6 +7,7 @@ from .views import (
     DocumentoDetailAPIView,
     PendientesFirmaAPIView,
     FirmarDocumentoAPIView,
+    FirmaDetailAPIView,
     HistorialFirmasAPIView,
     dashboard_firmas,
     dashboard_documentos,
@@ -31,6 +32,7 @@ urlpatterns = [
     path('firmas/pendientes/', PendientesFirmaAPIView.as_view(), name='firmas_pendientes'),
     path('documentos/firmas/historial/', HistorialFirmasAPIView.as_view()),
     path('firmas/<int:pk>/firmar/', FirmarDocumentoAPIView.as_view(), name='firmar_documento'),
+    path('firmas/<int:pk>/', FirmaDetailAPIView.as_view()),
     # apps/documentos/urls.py
     path('firmas/historial/', HistorialFirmasAPIView.as_view(), name='firmas_historial'),
 

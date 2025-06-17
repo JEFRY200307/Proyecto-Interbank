@@ -11,6 +11,7 @@ class Documento(models.Model):
     empresa = models.ForeignKey('empresas.Empresa', on_delete=models.CASCADE)
     nombre = models.CharField(max_length=255)
     archivo = models.FileField(upload_to='documentos/')
+    archivo_firmado = models.FileField(upload_to='firmados/', null=True, blank=True)  # firmado
     fecha_subida = models.DateTimeField(auto_now_add=True)
     tipo_documento = models.CharField(max_length=50, choices=[
         ('contrato', 'Contrato'),
