@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import ChatCategory, ChatMessage
+from .models import ChatCategory, Conversacion
 from django.utils import timezone
 import openai
 
@@ -24,7 +24,7 @@ CATEGORY_PROMPTS = {
 
 # Configuración de la API de OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+
 
 
 class ChatBotAPIView(APIView):
@@ -42,27 +42,36 @@ class ChatBotAPIView(APIView):
         if not system_prompt:
             return Response({"error": "Categoría no soportada."}, status=400)
 
-        # Verificar la API key de OpenAI
-        if not OPENAI_API_KEY:
-            return Response({"error": "API key de OpenAI no configurada."}, status=500)
+        # 1. Obtener historial de la conversación
+        conversaciones = Conversacion.objects.filter(
+            usuario=user,
+            chatbot=category.name
+        ).order_by('fecha_creacion')
 
-        # Llamar a la API de OpenAI
-        client = openai.OpenAI(api_key=OPENAI_API_KEY)
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": message}
-            ]
-        )
-        respuesta_chatbot = response.choices[0].message.content
+        # 2. Construir la lista de mensajes para OpenAI
+        messages = [{"role": "system", "content": system_prompt}]
+        for conv in conversaciones:
+            messages.append({"role": "user", "content": conv.mensaje_usuario})
+            messages.append({"role": "assistant", "content": conv.respuesta_chatbot})
+        messages.append({"role": "user", "content": message})
 
-        # Guardar la conversación en la base de datos
-        guardar_conversacion(
-            user=request.user,
-            category=category,
-            mensaje=message,
-            respuesta=respuesta_chatbot
+        # 3. Llamar a OpenAI con el historial
+        try:
+            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages
+            )
+            respuesta_chatbot = response.choices[0].message.content
+        except Exception as e:
+            return Response({"error": f"Error al comunicarse con OpenAI: {str(e)}"}, status=500)
+
+        # 4. Guardar la conversación nueva
+        Conversacion.objects.create(
+            usuario=user,
+            chatbot=category.name,
+            mensaje_usuario=message,
+            respuesta_chatbot=respuesta_chatbot
         )
 
         return Response({"response": respuesta_chatbot})

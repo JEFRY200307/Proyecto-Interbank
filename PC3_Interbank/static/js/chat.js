@@ -281,6 +281,60 @@ function guardarRoadmap(titulo, descripcion, actividades) {
   });
 }
 
+function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
+  let actividades = [];
+  let titulo = `Roadmap para ${categoriaNombre}`;
+  let descripcion = "Roadmap generado automáticamente por el chatbot.";
+
+  try {
+    // Extrae el JSON del texto (puede venir con texto antes/después)
+    const jsonMatch = respuesta.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error("No se encontró JSON en la respuesta.");
+    const roadmapObj = JSON.parse(jsonMatch[0]);
+
+    // Ajusta según la estructura del JSON recibido
+    const etapas = roadmapObj.roadmap?.etapas || roadmapObj.etapas || [];
+    etapas.forEach(etapa => {
+      (etapa.actividades || []).forEach(act => {
+        // Si act es string, úsalo; si es objeto, usa act.tarea
+        actividades.push({
+          descripcion: `${etapa.nombre}: ${typeof act === "string" ? act : (act.tarea || act)}`,
+          fecha_limite: null,
+          estado: "pendiente"
+        });
+      });
+    });
+
+    // Envía a Estrategias
+    const token = localStorage.getItem('access_token');
+    fetch('/empresas/api/estrategias/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        titulo: titulo,
+        descripcion: descripcion,
+        actividades: actividades,
+        categoria: categoriaNombre
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('¡Roadmap guardado en Estrategias!');
+    })
+    .catch(error => {
+      alert('Error al guardar el roadmap: ' + error.message);
+      console.error('Error al guardar el roadmap:', error);
+    });
+
+  } catch (e) {
+    alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato.");
+    console.error(e);
+  }
+}
+
 // Procesar la respuesta del chatbot
 function procesarRespuestaChatbot(data) {
   try {

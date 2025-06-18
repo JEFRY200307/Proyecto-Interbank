@@ -6,7 +6,6 @@ from rest_framework import status
 from django.contrib.auth.hashers import check_password
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
@@ -245,6 +244,10 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         actividades_data = self.request.data.get('actividades', [])
-        estrategia = serializer.save(usuario=self.request.user)
+        # Asigna usuario y empresa correctamente
+        estrategia = serializer.save(
+            usuario=self.request.user,
+            empresa=getattr(self.request.user, 'empresa', None)
+        )
         for actividad_data in actividades_data:
             Actividad.objects.create(estrategia=estrategia, **actividad_data)
