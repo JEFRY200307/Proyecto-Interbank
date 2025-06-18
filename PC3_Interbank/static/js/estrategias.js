@@ -59,4 +59,72 @@ function volverALaLista() {
 }
 
 // Cargar estrategias al inicio
-document.addEventListener('DOMContentLoaded', cargarEstrategias);
+document.addEventListener('DOMContentLoaded', function() {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    alert('Debes iniciar sesión para ver tus estrategias.');
+    window.location.href = '/login/';
+    return;
+  }
+
+  // 1. Cargar todas las estrategias
+  fetch('/empresas/api/estrategias/', {
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+  .then(response => response.json())
+  .then(estrategias => {
+    const tbody = document.getElementById('estrategias-tbody');
+    tbody.innerHTML = '';
+    estrategias.forEach(estrategia => {
+      let row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${estrategia.titulo}</td>
+        <td>${estrategia.descripcion}</td>
+        <td>${estrategia.categoria || ''}</td>
+        <td><button class="ver-actividades-btn" data-id="${estrategia.id}">Ver actividades</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    // 2. Agregar evento a los botones "Ver actividades"
+    document.querySelectorAll('.ver-actividades-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const estrategiaId = this.getAttribute('data-id');
+        mostrarActividades(estrategiaId, token);
+      });
+    });
+  })
+  .catch(error => {
+    alert('Error al cargar estrategias: ' + error.message);
+    console.error(error);
+  });
+
+  // 3. Función para mostrar actividades de una estrategia
+  function mostrarActividades(estrategiaId, token) {
+    fetch(`/empresas/api/estrategias/${estrategiaId}/`, {
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
+    })
+    .then(response => response.json())
+    .then(estrategia => {
+      const panel = document.getElementById('panel-actividades');
+      const lista = document.getElementById('lista-actividades');
+      lista.innerHTML = '';
+      if (estrategia.actividades && estrategia.actividades.length > 0) {
+        estrategia.actividades.forEach(act => {
+          lista.innerHTML += `<li>${act.descripcion} (${act.completada ? 'Completada' : 'Pendiente'})</li>`;
+        });
+      } else {
+        lista.innerHTML = '<li>No hay actividades</li>';
+      }
+      panel.style.display = 'block';
+    })
+    .catch(error => {
+      alert('Error al cargar actividades: ' + error.message);
+      console.error(error);
+    });
+  }
+});

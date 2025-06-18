@@ -19,7 +19,7 @@ from django.db.models import Avg, F, ExpressionWrapper, DurationField
 from apps.users.models import Usuario
 from .services import validar_ruc
 from rest_framework import generics, permissions
-from .models import Estrategia, Actividad
+from .models import Estrategia
 from .serializers import EstrategiaSerializer
 
 class PanelEmpresaView(APIView):
@@ -248,4 +248,13 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
             usuario=self.request.user,
             empresa=self.request.user.empresa
         )
+
+class EstrategiaDetailView(generics.RetrieveAPIView):
+    queryset = Estrategia.objects.all()
+    serializer_class = EstrategiaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Solo permite ver estrategias del usuario autenticado
+        return Estrategia.objects.filter(usuario=self.request.user)
 

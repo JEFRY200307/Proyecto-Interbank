@@ -1,5 +1,6 @@
 <!-- templates/dashboard_documentos.html -->
 {% extends 'dashboard_base.html' %}
+{% load static %}
 
 {% block content %}
 <div class="estrategias-container">
@@ -8,20 +9,17 @@
   <!-- Lista de estrategias -->
   <div class="estrategias-list">
     <h3>Mis Estrategias</h3>
-    <table class="estrategias-table">
+    <table class="estrategias-table" id="tabla-estrategias" border="1">
       <thead>
         <tr>
           <th>Título</th>
-          <th>Empresa</th>
+          <th>Descripción</th>
           <th>Categoría</th>
-          <th>Estado</th>
-          <th>Fecha de Creación</th>
-          <th>Fecha de Cumplimiento</th>
-          <th>Acciones</th>
+          <th>Ver actividades</th>
         </tr>
       </thead>
       <tbody id="estrategias-tbody">
-        <!-- Estrategias se cargarán dinámicamente -->
+        <!-- Estrategias se insertan aquí -->
       </tbody>
     </table>
   </div>
@@ -41,6 +39,13 @@
 
     <button onclick="volverALaLista()">Volver a la lista</button>
   </div>
+
+  <!-- Panel para mostrar actividades -->
+  <div id="panel-actividades" style="margin-top:20px; display:none;">
+    <h3>Actividades de la Estrategia</h3>
+    <ul id="lista-actividades"></ul>
+  </div>
+  
 </div>
 
 <script>
@@ -48,4 +53,5 @@
     window.location.href = '/login/'; // Cambia la ruta si tu login es diferente
   }
 </script>
+<script src="{% static 'js/estrategias.js' %}"></script>
 {% endblock %}

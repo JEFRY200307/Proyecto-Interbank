@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     home, registro_empresa, login_empresa,
     EmpresaRegistroView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,
-    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView
+    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView
 )
 
 urlpatterns = [
@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/panel-empresa/', PanelEmpresaView.as_view(), name='panel_empresa_api'),
     path('api/perfil/', PerfilEmpresaAPIView.as_view(), name='perfil_empresa_api'),
     path('api/estrategias/', EstrategiaListCreateView.as_view(), name='estrategias_api'),
+    path('api/estrategias/<int:pk>/', EstrategiaDetailView.as_view(), name='estrategia_detail_api'),  # <-- agrega esto
     # Admin/gestion
     path('admin/empresas/', lista_empresas, name='lista_empresas'),
     path('admin/empresas/eliminar/<int:empresa_id>/', eliminar_empresa, name='eliminar_empresa'),

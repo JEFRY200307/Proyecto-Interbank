@@ -40,8 +40,7 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
         model = Empresa
         fields = [
             'razon_social', 'ruc', 'representante', 'correo', 'direccion',
-            'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro',
-            'objetivo', 'mision', 'vision' ,'valores', 'historia', 'web', 'facebook', 'instagram'
+            'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro'
         ]
         read_only_fields = fields
 
@@ -49,18 +48,16 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
 class ActividadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actividad
-        fields = ['id', 'descripcion', 'fecha_limite', 'completada']
+        fields = ['id', 'descripcion', 'fecha_limite', 'completada']  # NO incluyas 'estrategia'
 
 class EstrategiaSerializer(serializers.ModelSerializer):
-    actividades = ActividadSerializer(many=True, required=False)
+    actividades = ActividadSerializer(many=True, read_only=False)
 
     class Meta:
         model = Estrategia
-        fields = ['id', 'usuario', 'empresa', 'titulo', 'descripcion', 'fecha_registro', 'fecha_cumplimiento', 'categoria', 'estado', 'actividades']
-        read_only_fields = ['usuario', 'fecha_registro']
+        fields = '__all__'
 
     def create(self, validated_data):
-        print("validated_data recibido en el serializer:", validated_data)
         actividades_data = validated_data.pop('actividades', [])
         estrategia = Estrategia.objects.create(**validated_data)
         for actividad_data in actividades_data:
