@@ -12,6 +12,7 @@ class Documento(models.Model):
     nombre = models.CharField(max_length=255)
     archivo = models.FileField(upload_to='documentos/')
     archivo_firmado = models.FileField(upload_to='firmados/', null=True, blank=True)  # firmado
+    archivo_firmado_visual = models.FileField(upload_to='firmados_visual/', null=True, blank=True) 
     fecha_subida = models.DateTimeField(auto_now_add=True)
     tipo_documento = models.CharField(max_length=50, choices=[
         ('contrato', 'Contrato'),
@@ -42,3 +43,4 @@ class Firma(models.Model):
     sello_tiempo = models.DateTimeField(null=True, blank=True)
     trazabilidad = models.JSONField(default=dict, blank=True)
     certificado = models.TextField(blank=True, null=True)
+    posicion = models.JSONField(null=True, blank=True) 

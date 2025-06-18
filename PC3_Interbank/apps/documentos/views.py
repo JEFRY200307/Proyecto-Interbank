@@ -20,9 +20,9 @@ import hashlib
 from rest_framework import viewsets, permissions
 from django.shortcuts import render
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import get_user_model
+from rest_framework.response import Response
 from .permissions import IsEditorOrReadOnly
-from .utils_pdf import insertar_firma_en_pdf
+from .utils_pdf import insertar_firmas_en_pdf, generar_pagina_trazabilidad_multiple, agregar_pagina_al_final
 from rest_framework.generics import RetrieveAPIView
 from .serializers import DocumentoSerializer, FirmaSerializer
 
@@ -34,6 +34,13 @@ def dashboard_documentos(request):
 def dashboard_firmas(request):
     rol = getattr(request.user, 'rol', None)
     return render(request, 'dashboard_firmas.html', {'rol': rol})
+
+def get_pdf_base(documento):
+    # Usa el PDF base solo con firmas visuales
+    if documento.archivo_firmado_visual and documento.archivo_firmado_visual.name:
+        return documento.archivo_firmado_visual.path
+    return documento.archivo.path
+
 # Listar y crear documentos
 class DocumentoEmpresaAPIView(generics.ListCreateAPIView):
     serializer_class = DocumentoSerializer
@@ -120,11 +127,8 @@ class PendientesFirmaAPIView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Firma.objects.filter(
-    documento__empresa=self.request.user.empresa,
-    firmante=self.request.user,
-    estado='pendiente'
-)
+        return Firma.objects.filter(firmante=self.request.user, estado='pendiente')
+    
 class FirmaDetailAPIView(RetrieveAPIView):
     queryset = Firma.objects.all()
     serializer_class = FirmaSerializer
@@ -152,50 +156,82 @@ class FirmarDocumentoAPIView(APIView):
             format, imgstr = firma_imagen.split(';base64,')
             ext = format.split('/')[-1]
             firma.firma_imagen.save(f'firma_{firma.id}.{ext}', ContentFile(base64.b64decode(imgstr)), save=False)
+        if firma_posicion:
+            firma.posicion = firma_posicion
 
-        # 1. Calcular hash SHA-256 del PDF original
-        with open(firma.documento.archivo.path, 'rb') as f:
-            pdf_bytes = f.read()
-        hash_sha256 = hashlib.sha256(pdf_bytes).hexdigest()
         firma.fecha_firma = timezone.now()
-
-        # 2. Generar QR con URL de verificación y preparar trazabilidad
-        qr_data = f"https://tusitio.com/verificacion_firma/{firma.id}/"
-        trazabilidad_dict = {
-            "Nombre": firma.firmante.nombre,
-            "DNI": getattr(firma.firmante, 'dni', '') or "No registrado",
-            "Fecha y hora": str(firma.fecha_firma),
-            "Hash SHA-256": hash_sha256,
-            "Certificado": getattr(firma, 'certificado', '') or "No disponible",
-            "ID de firma": firma.id,
-        }
-        firma.hash_documento = hash_sha256
-        firma.trazabilidad = trazabilidad_dict
         firma.estado = 'firmado'
         firma.save()
 
-        # 3. Inserta la firma visual en el PDF (si hay imagen y posición)
-        pdf_path = firma.documento.archivo.path
-        output_path = pdf_path.replace('.pdf', '_firmado.pdf')
-        if firma_imagen and firma_posicion:
-            insertar_firma_en_pdf(
-                pdf_path=pdf_path,
-                firma_base64=firma_imagen,
-                posicion=firma_posicion,
-                output_path=output_path
-            )
-        else:
-            # Si no hay firma visual, solo agrega la hoja de trazabilidad
-            from .utils_pdf import generar_pagina_trazabilidad, agregar_pagina_al_final
-            pagina_buffer = generar_pagina_trazabilidad(qr_data, trazabilidad_dict)
-            agregar_pagina_al_final(pdf_path, pagina_buffer, output_path)
+        # 0. Usa el PDF base (firmado por otros, o el original)
+        documento = firma.documento
+        pdf_base_path = get_pdf_base(documento)
 
-        # 4. Guarda el archivo firmado en el campo correcto
-        with open(output_path, 'rb') as f:
-            firma.documento.archivo_firmado.save(f'documento_{firma.documento.id}_firmado.pdf', ContentFile(f.read()))
-        firma.documento.save()
+        # 1. Inserta todas las firmas visuales en el PDF base
+        firmas_firmadas = list(documento.firmas.filter(estado='firmado').order_by('fecha_firma'))
+        temp_firmado_path = pdf_base_path.replace('.pdf', f'_temp_{firma.id}.pdf')
+        insertar_firmas_en_pdf(
+            pdf_path=pdf_base_path,
+            firmas=firmas_firmadas,
+            output_path=temp_firmado_path
+        )
+        # 2. Guarda el PDF base con firmas visuales
+        with open(temp_firmado_path, 'rb') as f:
+            documento.archivo_firmado_visual.save(f'documento_{documento.id}_firmado_visual.pdf', ContentFile(f.read()))
+        documento.save()
+
+        # 3. Genera la hoja de trazabilidad múltiple con QR, hash y firma visual
+        trazabilidad_lista = []
+        for f in firmas_firmadas:
+            # Hash del PDF firmado hasta ese momento (opcional)
+            hash_sha256 = ""
+            if f.documento.archivo_firmado:
+                with open(f.documento.archivo_firmado.path, 'rb') as pdf_f:
+                    hash_sha256 = hashlib.sha256(pdf_f.read()).hexdigest()
+
+            # QR con URL de verificación
+            qr_data = f"https://tusitio.com/verificacion_firma/{f.id}/"
+            qr_img = BytesIO()
+            qrcode.make(qr_data).save(qr_img, format='PNG')
+            qr_img.seek(0)
+
+            # Firma visual (si existe)
+            firma_img = None
+            if f.firma_imagen:
+                firma_img = f.firma_imagen.path
+
+            trazabilidad_lista.append({
+                "Nombre": getattr(f.firmante, 'nombre', f.firmante.get_username()),
+                "DNI": getattr(f.firmante, 'dni', '') or "No registrado",
+                "Fecha y hora": str(f.fecha_firma or timezone.now()),
+                "Posición": f.posicion,
+                "ID de firma": f.id,
+                "Hash SHA-256": hash_sha256,
+                "Certificado": getattr(f, 'certificado', '') or "No disponible",
+                "QR": qr_img,
+            })
+
+        pagina_buffer = generar_pagina_trazabilidad_multiple(trazabilidad_lista)
+
+        # 4. Agrega la hoja de trazabilidad al final
+        output_path_final = pdf_base_path.replace('.pdf', f'_firmado_{firma.id}.pdf')
+        agregar_pagina_al_final(temp_firmado_path, pagina_buffer, output_path_final)
+
+        # 5. Guarda el PDF final
+        with open(output_path_final, 'rb') as f:
+            documento.archivo_firmado.save(f'documento_{documento.id}_firmado.pdf', ContentFile(f.read()))
+        documento.save()
+
+        # Limpieza: elimina archivos temporales si existen
+        import os
+        try:
+            if os.path.exists(temp_firmado_path):
+                os.remove(temp_firmado_path)
+        except Exception:
+            pass
+
         return Response({'mensaje': 'Documento firmado correctamente.'})
-        
+    
 class FirmaViewSet(viewsets.ModelViewSet):
     """
     Ver firmas asignadas al usuario o a documentos que creó.
