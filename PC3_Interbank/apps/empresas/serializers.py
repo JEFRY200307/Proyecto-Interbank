@@ -40,7 +40,8 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
         model = Empresa
         fields = [
             'razon_social', 'ruc', 'representante', 'correo', 'direccion',
-            'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro'
+            'telefono', 'departamento', 'provincia', 'distrito', 'estado', 'fecha_registro',
+            'objetivo', 'mision', 'vision' ,'valores', 'historia', 'web', 'facebook', 'instagram'
         ]
         read_only_fields = fields
 

@@ -16,6 +16,14 @@ class Empresa(models.Model):
     distrito       = models.CharField(max_length=100, blank=True, null=True)  # Nuevo campo
     estado         = models.CharField(max_length=20, default='pendiente')
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    objetivo = models.TextField(blank=True, null=True)
+    mision = models.TextField(blank=True, null=True)
+    vision = models.TextField(blank=True, null=True)
+    valores = models.TextField(blank=True, null=True)
+    historia = models.TextField(blank=True, null=True)
+    web = models.URLField(blank=True, null=True)
+    facebook = models.URLField(blank=True, null=True)
+    instagram = models.URLField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"

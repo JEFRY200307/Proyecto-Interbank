@@ -30,6 +30,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('provincia').value = data.empresa.provincia || '';
                 document.getElementById('distrito').value = data.empresa.distrito || '';
                 document.getElementById('telefono').value = data.empresa.telefono || '';
+                document.getElementById('objetivo').value = data.empresa.objetivo || '';
+                document.getElementById('mision').value = data.empresa.mision || '';
+                document.getElementById('vision').value = data.empresa.vision || '';
+                document.getElementById('valores').value = data.empresa.telefono || '';
+                document.getElementById('historia').value = data.empresa.objetivo || '';
+                document.getElementById('web').value = data.empresa.mision || '';
+                document.getElementById('facebook').value = data.empresa.vision || '';
+                document.getElementById('instagram').value = data.empresa.vision || '';
             } else if ((rol === 'editor' || rol === 'lector')) {
                 document.getElementById('nombre').value = data.nombre || '';
                 document.getElementById('dni').value = data.dni || '';
@@ -54,7 +62,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 departamento: document.getElementById('departamento').value,
                 provincia: document.getElementById('provincia').value,
                 distrito: document.getElementById('distrito').value,
-                telefono: document.getElementById('telefono').value
+                telefono: document.getElementById('telefono').value,
+                objetivo: document.getElementById('objetivo').value,
+                mision: document.getElementById('mision').value,
+                vision: document.getElementById('vision').value,
+                valores: document.getElementById('valores').value,
+                historia: document.getElementById('historia').value,
+                web: document.getElementById('web').value,
+                facebook: document.getElementById('facebook').value,
+                instagram: document.getElementById('instagram').value
             };
         } else if (rol === 'editor' || rol === 'lector') {
             payload.nombre = document.getElementById('nombre').value;
