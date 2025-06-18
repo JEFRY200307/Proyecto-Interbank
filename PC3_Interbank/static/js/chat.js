@@ -305,6 +305,14 @@ function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
       });
     });
 
+    // Imprime el JSON que se enviará al backend
+    console.log("JSON que se enviará a /empresas/api/estrategias/:", {
+      titulo: titulo,
+      descripcion: descripcion,
+      actividades: actividades,
+      categoria: categoriaNombre
+    });
+
     // Envía a Estrategias
     const token = localStorage.getItem('access_token');
     fetch('/empresas/api/estrategias/', {
@@ -426,6 +434,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const token = localStorage.getItem('access_token');
   let esRoadmap = false;
 
+  // Verifica que el token exista antes de hacer cualquier petición
+  if (!token) {
+    alert('Debes iniciar sesión para usar el chat.');
+    window.location.href = '/login/';
+    return;
+  }
+
   // Cargar historial de conversaciones reales desde el backend
   fetch(`/users/dashboard/chat/api/conversaciones/${chatbotId}/`, {
     method: 'GET',
@@ -470,7 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatLog.scrollTop = chatLog.scrollHeight;
         // Si es roadmap, envía a estrategias
         if (esRoadmap) {
-          enviarRoadmapAEstrategias(data.response, window.categoriaNombre);
+          guardarRoadmapComoEstrategia(data.response, window.categoriaNombre);
           esRoadmap = false;
         }
       } else if (data.error) {
@@ -513,55 +528,65 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Función para enviar roadmap a Estrategias
-  function enviarRoadmapAEstrategias(respuesta, categoriaNombre) {
-    // Si la respuesta es texto plano, parsea etapas y actividades
-    const lineas = respuesta.split('\n');
+  // Función para guardar roadmap como Estrategia
+  function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
+    let actividades = [];
     let titulo = `Roadmap para ${categoriaNombre}`;
     let descripcion = "Roadmap generado automáticamente por el chatbot.";
-    let actividades = [];
 
-    let etapaActual = "";
-    lineas.forEach(linea => {
-      // Detecta el inicio de una etapa (ej: 1. **Análisis y Planificación:**)
-      const matchEtapa = linea.match(/^\d+\.\s*\*\*(.+?)\*\*:/);
-      if (matchEtapa) {
-        etapaActual = matchEtapa[1].trim();
-        return;
-      }
-      // Detecta actividad (guion)
-      const matchActividad = linea.match(/^\s*-\s*(.+)/);
-      if (matchActividad && etapaActual) {
-        actividades.push({
-          descripcion: `${etapaActual}: ${matchActividad[1].trim()}`,
-          fecha_limite: null,
-          estado: "pendiente"
+    try {
+      // Busca el bloque JSON dentro del mensaje
+      const jsonMatch = respuesta.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error("No se encontró JSON en la respuesta.");
+      const roadmapObj = JSON.parse(jsonMatch[0]);
+
+      // Procesa las etapas y actividades
+      const etapas = roadmapObj.roadmap?.etapas || roadmapObj.etapas || [];
+      etapas.forEach(etapa => {
+        (etapa.actividades || []).forEach(act => {
+          actividades.push({
+            descripcion: `${etapa.nombre}: ${typeof act === "string" ? act : (act.tarea || act)}`,
+            fecha_limite: null,
+            estado: "pendiente"
+          });
         });
-      }
-    });
+      });
 
-    // Envía a Estrategias
-    const token = localStorage.getItem('access_token');
-    fetch('/empresas/api/estrategias/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
+      // Imprime el JSON que se enviará al backend
+      console.log("JSON que se enviará a /empresas/api/estrategias/:", {
         titulo: titulo,
         descripcion: descripcion,
-        actividades: actividades
+        actividades: actividades,
+        categoria: categoriaNombre
+      });
+
+      // Envía a Estrategias con el token JWT
+      fetch('/empresas/api/estrategias/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({
+          titulo: titulo,
+          descripcion: descripcion,
+          actividades: actividades,
+          categoria: categoriaNombre
+        })
       })
-    })
-    .then(response => response.json())
-    .then(data => {
-      alert('¡Roadmap guardado en Estrategias!');
-    })
-    .catch(error => {
-      alert('Error al guardar el roadmap: ' + error.message);
-      console.error('Error al guardar el roadmap:', error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        alert('¡Roadmap guardado en Estrategias!');
+      })
+      .catch(error => {
+        alert('Error al guardar el roadmap: ' + error.message);
+        console.error('Error al guardar el roadmap:', error);
+      });
+
+    } catch (e) {
+      alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato.");
+      console.error(e);
+    }
   }
 });
 

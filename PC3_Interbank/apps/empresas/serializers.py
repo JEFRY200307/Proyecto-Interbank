@@ -59,6 +59,7 @@ class EstrategiaSerializer(serializers.ModelSerializer):
         read_only_fields = ['usuario', 'fecha_registro']
 
     def create(self, validated_data):
+        print("validated_data recibido en el serializer:", validated_data)
         actividades_data = validated_data.pop('actividades', [])
         estrategia = Estrategia.objects.create(**validated_data)
         for actividad_data in actividades_data:

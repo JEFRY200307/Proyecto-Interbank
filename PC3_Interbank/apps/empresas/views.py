@@ -243,11 +243,9 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
         return Estrategia.objects.filter(usuario=self.request.user).order_by('-fecha_registro')
 
     def perform_create(self, serializer):
-        actividades_data = self.request.data.get('actividades', [])
-        # Asigna usuario y empresa correctamente
-        estrategia = serializer.save(
+        print("JSON recibido en el POST de estrategia:", self.request.data)
+        serializer.save(
             usuario=self.request.user,
-            empresa=getattr(self.request.user, 'empresa', None)
+            empresa=self.request.user.empresa
         )
-        for actividad_data in actividades_data:
-            Actividad.objects.create(estrategia=estrategia, **actividad_data)
+
