@@ -363,24 +363,42 @@ function cargarConversaciones(chatbotId) {
 
 // Llamar a cargar conversaciones al iniciar el chat
 document.addEventListener('DOMContentLoaded', () => {
-  if (!chatbotId) return;
+  if (!window.chatbotId) return;
 
+  const chatLog = document.getElementById('chat-log');
   const enviarBtn = document.getElementById('enviar-btn');
   const userMessageInput = document.getElementById('user-message');
-  const chatLog = document.getElementById('chat-log');
+  const roadmapBtn = document.getElementById('roadmap-btn');
   const token = localStorage.getItem('access_token');
+  let esRoadmap = false;
 
-  if (!token) {
-    alert("Debes iniciar sesión para usar el chat.");
-    window.location.href = "/login/";
-    return;
-  }
+  // Cargar historial de conversaciones reales desde el backend
+  fetch(`/users/dashboard/chat/api/conversaciones/${chatbotId}/`, {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  })
+    .then(response => response.json())
+    .then(data => {
+      chatLog.innerHTML = '';
+      data.forEach(conversacion => {
+        chatLog.innerHTML += `
+          <div><strong>Tú:</strong> ${conversacion.mensaje_usuario}</div>
+          <div><strong>Bot:</strong> ${conversacion.respuesta_chatbot}</div>
+        `;
+      });
+      chatLog.scrollTop = chatLog.scrollHeight;
+    });
 
+  // Enviar mensaje normal
   enviarBtn.addEventListener('click', () => {
     const mensaje = userMessageInput.value.trim();
     if (!mensaje) return;
 
+    // Mostrar el mensaje del usuario inmediatamente
     chatLog.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
+    chatLog.scrollTop = chatLog.scrollHeight;
     userMessageInput.value = '';
 
     fetch(`/users/dashboard/chat/api/chatbot/${chatbotId}/`, {
@@ -391,48 +409,105 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       body: JSON.stringify({ message: mensaje })
     })
-    .then(response => {
-      if (response.status === 401) {
-        alert("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
-        window.location.href = "/login/";
-        return;
-      }
-      return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-      if (!data) return;
       if (data.response) {
-        chatLog.innerHTML += `<div><strong>${categoriaNombre} Bot:</strong> ${data.response}</div>`;
+        chatLog.innerHTML += `<div><strong>${window.categoriaNombre} Bot:</strong> ${data.response}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
+        // Si es roadmap, envía a estrategias
+        if (esRoadmap) {
+          enviarRoadmapAEstrategias(data.response, window.categoriaNombre);
+          esRoadmap = false;
+        }
       } else if (data.error) {
         chatLog.innerHTML += `<div style="color:red;"><strong>Error:</strong> ${data.error}</div>`;
+        chatLog.scrollTop = chatLog.scrollHeight;
       }
-      chatLog.scrollTop = chatLog.scrollHeight;
     });
   });
 
-  document.getElementById('roadmap-btn').addEventListener('click', function() {
-    // Usa el prompt especial según la categoría
-    let mensaje = "";
-    switch (categoriaNombre) {
-      case "Acceso a Financiamiento":
-        mensaje = `Por favor, genera un roadmap estructurado en formato JSON para el acceso a financiamiento...`;
-        break;
-      case "Marketing Digital":
-        mensaje = `Por favor, genera un roadmap estructurado en formato JSON para una campaña de marketing digital...`;
-        break;
-      // ...otros casos...
-      case "Gestión de Clientes":
-        mensaje = `Por favor, genera un roadmap estructurado en formato JSON para la gestión de clientes en una pyme...`;
-        break;
-      case "Sostenibilidad y RSE":
-        mensaje = `Por favor, genera un roadmap estructurado en formato JSON para implementar prácticas de sostenibilidad y RSE en una pyme...`;
-        break;
-      default:
-        mensaje = "Por favor, genera un roadmap estructurado para esta categoría.";
-        break;
-    }
-    document.getElementById('user-message').value = mensaje;
-    document.getElementById('enviar-btn').click();
-  });
+  // Botón roadmap
+  if (roadmapBtn) {
+    roadmapBtn.addEventListener('click', function() {
+      let mensaje = "";
+      esRoadmap = true;
+      switch (window.categoriaNombre) {
+        case "Acceso a Financiamiento":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para el acceso a financiamiento de una pyme, incluyendo etapas como análisis de necesidades, búsqueda de opciones, preparación de documentos, solicitud y seguimiento.";
+          break;
+        case "Marketing Digital":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para una campaña de marketing digital de una pyme, incluyendo etapas como análisis, planificación, ejecución, monitoreo y optimización.";
+          break;
+        case "Innovación y Desarrollo de Productos":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para la innovación y desarrollo de productos en una pyme, incluyendo etapas como ideación, validación, prototipado, lanzamiento y mejora continua.";
+          break;
+        case "Branding":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para el desarrollo de branding de una pyme. Incluye etapas como definición de identidad, diseño de logotipo, desarrollo de manual de marca y lanzamiento.";
+          break;
+        case "Diseño y Desarrollo UX/UI":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para el diseño y desarrollo UX/UI de un producto digital. Incluye etapas como investigación de usuario, wireframes, prototipado, testeo y entrega final.";
+          break;
+        case "SEO en la Era de la IA":
+          mensaje = "Por favor, genera un roadmap estructurado en formato JSON para una estrategia de SEO moderna que aproveche herramientas de inteligencia artificial. Incluye etapas como auditoría SEO, análisis de palabras clave con IA, optimización on-page y seguimiento de resultados.";
+          break;
+        default:
+          mensaje = "Por favor, genera un roadmap estructurado para esta categoría.";
+          break;
+      }
+      userMessageInput.value = mensaje;
+      enviarBtn.click();
+    });
+  }
+
+  // Función para enviar roadmap a Estrategias
+  function enviarRoadmapAEstrategias(respuesta, categoriaNombre) {
+    // Si la respuesta es texto plano, parsea etapas y actividades
+    const lineas = respuesta.split('\n');
+    let titulo = `Roadmap para ${categoriaNombre}`;
+    let descripcion = "Roadmap generado automáticamente por el chatbot.";
+    let actividades = [];
+
+    let etapaActual = "";
+    lineas.forEach(linea => {
+      // Detecta el inicio de una etapa (ej: 1. **Análisis y Planificación:**)
+      const matchEtapa = linea.match(/^\d+\.\s*\*\*(.+?)\*\*:/);
+      if (matchEtapa) {
+        etapaActual = matchEtapa[1].trim();
+        return;
+      }
+      // Detecta actividad (guion)
+      const matchActividad = linea.match(/^\s*-\s*(.+)/);
+      if (matchActividad && etapaActual) {
+        actividades.push({
+          descripcion: `${etapaActual}: ${matchActividad[1].trim()}`,
+          fecha_limite: null,
+          estado: "pendiente"
+        });
+      }
+    });
+
+    // Envía a Estrategias
+    const token = localStorage.getItem('access_token');
+    fetch('/empresas/api/estrategias/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        titulo: titulo,
+        descripcion: descripcion,
+        actividades: actividades
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      alert('¡Roadmap guardado en Estrategias!');
+    })
+    .catch(error => {
+      alert('Error al guardar el roadmap: ' + error.message);
+      console.error('Error al guardar el roadmap:', error);
+    });
+  }
 });
 
