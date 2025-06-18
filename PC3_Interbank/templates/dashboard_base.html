@@ -12,6 +12,8 @@
     <div class="sidebar">
         <h2>Panel</h2>
         <ul id="sidebar-menu"></ul>
+        <!-- Agrega aquí el botón de cerrar sesión -->
+        <button onclick="logout()" style="margin-top:20px;width:90%;">Cerrar sesión</button>
     </div>
     <div class="main-content">
         {% block content %}{% endblock %}
@@ -20,6 +22,8 @@
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Asegúrate de incluir logout.js -->
+    <script src="{% static 'js/logout.js' %}"></script>
     {% endblock %}
 </body>
 

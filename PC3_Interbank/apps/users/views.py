@@ -29,6 +29,9 @@ def dashboard_usuarios(request):
     rol = getattr(request.user, 'rol', None)
     return render(request, 'perfil_y_usuarios/usuarios.html', {'rol': rol})
 
+def dashboard_estrategias(request):
+    return render(request, 'dashboard_estrategias.html')
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 

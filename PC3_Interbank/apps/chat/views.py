@@ -1,123 +1,93 @@
 import os
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from .models import ChatCategory, ChatMessage
+from .models import ChatCategory, Conversacion
 from django.utils import timezone
 import openai
 
 # Prompts personalizados por categoría
 CATEGORY_PROMPTS = {
-    "Marketing Digital": "Eres un asistente experto en Marketing Digital enfocado en pequeñas empresas. Tu objetivo es ayudar al usuario a diseñar campañas en redes sociales, optimizar anuncios de pago por clic (PPC), mejorar la estrategia de contenidos (SEO y SEM), y medir resultados con herramientas de analítica web. Responde de forma clara, práctica y brinda ejemplos concretos adaptados al presupuesto y recursos limitados de una pyme.",
-    "Acceso a Financiamiento": "Eres un asesor financiero especializado en pymes. Guiarás al usuario paso a paso para identificar fuentes de financiamiento (bancos, microfinanzas, inversionistas ángeles, crowdfunding), preparar la documentación necesaria (plan de negocios, proyecciones financieras) y calcular costos y tasas de interés. Ofrece comparaciones de opciones, consejos para mejorar el perfil crediticio y plantillas de solicitud de crédito.",
-    "Legal y Tributario": "Eres un experto en aspectos legales y tributarios para pequeñas empresas en Perú. Ayuda al usuario a entender requisitos de constitución de empresa, obligaciones fiscales (IGV, impuesto a la renta), plazos de declaración y pagos, y trámites ante SUNAT y otras entidades. Proporciona resúmenes de normativas vigentes, esquemas de cálculo de impuestos y ejemplos prácticos de asientos contables básicos",
-    "Innovación y Desarrollo de Productos": "Eres un consultor de innovación y desarrollo de productos para pymes. Acompaña al usuario en la ideación de nuevos productos o servicios, validación de mercado (encuestas, pruebas de concepto), metodologías ágiles (Design Thinking, Lean Startup) y gestión de proyectos. Ofrece plantillas de roadmap, ejemplos de prototipos mínimos viables (MVP) y métricas para medir el éxito de la innovación",
+  "Marketing Digital": "Eres un consultor experto en Marketing Digital para pymes peruanas. Ayudas a diseñar campañas efectivas en redes sociales (Facebook Ads, Instagram Ads y TikTok Ads), optimizar presupuestos limitados en PPC (Google Ads), generar contenidos SEO y SEM adaptados al mercado local, y medir resultados con Google Analytics, Data Studio y otras herramientas gratuitas. Ofreces ejemplos prácticos, plantillas de planificación mensual y consejos para maximizar el ROI con recursos acotados.",
+  
+  "Acceso a Financiamiento": "Eres un asesor financiero especializado en pymes del Perú. Guías paso a paso para identificar y comparar fuentes de financiamiento locales (COFIDE, cajas municipales, inversionistas ángeles, crowdfunding en plataformas peruanas), preparar un plan de negocios sólido y proyecciones financieras, y calcular costos y tasas de interés vigentes. Proporcionas plantillas de solicitud de crédito, consejos para mejorar el historial crediticio en la SBS y casos de éxito de pequeñas empresas peruanas.",
+
+  "Innovación y Desarrollo de Productos": "Eres un consultor en Innovación y Desarrollo de Productos para pymes peruanas. Acompañas en la generación de ideas, validación de mercado con encuestas y prototipos (MVP), aplicando metodologías ágiles como Design Thinking y Lean Startup. Proporcionas un roadmap de desarrollo, ejemplos de pruebas de concepto con materiales y costos locales, métricas clave (tasa de conversión, feedback de usuarios) y recomendaciones para escalar el producto en el mercado nacional.",
+
+  "Branding": "Eres un experto en Branding para pequeñas empresas peruanas. Ayudas a definir identidad de marca (misión, visión, valores), elegir paleta de colores y tipografía coherentes con la cultura local, y diseñar un manual de marca sencillo. Propones un tono de comunicación cercano al consumidor peruano, estrategias de posicionamiento en ferias y redes sociales, y ejemplos de activaciones de bajo costo para generar reconocimiento y lealtad en el mercado nacional.",
+
+  "Diseño y Desarrollo UX/UI": "Eres un consultor en UX/UI especializado en productos digitales para pymes del Perú. Aconsejas sobre arquitectura de información, patrones de interacción y flujos de navegación claros para el usuario peruano. Recomiendas herramientas gratuitas o de bajo costo para prototipado (Figma, Adobe XD), metodologías de testeo con usuarios reales y ejemplos de interfaces adaptadas a smartphones de gama media. Ofreces plantillas de wireframes y checklists de usabilidad.",
+
+  "SEO en la Era de la IA": "Eres un especialista en SEO para pymes peruanas que aprovecha IA. Brindas técnicas para optimizar sitios web en español peruano usando herramientas como ChatGPT para sugerir palabras clave locales, Google Search Console y SEMrush. Explicas cómo generar contenidos de valor, estructurar datos con schema.org y mejorar el posicionamiento orgánico en buscadores. Incluyes un plan trimestral de auditoría SEO y ejemplos de optimización on‑page y link building adaptados al presupuesto de una pyme."
 }
 
 # Configuración de la API de OpenAI
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
+
 
 
 class ChatBotAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, category_id):
+        user = request.user
+        message = request.data.get('message')
+        if not message:
+            return Response({"error": "El mensaje no puede estar vacío."}, status=400)
+
+        # Obtener la categoría del chatbot
+        category = get_object_or_404(ChatCategory, id=category_id)
+        system_prompt = CATEGORY_PROMPTS.get(category.name)
+        if not system_prompt:
+            return Response({"error": "Categoría no soportada."}, status=400)
+
+        # 1. Obtener historial de la conversación
+        conversaciones = Conversacion.objects.filter(
+            usuario=user,
+            chatbot=category.name
+        ).order_by('fecha_creacion')
+
+        # 2. Construir la lista de mensajes para OpenAI
+        messages = [{"role": "system", "content": system_prompt}]
+        for conv in conversaciones:
+            messages.append({"role": "user", "content": conv.mensaje_usuario})
+            messages.append({"role": "assistant", "content": conv.respuesta_chatbot})
+        messages.append({"role": "user", "content": message})
+
+        # 3. Llamar a OpenAI con el historial
         try:
-            # Obtener el mensaje del usuario
-            user_message = request.data.get("message", "")
-            if not user_message:
-                return Response({"error": "El mensaje no puede estar vacío."}, status=400)
-
-            # Obtener la categoría del chatbot
-            category = ChatCategory.objects.get(id=category_id)
-            system_prompt = CATEGORY_PROMPTS.get(category.name)
-            if not system_prompt:
-                return Response({"error": "Categoría no soportada."}, status=400)
-
-            # Verificar la API key de OpenAI
-            if not OPENAI_API_KEY:
-                return Response({"error": "API key de OpenAI no configurada."}, status=500)
-
-            # Llamar a la API de OpenAI
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_message}
-                ]
+            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=messages
             )
-            respuesta_chatbot = response['choices'][0]['message']['content']
-
-            # Guardar la conversación en la base de datos
-            guardar_conversacion(
-                user=request.user,
-                category=category,
-                mensaje=user_message,
-                respuesta=respuesta_chatbot
-            )
-
-            return Response({"response": respuesta_chatbot})
-
-        except ChatCategory.DoesNotExist:
-            return Response({"error": "Categoría no encontrada."}, status=404)
+            respuesta_chatbot = response.choices[0].message.content
         except Exception as e:
-            return Response({"error": str(e)}, status=500)
+            return Response({"error": f"Error al comunicarse con OpenAI: {str(e)}"}, status=500)
 
+        # 4. Guardar la conversación nueva
+        Conversacion.objects.create(
+            usuario=user,
+            chatbot=category.name,
+            mensaje_usuario=message,
+            respuesta_chatbot=respuesta_chatbot
+        )
+
+        return Response({"response": respuesta_chatbot})
 
 def guardar_conversacion(user, category, mensaje, respuesta):
-    """
-    Guarda el mensaje del usuario y la respuesta del chatbot en la base de datos.
-    """
-    ChatMessage.objects.create(
-        user=user,
-        category=category,
-        message=mensaje,
-        timestamp=timezone.now()
-    )
-    ChatMessage.objects.create(
-        user=user,
-        category=category,
-        message=respuesta,
-        timestamp=timezone.now()
-    )
-
-
-def chat_dashboard(request, chatbot_id):
-    """
-    Renderiza el dashboard del chat con las categorías disponibles.
-    """
+    from .models import Conversacion
     try:
-        category = ChatCategory.objects.get(id=chatbot_id)
-        return render(request, 'dashboard_chat.html', {'category': category, 'chatbot_id': chatbot_id})
-    except ChatCategory.DoesNotExist:
-        return render(request, '404.html', status=404)  # Muestra una página 404 si el chatbot no existe
-
-
-class ConversacionesUsuarioAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, chatbot_id):
-        try:
-            conversaciones = ChatMessage.objects.filter(
-                user=request.user,
-                category_id=chatbot_id
-            ).order_by('-timestamp')
-
-            data = [
-                {
-                    "mensaje_usuario": conv.message,
-                    "respuesta_chatbot": conv.message,  # Ajusta según tu modelo
-                    "fecha_creacion": conv.timestamp
-                }
-                for conv in conversaciones
-            ]
-            return Response(data)
-
-        except ChatCategory.DoesNotExist:
-            return Response({"error": "Categoría no encontrada."}, status=404)
-
+        Conversacion.objects.create(
+            usuario=user,
+            chatbot=category.name,
+            mensaje_usuario=mensaje,
+            respuesta_chatbot=respuesta
+        )
+        print("Conversación guardada correctamente.")
+    except Exception as e:
+        print("Error al guardar conversación:", e)
 
 def chat_list(request):
     """
@@ -125,4 +95,38 @@ def chat_list(request):
     """
     categories = ChatCategory.objects.all()  # Obtiene todas las categorías de chatbots
     return render(request, 'dashboard_chat.html', {'categories': categories})
+
+def chat_dashboard(request, chatbot_id):
+    """
+    Renderiza el dashboard del chat con las categorías disponibles.
+    """
+    category = get_object_or_404(ChatCategory, id=chatbot_id)
+    prompt = CATEGORY_PROMPTS.get(category.name, "")
+    return render(request, 'dashboard_chat.html', {
+        'categories': ChatCategory.objects.all(),
+        'category': category,
+        'chatbot_id': chatbot_id,
+        'prompt': prompt,
+    })
+
+
+class ConversacionesUsuarioAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, chatbot_id):
+        from .models import Conversacion
+        category = get_object_or_404(ChatCategory, id=chatbot_id)
+        conversaciones = Conversacion.objects.filter(
+            usuario=request.user,
+            chatbot=category.name
+        ).order_by('fecha_creacion')
+        data = [
+            {
+                "mensaje_usuario": conv.mensaje_usuario,
+                "respuesta_chatbot": conv.respuesta_chatbot,
+                "fecha_creacion": conv.fecha_creacion
+            }
+            for conv in conversaciones
+        ]
+        return Response(data)
 

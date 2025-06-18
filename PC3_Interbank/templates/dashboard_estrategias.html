@@ -42,4 +42,10 @@
     <button onclick="volverALaLista()">Volver a la lista</button>
   </div>
 </div>
+
+<script>
+  if (!localStorage.getItem('access_token')) {
+    window.location.href = '/login/'; // Cambia la ruta si tu login es diferente
+  }
+</script>
 {% endblock %}

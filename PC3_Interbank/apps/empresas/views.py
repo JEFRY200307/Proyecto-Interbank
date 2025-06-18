@@ -6,7 +6,6 @@ from rest_framework import status
 from django.contrib.auth.hashers import check_password
 from rest_framework.decorators import api_view, permission_classes
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.contrib.auth import authenticate, login
@@ -117,6 +116,19 @@ class EmpresaLoginView(APIView):
                 return Response({'error': 'Tu empresa aún no está activa o no tienes empresa asociada.'}, status=403)
         else:
             return Response({'error': 'Credenciales incorrectas.'}, status=400)
+        
+class EmpresaLogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()  # Agrega el token a la blacklist
+            return Response({"mensaje": "Sesión cerrada correctamente."}, status=status.HTTP_205_RESET_CONTENT)
+        except Exception as e:
+            return Response({"error": "Token inválido o ya fue cerrado."}, status=status.HTTP_400_BAD_REQUEST)
+        
 class PerfilEmpresaAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -232,6 +244,10 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         actividades_data = self.request.data.get('actividades', [])
-        estrategia = serializer.save(usuario=self.request.user)
+        # Asigna usuario y empresa correctamente
+        estrategia = serializer.save(
+            usuario=self.request.user,
+            empresa=getattr(self.request.user, 'empresa', None)
+        )
         for actividad_data in actividades_data:
             Actividad.objects.create(estrategia=estrategia, **actividad_data)

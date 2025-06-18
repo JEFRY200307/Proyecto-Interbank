@@ -17,7 +17,7 @@ function cargarEstrategias() {
           <td>${estrategia.empresa || 'Sin empresa'}</td>
           <td>${estrategia.categoria}</td>
           <td>${estrategia.estado}</td>
-          <td>${estrategia.fecha_creacion}</td>
+          <td>${estrategia.fecha_registro}</td>
           <td>${estrategia.fecha_cumplimiento || 'Sin fecha'}</td>
           <td><button onclick="verDetalle(${estrategia.id})">Ver</button></td>
         `;
