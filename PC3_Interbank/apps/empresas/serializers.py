@@ -63,3 +63,20 @@ class EstrategiaSerializer(serializers.ModelSerializer):
         for actividad_data in actividades_data:
             Actividad.objects.create(estrategia=estrategia, **actividad_data)
         return estrategia
+    
+class EmpresaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empresa
+        fields = [
+            'id', 'razon_social', 'ruc', 'correo', 'estado'
+        ]
+
+class EmpresaDetalleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Empresa
+        fields = [
+            'id', 'razon_social', 'ruc', 'representante', 'correo', 'direccion',
+            'telefono', 'departamento', 'provincia', 'distrito', 'estado',
+            'objetivo', 'mision', 'vision', 'valores', 'historia',
+            'web', 'facebook', 'instagram'
+        ]

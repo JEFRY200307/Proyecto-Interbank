@@ -1,5 +1,6 @@
 # apps/empresas/models.py
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -24,6 +25,8 @@ class Empresa(models.Model):
     web = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
+    mentores = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='empresas_asesoradas', blank=True, limit_choices_to={'rol': 'mentor'} ) # Opcional: solo usuarios con rol mentor
+    solicita_mentoria = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"

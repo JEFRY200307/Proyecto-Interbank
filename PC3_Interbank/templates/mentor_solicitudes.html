@@ -1,0 +1,51 @@
+<!-- mentor_solicitudes.html -->
+{% extends 'dashboard_base.html' %}
+{% block content %}
+<h2>Empresas que solicitan mentoría</h2>
+<div id="solicitudes-container"></div>
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const token = localStorage.getItem('access_token');
+    const container = document.getElementById('solicitudes-container');
+    if (!token) {
+        container.innerHTML = '<p>No autenticado.</p>';
+        return;
+    }
+    const res = await fetch('/mentor/api/empresas-solicitan/', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+        const empresas = await res.json();
+        if (empresas.length === 0) {
+            container.innerHTML = '<p>No hay empresas esperando mentoría.</p>';
+        } else {
+            container.innerHTML = empresas.map(e => `
+                <div class="tarjeta-empresa" style="margin-bottom:1rem;">
+                  <h3>${e.razon_social}</h3>
+                  <p><strong>RUC:</strong> ${e.ruc}</p>
+                  <p><strong>Correo:</strong> ${e.correo}</p>
+                  <p><strong>Estado:</strong> ${e.estado}</p>
+                  <button onclick="aceptarMentoria(${e.id})" style="background:#43a047;color:#fff;padding:0.5rem 1.2rem;border:none;border-radius:5px;cursor:pointer;">Aceptar mentoría</button>
+                </div>
+            `).join('');
+        }
+    } else {
+        container.innerHTML = '<p>Error al cargar solicitudes.</p>';
+    }
+});
+
+function aceptarMentoria(empresaId) {
+    const token = localStorage.getItem('access_token');
+    fetch(`/mentor/api/empresas/${empresaId}/aceptar_mentoria/`, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.mensaje || 'Mentoría aceptada');
+        location.reload();
+    })
+    .catch(() => alert('Error al aceptar mentoría'));
+}
+</script>
+{% endblock %}
