@@ -42,7 +42,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                         localStorage.setItem('nombre', data.nombre);
                     }
                     // Redirige siempre al dashboard único
-                    window.location.href = '/users/dashboard/';
+                    if (data.rol === 'mentor') {
+                        window.location.href = '/mentor/dashboard/';
+                    } else {
+                        window.location.href = '/users/dashboard/';
+                    }
                 })
                 .catch((err) => {
                     console.log('Error al consultar cuenta:', err);

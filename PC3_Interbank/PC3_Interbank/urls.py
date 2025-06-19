@@ -16,6 +16,7 @@ urlpatterns = [
     path('users/dashboard/chat/', include('apps.chat.urls')),
     path('users/', include('apps.chat.urls')),
     path('users/', include('apps.users.urls')),
+    path('mentor/', include('apps.mentor.urls')),
     path('dashboard/', include('apps.dashboard.urls')),
     path('empresas/', include('apps.empresas.urls')),
     path('documentos/', include('apps.documentos.urls')),

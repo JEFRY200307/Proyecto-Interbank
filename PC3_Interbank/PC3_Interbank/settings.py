@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.empresas',
     'apps.documentos',
-    'apps.chat',        
+    'apps.chat',
+    'apps.mentor'        
 ]
 
 MIDDLEWARE = [

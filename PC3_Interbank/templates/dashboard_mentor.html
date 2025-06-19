@@ -1,0 +1,194 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Empresas a tu cargo</h2>
+<div class="empresas-tarjetas-container">
+  {% for empresa in empresas %}
+    <div class="tarjeta-empresa" 
+     data-id="{{ empresa.id }}" 
+     data-razon="{{ empresa.razon_social|escapejs }}" 
+     onclick="mostrarEstrategiasDesdeTarjeta(this)">
+      <h3>{{ empresa.razon_social }}</h3>
+      <p><strong>RUC:</strong> {{ empresa.ruc }}</p>
+      <p><strong>Correo:</strong> {{ empresa.correo }}</p>
+      <p><strong>Estado:</strong> {{ empresa.estado }}</p>
+    </div>
+  {% empty %}
+    <p>No hay empresas registradas.</p>
+  {% endfor %}
+</div>
+
+<div id="estrategias-panel" style="display:none; margin-top:2rem;">
+  <h2 id="titulo-empresa"></h2>
+  <button onclick="cerrarPanelEstrategias()" style="margin-bottom:1rem;">Volver a empresas</button>
+  <div class="estrategias-list">
+    <table class="estrategias-table" style="width:100%; border: 1px solid black;">
+      <thead>
+        <tr>
+          <th>Título</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Estado</th>
+          <th>Fecha de Registro</th>
+          <th>Fecha de Cumplimiento</th>
+          <th>Actividades</th>
+        </tr>
+      </thead>
+      <tbody id="estrategias-tbody">
+        <!-- Estrategias se insertan aquí por JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+.empresas-tarjetas-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.tarjeta-empresa {
+  background: #f7f7f7;
+  border: 1px solid #b2dfdb;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px #e0f2f1;
+  padding: 1.2rem 1.5rem;
+  width: 260px;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.tarjeta-empresa:hover {
+  box-shadow: 0 4px 16px #80cbc4;
+  background: #e0f7fa;
+}
+.estrategias-table th, .estrategias-table td {
+  padding: 0.7rem;
+  border: 1px solid #b2dfdb;
+}
+.estrategias-table th {
+  background: #e0f2f1;
+}
+.actividad-editable {
+  width: 90%;
+  padding: 0.3rem;
+  border: 1px solid #b2dfdb;
+  border-radius: 5px;
+}
+.btn-guardar {
+  background: #388e3c;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+}
+.btn-guardar:hover {
+  background: #43a047;
+}
+</style>
+
+<script>
+let empresaSeleccionadaId = null;
+let estrategiasActuales = [];
+
+function mostrarEstrategias(empresaId, razonSocial) {
+  empresaSeleccionadaId = empresaId;
+  document.getElementById('estrategias-panel').style.display = 'block';
+  document.querySelector('.empresas-tarjetas-container').style.display = 'none';
+  document.getElementById('titulo-empresa').textContent = 'Estrategias de ' + razonSocial;
+
+  fetch(`/empresas/api/estrategias/?empresa_id=${empresaId}`, {
+    headers: {
+      'Authorization': 'Bearer ' + (localStorage.getItem('access_token') || '')
+    }
+  })
+  .then(response => response.json())
+  .then(estrategias => {
+    estrategiasActuales = estrategias;
+    const tbody = document.getElementById('estrategias-tbody');
+    tbody.innerHTML = '';
+    estrategias.forEach(estrategia => {
+      let actividadesHtml = '';
+      if (estrategia.actividades && estrategia.actividades.length > 0) {
+        estrategia.actividades.forEach((act, idx) => {
+          actividadesHtml += `
+            <div style="margin-bottom:0.5rem;">
+              <input type="text" class="actividad-editable" value="${act.descripcion.replace(/"/g, '&quot;')}" 
+                data-estrategia="${estrategia.id}" data-actividad="${act.id}" id="act-${estrategia.id}-${act.id}">
+              <select data-estrategia="${estrategia.id}" data-actividad="${act.id}" id="estado-${estrategia.id}-${act.id}">
+                <option value="false" ${!act.completada ? 'selected' : ''}>Pendiente</option>
+                <option value="true" ${act.completada ? 'selected' : ''}>Completada</option>
+              </select>
+            </div>
+          `;
+        });
+        actividadesHtml += `<button class="btn-guardar" onclick="guardarActividades(${estrategia.id})">Guardar cambios</button>`;
+      } else {
+        actividadesHtml = '<em>No hay actividades</em>';
+      }
+      let row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${estrategia.titulo}</td>
+        <td>${estrategia.descripcion}</td>
+        <td>${estrategia.categoria || ''}</td>
+        <td>${estrategia.estado}</td>
+        <td>${estrategia.fecha_registro}</td>
+        <td>${estrategia.fecha_cumplimiento || ''}</td>
+        <td>${actividadesHtml}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  })
+  .catch(error => {
+    alert('Error al cargar estrategias: ' + error.message);
+    console.error(error);
+  });
+}
+
+function cerrarPanelEstrategias() {
+  document.getElementById('estrategias-panel').style.display = 'none';
+  document.querySelector('.empresas-tarjetas-container').style.display = 'flex';
+  empresaSeleccionadaId = null;
+}
+
+function guardarActividades(estrategiaId) {
+  // Recolectar datos editados
+  const estrategia = estrategiasActuales.find(e => e.id === estrategiaId);
+  if (!estrategia) return;
+  const actividadesEditadas = estrategia.actividades.map(act => {
+    const desc = document.getElementById(`act-${estrategiaId}-${act.id}`).value;
+    const estado = document.getElementById(`estado-${estrategiaId}-${act.id}`).value === 'true';
+    return {
+      id: act.id,
+      descripcion: desc,
+      completada: estado
+    };
+  });
+
+  fetch(`/empresas/api/estrategias/${estrategiaId}/editar_actividades/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + (localStorage.getItem('access_token') || ''),
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({ actividades: actividadesEditadas })
+  })
+  .then(response => {
+    if (response.ok) {
+      alert('Actividades actualizadas correctamente.');
+      mostrarEstrategias(empresaSeleccionadaId, document.getElementById('titulo-empresa').textContent.replace('Estrategias de ', ''));
+    } else {
+      alert('Error al guardar actividades.');
+    }
+  })
+  .catch(error => {
+    alert('Error al guardar actividades: ' + error.message);
+    console.error(error);
+  });
+}
+</script>
+{% endblock %}

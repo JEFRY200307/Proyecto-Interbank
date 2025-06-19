@@ -103,7 +103,8 @@ class EmpresaLoginView(APIView):
         password = request.data.get('password')
         user = authenticate(request, correo=correo, password=password)
         if user is not None:
-            if user.empresa and user.empresa.estado == 'activo':
+            # Solo exige empresa activa si el rol NO es mentor
+            if user.rol == 'mentor' or (user.empresa and user.empresa.estado == 'activo'):
                 refresh = RefreshToken.for_user(user)
                 return Response({
                     'refresh': str(refresh),
