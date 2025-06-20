@@ -1,7 +1,7 @@
 # apps/empresas/serializers.py
 
 from rest_framework import serializers
-from .models import Empresa, Estrategia, Actividad
+from .models import Empresa, Estrategia, Actividad, Etapa
 from django.contrib.auth.hashers import make_password
 
 class EmpresaRegistroSerializer(serializers.ModelSerializer):
@@ -48,20 +48,30 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
 class ActividadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actividad
-        fields = ['id', 'descripcion', 'fecha_limite', 'completada']  # NO incluyas 'estrategia'
+        fields = ['id', 'descripcion', 'fecha_limite', 'completada']
+
+class EtapaSerializer(serializers.ModelSerializer):
+    actividades = ActividadSerializer(many=True)
+
+    class Meta:
+        model = Etapa
+        fields = ['id', 'nombre', 'descripcion', 'actividades']
 
 class EstrategiaSerializer(serializers.ModelSerializer):
-    actividades = ActividadSerializer(many=True, read_only=False)
+    etapas = EtapaSerializer(many=True)
 
     class Meta:
         model = Estrategia
         fields = '__all__'
 
     def create(self, validated_data):
-        actividades_data = validated_data.pop('actividades', [])
+        etapas_data = validated_data.pop('etapas', [])
         estrategia = Estrategia.objects.create(**validated_data)
-        for actividad_data in actividades_data:
-            Actividad.objects.create(estrategia=estrategia, **actividad_data)
+        for etapa_data in etapas_data:
+            actividades_data = etapa_data.pop('actividades', [])
+            etapa = Etapa.objects.create(estrategia=estrategia, **etapa_data)
+            for actividad_data in actividades_data:
+                Actividad.objects.create(etapa=etapa, **actividad_data)
         return estrategia
     
 class EmpresaSerializer(serializers.ModelSerializer):
