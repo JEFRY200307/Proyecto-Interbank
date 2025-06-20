@@ -71,185 +71,44 @@ function enviarMensajeRoadmap() {
 
   let mensaje = "";
 
-  // Generar el prompt según el chatbot seleccionado
-  switch (categoriaNombre) {
+  // Prompt para generar JSON acorde a los modelos Django Estrategia, Etapa y Actividad
+  const estructuraBase = `Debe devolverse un objeto JSON con la siguiente estructura:
 
-    case "Acceso a Financiamiento":
-      mensaje = `
-Por favor, crea un roadmap en formato JSON para una pyme peruana que busque acceder a financiamiento. Debe incluir 4 etapas:
-1. Identificar fuentes de financiamiento  
-2. Preparar documentación  
-3. Calcular costos y tasas  
-4. Mejorar perfil crediticio  
-
-Para cada etapa:
-- "descripcion": breve explicación del propósito.  
-- "actividades": lista de objetos con "tarea" y "fecha_limite" (usa fechas ficticias).  
-- "estado": inicial "pendiente".  
-Ejemplo de estructura general:
 {
-  "etapas": [
-    {
-      "nombre": "Identificar fuentes de financiamiento",
-      "descripcion": "...",
-      "actividades": [
-        { "tarea": "...", "fecha_limite": "YYYY-MM-DD" },
-        …
-      ],
-      "estado": "pendiente"
-    },
-    …
-  ]
-}
-      `.trim();
-      break;
-
-    case "Marketing Digital":
-      mensaje = `
-Por favor, crea un roadmap en JSON para una campaña de marketing digital de una pyme peruana. Debe tener 4 etapas:
-1. Definir objetivos de campaña  
-2. Identificar público objetivo  
-3. Crear y calendarizar contenido para redes  
-4. Configurar PPC y SEO  
-
-Cada etapa debe incluir:
-- "descripcion": objetivo de la fase.  
-- "actividades": listado con "tarea" y "fecha_limite" (ficticias).  
-- "estado": "pendiente".  
-
-Devuélvelo sólo como JSON, sin texto adicional.
-      `.trim();
-      break;
-
-    case "Legal y Tributario":
-      mensaje = `
-Por favor, crea un roadmap en JSON para que una pyme peruana cumpla con sus obligaciones legales y tributarias. Incluye 4 etapas:
-1. Constitución de la empresa  
-2. Registro en SUNAT  
-3. Declaración de impuestos  
-4. Cumplimiento de obligaciones laborales  
-
-Para cada etapa:
-- "descripcion": breve.  
-- "actividades": array de objetos con "tarea" y "fecha_limite".  
-- "estado": "pendiente".  
-
-La salida debe ser un único objeto JSON.
-      `.trim();
-      break;
-
-    case "Innovación y Desarrollo de Productos":
-      mensaje = `
-Por favor, crea un roadmap en JSON para el desarrollo de un nuevo producto en una pyme peruana, con 4 etapas:
-1. Ideación y validación de concepto  
-2. Desarrollo de prototipo (MVP)  
-3. Pruebas de mercado  
-4. Lanzamiento  
-
-Cada objeto de etapa debe contener:
-- "descripcion"  
-- "actividades": lista de { "tarea", "fecha_limite" }  
-- "estado": "pendiente"  
-
-Entrega únicamente el JSON.
-      `.trim();
-      break;
-
-    case "Gestión de Clientes":
-      mensaje = `
-Por favor, crea un roadmap en JSON para optimizar la gestión de clientes en una pyme peruana. Incluye 4 etapas:
-1. Identificación de clientes potenciales  
-2. Estrategias de acercamiento  
-3. Proceso de ventas y cierre  
-4. Seguimiento y fidelización  
-
-Para cada etapa:
-- "descripcion"  
-- "actividades": array de { "tarea", "fecha_limite" }  
-- "estado": "pendiente"  
-
-Responde solo con el JSON.
-      `.trim();
-      break;
-
-    case "Sostenibilidad y RSE":
-      mensaje = `
-Por favor, crea un roadmap en JSON para implementar sostenibilidad y RSE en una pyme peruana. Debe incluir 4 etapas:
-1. Evaluación del estado actual  
-2. Definición de políticas y objetivos  
-3. Implementación de prácticas  
-4. Monitoreo y reporte  
-
-Cada etapa con:
-- "descripcion"  
-- "actividades": listado con "tarea" y "fecha_limite"  
-- "estado": "pendiente"  
-
-Solo JSON como respuesta.
-      `.trim();
-      break;
-
-    case "Branding":
-      mensaje = `
-Por favor, crea un roadmap en JSON para el branding de una pyme peruana. Incluye estas 4 etapas:
-1. Definición de identidad (misión, visión, valores)  
-2. Diseño de logotipo y paleta de colores  
-3. Elaboración de manual de marca  
-4. Plan de lanzamiento  
-
-Cada etapa debe tener:
-- "descripcion"  
-- "actividades": array de { "tarea", "fecha_limite" }  
-- "estado": "pendiente"  
-
-Devuelve únicamente el JSON.
-      `.trim();
-      break;
-
-    case "Diseño y Desarrollo UX/UI":
-      mensaje = `
-Por favor, crea un roadmap en JSON para el diseño y desarrollo UX/UI de un producto digital para una pyme peruana. Con estas 5 etapas:
-1. Investigación de usuario  
-2. Arquitectura de información y wireframes  
-3. Prototipado interactivo  
-4. Testeo con usuarios  
-5. Ajustes finales y entrega  
-
-Para cada etapa:
-- "descripcion"  
-- "actividades": lista de { "tarea", "fecha_limite" }  
-- "estado": "pendiente"  
-
-Solo JSON en la respuesta.
-      `.trim();
-      break;
-
-    case "SEO en la Era de la IA":
-      mensaje = `
-Por favor, crea un roadmap en JSON para una estrategia de SEO con IA en una pyme peruana. Debe incluir 4 etapas:
-1. Auditoría SEO inicial  
-2. Análisis de palabras clave con IA  
-3. Optimización on‑page  
-4. Seguimiento y ajustes  
-
-Cada etapa con:
-- "descripcion"  
-- "actividades": array de { "tarea", "fecha_limite" }  
-- "estado": "pendiente"  
-
-Responde únicamente con el objeto JSON.
-      `.trim();
-      break;
-
-    default:
-      mensaje = "Por favor, genera un roadmap estructurado en JSON para esta categoría.";
-      break;
+  "estrategia": {
+    "titulo": "Título de la estrategia",
+    "descripcion": "Descripción breve",
+    "categoria": "${categoriaNombre}",
+    "fecha_cumplimiento": "YYYY-MM-DD",  // opcional
+    "estado": "pendiente",
+    "etapas": [
+      {
+        "nombre": "Nombre de la etapa",
+        "descripcion": "Descripción de la etapa",
+        "actividades": [
+          {
+            "descripcion": "Descripción de la actividad",
+            "fecha_limite": "YYYY-MM-DD",  // opcional
+            "completada": false
+          }
+        ]
+      }
+    ]
   }
+}`;
+
+  // Generar prompt según categoría sin nombres de etapas fijos
+  mensaje = `Por favor, genera un roadmap para una pyme peruana en la categoría "${categoriaNombre}" siguiendo la estructura JSON de Estrategia, Etapa y Actividad:
+
+${estructuraBase}
+
+Usa nombres de etapas relevantes según el contexto y mensajes previos. No agregues texto adicional, solo devuelve el JSON.`;
 
   // Enviar el mensaje al chatbot
   document.getElementById('user-message').value = mensaje;
   enviarMensaje();
 }
+
 
 function volverATarjetas() {
   document.getElementById('chat-section').style.display = 'none';
