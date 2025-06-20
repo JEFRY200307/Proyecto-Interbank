@@ -1,130 +1,112 @@
-function cargarEstrategias() {
+document.addEventListener('DOMContentLoaded', function () {
   const token = localStorage.getItem('access_token');
-  fetch('/empresas/api/estrategias/', {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  })
-    .then(response => response.json())
-    .then(data => {
-      const tbody = document.getElementById('estrategias-tbody');
-      tbody.innerHTML = '';
-      data.forEach(estrategia => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${estrategia.titulo}</td>
-          <td>${estrategia.empresa || 'Sin empresa'}</td>
-          <td>${estrategia.categoria}</td>
-          <td>${estrategia.estado}</td>
-          <td>${estrategia.fecha_registro}</td>
-          <td>${estrategia.fecha_cumplimiento || 'Sin fecha'}</td>
-          <td><button onclick="verDetalle(${estrategia.id})">Ver</button></td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
-}
 
-function verDetalle(id) {
-  const token = localStorage.getItem('access_token');
-  fetch(`/empresas/api/estrategias/${id}/`, {
-    method: 'GET',
-    headers: {
-      'Authorization': 'Bearer ' + token
-    }
-  })
-    .then(response => response.json())
-    .then(data => {
-      document.getElementById('detalle-titulo').textContent = data.titulo;
-      document.getElementById('detalle-descripcion').textContent = data.descripcion;
-      document.getElementById('detalle-estado').textContent = data.estado;
-      document.getElementById('detalle-fecha-creacion').textContent = data.fecha_creacion;
-      document.getElementById('detalle-fecha-cumplimiento').textContent = data.fecha_cumplimiento || 'Sin fecha';
-      const actividadesList = document.getElementById('detalle-actividades');
-      actividadesList.innerHTML = '';
-      data.actividades.forEach(actividad => {
-        const li = document.createElement('li');
-        li.textContent = `${actividad.descripcion} - ${actividad.completada ? 'Completada' : 'Pendiente'}`;
-        actividadesList.appendChild(li);
-      });
-      document.getElementById('estrategia-detalle').style.display = 'block';
-      document.querySelector('.estrategias-list').style.display = 'none';
-    });
-}
-
-function volverALaLista() {
-  document.getElementById('estrategia-detalle').style.display = 'none';
-  document.querySelector('.estrategias-list').style.display = 'block';
-}
-
-// Cargar estrategias al inicio
-document.addEventListener('DOMContentLoaded', function() {
-  const token = localStorage.getItem('access_token');
   if (!token) {
-    alert('Debes iniciar sesión para ver tus estrategias.');
-    window.location.href = '/login/';
+    alert('Debes iniciar sesión para ver esta sección.');
+    window.location.href = '/login/'; // Asegúrate que esta es tu URL de login
     return;
   }
 
-  // 1. Cargar todas las estrategias
+  // Llamamos a las funciones para cargar el contenido de la página
+  cargarEstrategias(token);
+  verificarEstadoMentoria(token);
+});
+
+function cargarEstrategias(token) {
   fetch('/empresas/api/estrategias/', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error al cargar las estrategias.');
+    }
+    return response.json();
+  })
   .then(estrategias => {
     const tbody = document.getElementById('estrategias-tbody');
-    tbody.innerHTML = '';
-    estrategias.forEach(estrategia => {
-      let row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${estrategia.titulo}</td>
-        <td>${estrategia.descripcion}</td>
-        <td>${estrategia.categoria || ''}</td>
-        <td><button class="ver-actividades-btn" data-id="${estrategia.id}">Ver actividades</button></td>
-      `;
-      tbody.appendChild(row);
-    });
+    tbody.innerHTML = ''; // Limpiar tabla
 
-    // 2. Agregar evento a los botones "Ver actividades"
-    document.querySelectorAll('.ver-actividades-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const estrategiaId = this.getAttribute('data-id');
-        mostrarActividades(estrategiaId, token);
-      });
+    if (estrategias.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4">No tienes estrategias registradas. Puedes crear una desde el chatbot.</td></tr>';
+      return;
+    }
+
+    estrategias.forEach(estrategia => {
+      const fila = document.createElement('tr');
+
+      // --- AQUÍ ESTÁ LA CORRECCIÓN ---
+      // Cambiamos el botón que abre un modal por un enlace (<a>) que redirige a otra página.
+      fila.innerHTML = `
+        <td>${estrategia.titulo || 'Sin título'}</td>
+        <td>${estrategia.descripcion || 'Sin descripción'}</td>
+        <td>${estrategia.categoria || 'N/A'}</td>
+        <td>
+          <a href="/users/dashboard/estrategias/${estrategia.id}/actividades/" class="btn-ver-actividades">
+            Ver etapas y actividades
+          </a>
+        </td>
+      `;
+      tbody.appendChild(fila);
     });
   })
   .catch(error => {
-    alert('Error al cargar estrategias: ' + error.message);
-    console.error(error);
+    console.error('Error:', error);
+    const tbody = document.getElementById('estrategias-tbody');
+    tbody.innerHTML = `<tr><td colspan="4" style="color: red;">${error.message}</td></tr>`;
   });
+}
 
-  // 3. Función para mostrar actividades de una estrategia
-  function mostrarActividades(estrategiaId, token) {
-    fetch(`/empresas/api/estrategias/${estrategiaId}/`, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    })
-    .then(response => response.json())
-    .then(estrategia => {
-      const panel = document.getElementById('panel-actividades');
-      const lista = document.getElementById('lista-actividades');
-      lista.innerHTML = '';
-      if (estrategia.actividades && estrategia.actividades.length > 0) {
-        estrategia.actividades.forEach(act => {
-          lista.innerHTML += `<li>${act.descripcion} (${act.completada ? 'Completada' : 'Pendiente'})</li>`;
-        });
-      } else {
-        lista.innerHTML = '<li>No hay actividades</li>';
-      }
-      panel.style.display = 'block';
-    })
-    .catch(error => {
-      alert('Error al cargar actividades: ' + error.message);
-      console.error(error);
+// --- LÓGICA DE MENTORÍA (se mantiene igual) ---
+async function verificarEstadoMentoria(token) {
+  const mentoriaContainer = document.getElementById('mentoria-seccion');
+  if (!mentoriaContainer) return;
+
+  try {
+    const response = await fetch('/empresas/api/perfil/', {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (!response.ok) throw new Error('No se pudo obtener el perfil de la empresa.');
+
+    const perfil = await response.json();
+
+    if (perfil.tiene_mentor) {
+      mentoriaContainer.innerHTML = `<p class="text-success">Ya tienes un mentor asignado.</p>`;
+    } else if (perfil.solicita_mentoria) {
+      mentoriaContainer.innerHTML = `<p class="text-info">Solicitud de mentoría pendiente.</p>`;
+    } else {
+      mentoriaContainer.innerHTML = `<button id="solicitar-mentoria-btn" class="btn btn-primary">Solicitar Mentoría</button>`;
+      document.getElementById('solicitar-mentoria-btn').addEventListener('click', () => solicitarMentoria(token));
+    }
+  } catch (error) {
+    console.error('Error verificando estado de mentoría:', error);
+    mentoriaContainer.innerHTML = `<p class="text-danger">No se pudo cargar el estado de la mentoría.</p>`;
   }
-});
+}
+
+async function solicitarMentoria(token) {
+  const btn = document.getElementById('solicitar-mentoria-btn');
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+
+  try {
+    const response = await fetch('/empresas/api/solicitar-mentoria/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.mensaje || 'Error al enviar la solicitud.');
+
+    document.getElementById('mentoria-seccion').innerHTML = `<p class="text-info">${result.mensaje}</p>`;
+
+  } catch (error) {
+    console.error('Error al solicitar mentoría:', error);
+    alert(error.message);
+    btn.disabled = false;
+    btn.textContent = 'Solicitar Mentoría';
+  }
+}

@@ -1,5 +1,6 @@
 # apps/empresas/models.py
 
+from django.conf import settings
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -24,6 +25,8 @@ class Empresa(models.Model):
     web = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
+    mentores = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='empresas_asesoradas', blank=True, limit_choices_to={'rol': 'mentor'} ) # Opcional: solo usuarios con rol mentor
+    solicita_mentoria = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"
@@ -47,8 +50,13 @@ class Estrategia(models.Model):
     def __str__(self):
         return self.titulo
 
+class Etapa(models.Model):
+    estrategia = models.ForeignKey(Estrategia, related_name='etapas', on_delete=models.CASCADE,default=None, null=True, blank=True)
+    nombre = models.CharField(max_length=255,default='Etapa sin nombre')
+    descripcion = models.TextField(blank=True, null=True,default='Descripción de la etapa')
+
 class Actividad(models.Model):
-    estrategia = models.ForeignKey(Estrategia, related_name='actividades', on_delete=models.CASCADE)
+    etapa = models.ForeignKey('Etapa', related_name='actividades', on_delete=models.CASCADE, null=True, blank=True)
     descripcion = models.CharField(max_length=255)
     fecha_limite = models.DateField(null=True, blank=True)
     completada = models.BooleanField(default=False)

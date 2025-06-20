@@ -487,3 +487,140 @@ body {
     gap: 18px;
   }
 }
+
+/* --- ESTILOS PARA EL ROADMAP DE ACTIVIDADES --- */
+
+.roadmap-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.roadmap-container h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.roadmap-container .estrategia-descripcion {
+  text-align: center;
+  color: #666;
+  margin-bottom: 40px;
+}
+
+.timeline {
+  position: relative;
+  max-width: 800px;
+  margin: 0 auto;
+  padding-left: 20px;
+}
+
+/* La línea vertical del timeline */
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #e9ecef;
+  border-radius: 2px;
+}
+
+.timeline-etapa {
+  margin-bottom: 40px;
+  position: relative;
+  padding-left: 40px;
+}
+
+.timeline-etapa h3 {
+  color: #0056b3; /* Un azul corporativo */
+  margin-bottom: 5px;
+}
+
+.timeline-etapa > p {
+  color: #555;
+  font-style: italic;
+  margin-bottom: 20px;
+}
+
+.timeline-actividades {
+  list-style: none;
+  padding-left: 0;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 6px;
+  border-left: 4px solid #007bff; /* Azul para pendiente */
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* El círculo en la línea del tiempo */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -30px; /* (40px de padding - 10px de radio) */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #fff;
+  border: 4px solid #007bff; /* Azul para pendiente */
+  z-index: 1;
+}
+
+.timeline-item .actividad-descripcion {
+  font-weight: 500;
+  color: #343a40;
+}
+
+.timeline-item .actividad-estado {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-top: 5px;
+  display: block;
+}
+
+/* Estilo para actividades completadas */
+.timeline-item.completada {
+  border-left-color: #28a745; /* Verde para completado */
+  background-color: #f0fff4;
+}
+
+.timeline-item.completada::before {
+  border-color: #28a745; /* Verde para completado */
+  background-color: #28a745;
+}
+
+.timeline-item.completada .actividad-descripcion {
+  text-decoration: line-through;
+  color: #6c757d;
+}
+
+.timeline-item.completada .actividad-estado {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.btn-volver {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-bottom: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-volver:hover {
+    background-color: #5a6268;
+}

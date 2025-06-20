@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from .models import ChatCategory, Conversacion
 from django.utils import timezone
 import openai
+from django.conf import settings 
 
 # Prompts personalizados por categoría
 CATEGORY_PROMPTS = {
@@ -23,7 +24,7 @@ CATEGORY_PROMPTS = {
 }
 
 # Configuración de la API de OpenAI
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
 
 
@@ -57,7 +58,7 @@ class ChatBotAPIView(APIView):
 
         # 3. Llamar a OpenAI con el historial
         try:
-            client = openai.OpenAI(api_key=OPENAI_API_KEY)
+            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=messages

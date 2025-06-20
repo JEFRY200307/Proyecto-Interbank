@@ -19,8 +19,8 @@ from django.db.models import Avg, F, ExpressionWrapper, DurationField
 from apps.users.models import Usuario
 from .services import validar_ruc
 from rest_framework import generics, permissions
-from .models import Estrategia
-from .serializers import EstrategiaSerializer
+from .models import Estrategia, Etapa, Actividad
+from .serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer
 
 class PanelEmpresaView(APIView):
     permission_classes = [IsAuthenticated]
@@ -101,21 +101,27 @@ class EmpresaLoginView(APIView):
     def post(self, request):
         correo = request.data.get('correo')
         password = request.data.get('password')
-        user = authenticate(request, correo=correo, password=password)
+
+        # Autenticamos al usuario con las credenciales
+        user = authenticate(request, username=correo, password=password)
+
         if user is not None:
-            if user.empresa and user.empresa.estado == 'activo':
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'nombre': user.nombre,
-                    'rol': user.rol,
-                    'mensaje': 'Login exitoso.'
-                })
-            else:
-                return Response({'error': 'Tu empresa aún no está activa o no tienes empresa asociada.'}, status=403)
+            # ¡LÍNEA CLAVE! Inicia la sesión en Django para este usuario.
+            # Esto crea la cookie de sesión que las vistas con @login_required necesitan.
+            login(request, user)
+
+            # Ahora, generamos los tokens JWT como ya lo hacías
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'rol': user.rol,
+                'nombre': user.nombre,
+            }, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Credenciales incorrectas.'}, status=400)
+            # Si la autenticación falla, devolvemos un error
+            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
         
 class EmpresaLogoutView(APIView):
     permission_classes = [IsAuthenticated]
@@ -144,7 +150,22 @@ class PerfilEmpresaAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
-    
+
+class SolicitarMentoriaAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        empresa = request.user.empresa
+        if not empresa:
+            return Response({'error': 'El usuario no está asociado a ninguna empresa.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if empresa.solicita_mentoria or empresa.mentores.exists():
+            return Response({'mensaje': 'Ya existe una solicitud de mentoría activa o ya tienes un mentor.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        empresa.solicita_mentoria = True
+        empresa.save()
+        return Response({'mensaje': 'Solicitud de mentoría enviada correctamente.'}, status=status.HTTP_200_OK)
+  
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
 def eliminar_empresa(request, empresa_id):
@@ -234,13 +255,55 @@ class KPIsView(APIView):
             "tickets_abiertos": abiertos,
             "tickets_cerrados": cerrados
         })
+class ActividadListByEstrategiaView(generics.ListAPIView):
+    """
+    Devuelve una lista de actividades filtradas por una estrategia específica.
+    Incluye una comprobación de permisos para asegurar que el usuario
+    (mentor o empresa) tiene acceso a la estrategia padre.
+    """
+    serializer_class = ActividadSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        estrategia_id = self.kwargs['estrategia_pk'] # Obtiene el ID de la estrategia desde la URL
+
+        # 1. Comprobación de seguridad: ¿El usuario tiene permiso para ver esta estrategia?
+        estrategia_accesible = Estrategia.objects.filter(pk=estrategia_id)
+        if hasattr(user, 'empresa'):
+            estrategia_accesible = estrategia_accesible.filter(empresa=user.empresa)
+        elif user.rol == 'mentor':
+            estrategia_accesible = estrategia_accesible.filter(empresa__mentores=user)
+        else:
+            return Actividad.objects.none() # No es empresa ni mentor
+
+        # Si la comprobación falla (la estrategia no es accesible), no devolver nada.
+        if not estrategia_accesible.exists():
+            return Actividad.objects.none()
+
+        # 2. Si la seguridad pasa, devuelve las actividades de esa estrategia.
+        return Actividad.objects.filter(etapa__estrategia_id=estrategia_id).order_by('id')
+    
 class EstrategiaListCreateView(generics.ListCreateAPIView):
     serializer_class = EstrategiaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Estrategia.objects.filter(usuario=self.request.user).order_by('-fecha_registro')
+        user = self.request.user
+        empresa_id = self.request.query_params.get('empresa_id')
+
+        # Si un mentor pide las estrategias de una empresa específica...
+        if empresa_id and user.rol == 'mentor':
+            # ...devuélvelas SÓLO SI el mentor está asignado a esa empresa.
+            return Estrategia.objects.filter(empresa_id=empresa_id, empresa__mentores=user).order_by('-fecha_registro')
+        
+        # Si un usuario de empresa pide sus propias estrategias...
+        elif hasattr(user, 'empresa'):
+            # ...devuelve solo las de su empresa (comportamiento original).
+            return Estrategia.objects.filter(empresa=user.empresa).order_by('-fecha_registro')
+
+        # Si no es ninguno de los casos, no devolver nada por seguridad.
+        return Estrategia.objects.none()
 
     def perform_create(self, serializer):
         print("JSON recibido en el POST de estrategia:", self.request.data)
@@ -249,12 +312,45 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
             empresa=self.request.user.empresa
         )
 
-class EstrategiaDetailView(generics.RetrieveAPIView):
+class EstrategiaDetailView(generics.RetrieveUpdateAPIView):
     queryset = Estrategia.objects.all()
     serializer_class = EstrategiaSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Solo permite ver estrategias del usuario autenticado
-        return Estrategia.objects.filter(usuario=self.request.user)
+        user = self.request.user
+        # Si el usuario es una empresa, solo puede ver/editar sus propias estrategias.
+        if hasattr(user, 'empresa'):
+            return Estrategia.objects.filter(empresa=user.empresa)
+        # Si el usuario es un mentor, puede ver/editar las estrategias de las empresas que asesora.
+        elif user.rol == 'mentor':
+            return Estrategia.objects.filter(empresa__mentores=user)
+        # Si es otro tipo de usuario (ej. admin), podría ver todas.
+        # Por seguridad, si no es empresa ni mentor, no devolvemos nada.
+        return Estrategia.objects.none()
+    
+class EtapaDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Etapa.objects.all()
+    serializer_class = EtapaSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'empresa'):
+            return Etapa.objects.filter(estrategia__empresa=user.empresa)
+        elif user.rol == 'mentor':
+            return Etapa.objects.filter(estrategia__empresa__mentores=user)
+        return Etapa.objects.none()
+
+class ActividadDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Actividad.objects.all()
+    serializer_class = ActividadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'empresa'):
+            return Actividad.objects.filter(etapa__estrategia__empresa=user.empresa)
+        elif user.rol == 'mentor':
+            return Actividad.objects.filter(etapa__estrategia__empresa__mentores=user)
+        return Actividad.objects.none()

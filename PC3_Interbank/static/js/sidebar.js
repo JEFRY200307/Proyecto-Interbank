@@ -59,6 +59,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
                 <li><a href="/users/dashboard/recursos/">Recursos y Capacitación</a></li>`;
+        } else if (rol === 'mentor') {
+        menu += `<li style="list-style:none;"><h3>Mentor</h3></li>
+            <li><a href="/mentor/dashboard/">Gestión de empresas</a></li>
+            <li><a href="/mentor/dashboard/bots/">Alimentar al bot</a></li>`;
         }
         menu += `<li><a href="#" id="logout-link">Cerrar sesión</a></li>`;
         sidebar.innerHTML = menu;

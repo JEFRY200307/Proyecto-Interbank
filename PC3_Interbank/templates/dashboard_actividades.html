@@ -1,0 +1,41 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="roadmap-container">
+  <!-- Botón para regresar a la lista de estrategias -->
+  <a href="{% url 'dashboard_estrategias' %}" class="btn-volver">← Volver a Estrategias</a>
+
+  <h2>{{ estrategia.titulo }}</h2>
+  <p class="estrategia-descripcion">{{ estrategia.descripcion }}</p>
+
+  <div class="timeline">
+    {% for etapa in estrategia.etapas.all %}
+      <div class="timeline-etapa">
+        <h3>{{ etapa.nombre }}</h3>
+        <p>{{ etapa.descripcion }}</p>
+
+        <ul class="timeline-actividades">
+          {% for actividad in etapa.actividades.all %}
+            <!-- Aplicamos la clase 'completada' si la actividad lo está -->
+            <li class="timeline-item {% if actividad.completada %}completada{% endif %}">
+              <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
+              <small class="actividad-estado">
+                {% if actividad.completada %}
+                  ✔ Completada
+                {% else %}
+                  Pendiente
+                {% endif %}
+              </small>
+            </li>
+          {% empty %}
+            <li class="timeline-item">No hay actividades en esta etapa.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% empty %}
+      <p>No hay etapas definidas para esta estrategia.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

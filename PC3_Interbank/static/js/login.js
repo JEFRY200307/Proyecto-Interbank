@@ -47,12 +47,15 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                     if (data.nombre) {
                         localStorage.setItem('nombre', data.nombre);
                     }
-                    if (data.id) {
+                     if (data.id) {
                         localStorage.setItem('user_id', data.id);
                     }
-                    setTimeout(() => {
+                    // Redirige siempre al dashboard único
+                    if (data.rol === 'mentor') {
+                        window.location.href = '/mentor/dashboard/';
+                    } else {
                         window.location.href = '/users/dashboard/';
-                    }, 200);
+                    }
                 })
                 .catch((err) => {
                     console.log('Error al consultar cuenta:', err);
