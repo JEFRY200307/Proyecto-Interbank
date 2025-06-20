@@ -51,14 +51,14 @@ class ActividadSerializer(serializers.ModelSerializer):
         fields = ['id', 'descripcion', 'fecha_limite', 'completada']
 
 class EtapaSerializer(serializers.ModelSerializer):
-    actividades = ActividadSerializer(many=True)
+    actividades = ActividadSerializer(many=True, required=False)
 
     class Meta:
         model = Etapa
         fields = ['id', 'nombre', 'descripcion', 'actividades']
 
 class EstrategiaSerializer(serializers.ModelSerializer):
-    etapas = EtapaSerializer(many=True)
+    etapas = EtapaSerializer(many=True, required=False)
 
     class Meta:
         model = Estrategia

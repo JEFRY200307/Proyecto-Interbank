@@ -19,8 +19,8 @@ from django.db.models import Avg, F, ExpressionWrapper, DurationField
 from apps.users.models import Usuario
 from .services import validar_ruc
 from rest_framework import generics, permissions
-from .models import Estrategia
-from .serializers import EstrategiaSerializer
+from .models import Estrategia, Etapa, Actividad
+from .serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer
 
 class PanelEmpresaView(APIView):
     permission_classes = [IsAuthenticated]
@@ -241,7 +241,11 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Estrategia.objects.filter(usuario=self.request.user).order_by('-fecha_registro')
+        qs = Estrategia.objects.filter(usuario=self.request.user).order_by('-fecha_registro')
+        empresa_id = self.request.query_params.get('empresa_id')
+        if empresa_id:
+            qs = qs.filter(empresa_id=empresa_id)
+        return qs
 
     def perform_create(self, serializer):
         print("JSON recibido en el POST de estrategia:", self.request.data)
@@ -250,7 +254,7 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
             empresa=self.request.user.empresa
         )
 
-class EstrategiaDetailView(generics.RetrieveAPIView):
+class EstrategiaDetailView(generics.RetrieveUpdateAPIView):
     queryset = Estrategia.objects.all()
     serializer_class = EstrategiaSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -259,3 +263,12 @@ class EstrategiaDetailView(generics.RetrieveAPIView):
         # Solo permite ver estrategias del usuario autenticado
         return Estrategia.objects.filter(usuario=self.request.user)
 
+class EtapaDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Etapa.objects.all()
+    serializer_class = EtapaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+class ActividadDetailView(generics.RetrieveUpdateAPIView):
+    queryset = Actividad.objects.all()
+    serializer_class = ActividadSerializer
+    permission_classes = [permissions.IsAuthenticated]
