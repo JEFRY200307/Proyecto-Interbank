@@ -51,134 +51,140 @@
 </div>
 
 <style>
-.empresas-tarjetas-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-.tarjeta-empresa {
-  background: #f7f7f7;
-  border: 1px solid #b2dfdb;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px #e0f2f1;
-  padding: 1.2rem 1.5rem;
-  width: 260px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.tarjeta-empresa:hover {
-  box-shadow: 0 4px 16px #80cbc4;
-  background: #e0f7fa;
-}
-.actividad-editable {
-  width: 90%;
-  padding: 0.3rem;
-  border: 1px solid #b2dfdb;
-  border-radius: 5px;
-}
-.btn-guardar {
-  background: #388e3c;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-.btn-guardar:hover {
-  background: #43a047;
-}
-.form-detalle-empresa {
-  max-width: 500px;
-  margin: 0 auto;
-  background: #f7f7f7;
-  border: 1px solid #b2dfdb;
-  border-radius: 10px;
-  padding: 2rem 2.5rem;
-  box-shadow: 0 2px 8px #e0f2f1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  .empresas-tarjetas-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
 
-.form-detalle-empresa label {
-  font-weight: 500;
-  margin-bottom: 0.2rem;
-  display: flex;
-  flex-direction: column;
-  color: #00695c;
-}
+  .tarjeta-empresa {
+    background: #f7f7f7;
+    border: 1px solid #b2dfdb;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px #e0f2f1;
+    padding: 1.2rem 1.5rem;
+    width: 260px;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
 
-.form-detalle-empresa input {
-  padding: 0.5rem;
-  border: 1px solid #b2dfdb;
-  border-radius: 5px;
-  margin-top: 0.2rem;
-  font-size: 1rem;
-}
+  .tarjeta-empresa:hover {
+    box-shadow: 0 4px 16px #80cbc4;
+    background: #e0f7fa;
+  }
 
-.form-detalle-empresa input:focus {
-  outline: 2px solid #26a69a;
-}
+  .actividad-editable {
+    width: 90%;
+    padding: 0.3rem;
+    border: 1px solid #b2dfdb;
+    border-radius: 5px;
+  }
 
-.form-detalle-empresa button[type="submit"] {
-  background: #388e3c;
-  color: #fff;
-  border: none;
-  padding: 0.7rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 1rem;
-  font-size: 1rem;
-  align-self: flex-end;
-}
+  .btn-guardar {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 0.5rem;
+  }
 
-.form-detalle-empresa button[type="submit"]:hover {
-  background: #43a047;
-}
+  .btn-guardar:hover {
+    background: #43a047;
+  }
 
-.detalle-empresa-botones {
-  text-align: center;
-  margin-top: 1.5rem;
-}
+  .form-detalle-empresa {
+    max-width: 500px;
+    margin: 0 auto;
+    background: #f7f7f7;
+    border: 1px solid #b2dfdb;
+    border-radius: 10px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 2px 8px #e0f2f1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-.detalle-empresa-botones button {
-  background: #00838f;
-  color: #fff;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
+  .form-detalle-empresa label {
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+    display: flex;
+    flex-direction: column;
+    color: #00695c;
+  }
 
-.detalle-empresa-botones button:hover {
-  background: #0097a7;
-}
+  .form-detalle-empresa input {
+    padding: 0.5rem;
+    border: 1px solid #b2dfdb;
+    border-radius: 5px;
+    margin-top: 0.2rem;
+    font-size: 1rem;
+  }
+
+  .form-detalle-empresa input:focus {
+    outline: 2px solid #26a69a;
+  }
+
+  .form-detalle-empresa button[type="submit"] {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-size: 1rem;
+    align-self: flex-end;
+  }
+
+  .form-detalle-empresa button[type="submit"]:hover {
+    background: #43a047;
+  }
+
+  .detalle-empresa-botones {
+    text-align: center;
+    margin-top: 1.5rem;
+  }
+
+  .detalle-empresa-botones button {
+    background: #00838f;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .detalle-empresa-botones button:hover {
+    background: #0097a7;
+  }
 </style>
 
 <script>
-let empresaSeleccionadaId = null;
-let estrategiasActuales = [];
+  let empresaSeleccionadaId = null;
+  let estrategiasActuales = [];
 
-// Cargar empresas del mentor por AJAX
-document.addEventListener('DOMContentLoaded', async function() {
+  // Cargar empresas del mentor por AJAX
+  document.addEventListener('DOMContentLoaded', async function () {
     const token = localStorage.getItem('access_token');
     const container = document.querySelector('.empresas-tarjetas-container');
     if (!token) {
-        container.innerHTML = '<p>No autenticado.</p>';
-        return;
+      container.innerHTML = '<p>No autenticado.</p>';
+      return;
     }
     const res = await fetch('/mentor/api/empresas/', {
-        headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     if (res.ok) {
-        const empresas = await res.json();
-        if (empresas.length === 0) {
-            container.innerHTML = '<p>No tienes empresas asignadas.</p>';
-        } else {
-            container.innerHTML = empresas.map(e => `
+      const empresas = await res.json();
+      if (empresas.length === 0) {
+        container.innerHTML = '<p>No tienes empresas asignadas.</p>';
+      } else {
+        container.innerHTML = empresas.map(e => `
                 <div class="tarjeta-empresa"
                      data-id="${e.id}"
                      onclick="mostrarDetalleEmpresa(${e.id})">
@@ -188,25 +194,25 @@ document.addEventListener('DOMContentLoaded', async function() {
                   <p><strong>Estado:</strong> ${e.estado}</p>
                 </div>
             `).join('');
-        }
+      }
     } else {
-        container.innerHTML = '<p>Error al cargar empresas.</p>';
+      container.innerHTML = '<p>Error al cargar empresas.</p>';
     }
-});
+  });
 
-// Mostrar detalle editable de la empresa
-async function mostrarDetalleEmpresa(empresaId) {
+  // Mostrar detalle editable de la empresa
+  async function mostrarDetalleEmpresa(empresaId) {
     empresaSeleccionadaId = empresaId;
     document.querySelector('.empresas-tarjetas-container').style.display = 'none';
     document.getElementById('detalle-empresa-panel').style.display = 'block';
 
     const token = localStorage.getItem('access_token');
     const res = await fetch(`/mentor/api/empresas/${empresaId}/`, {
-        headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     if (res.ok) {
-        const empresa = await res.json();
-        let formHtml = `
+      const empresa = await res.json();
+      let formHtml = `
             <label>Razón Social: <input name="razon_social" value="${empresa.razon_social || ''}" readonly style="background:#eee;"></label><br>
             <label>RUC: <input name="ruc" value="${empresa.ruc || ''}" readonly style="background:#eee;"></label><br>
             <label>Representante: <input name="representante" value="${empresa.representante || ''}"></label><br>
@@ -227,92 +233,93 @@ async function mostrarDetalleEmpresa(empresaId) {
             <label>Instagram: <input name="instagram" value="${empresa.instagram || ''}"></label><br>
             <button type="submit">Guardar cambios</button>
         `;
-        const form = document.getElementById('form-editar-empresa');
-        form.innerHTML = formHtml;
+      const form = document.getElementById('form-editar-empresa');
+      form.innerHTML = formHtml;
 
-        form.onsubmit = async function(e) {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = {};
-            formData.forEach((v, k) => data[k] = v);
-            const putRes = await fetch(`/mentor/api/empresas/${empresaId}/`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': 'Bearer ' + token,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-            if (putRes.ok) {
-                alert('Datos actualizados correctamente');
-                cerrarDetalleEmpresa();
-            } else {
-                alert('Error al actualizar');
-            }
-        };
+      form.onsubmit = async function (e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const data = {};
+        formData.forEach((v, k) => data[k] = v);
+        const putRes = await fetch(`/mentor/api/empresas/${empresaId}/`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (putRes.ok) {
+          alert('Datos actualizados correctamente');
+          cerrarDetalleEmpresa();
+        } else {
+          alert('Error al actualizar');
+        }
+      };
     } else {
-        alert('No se pudo cargar la empresa');
-        cerrarDetalleEmpresa();
+      alert('No se pudo cargar la empresa');
+      cerrarDetalleEmpresa();
     }
-}
+  }
 
-function cerrarDetalleEmpresa() {
+  function cerrarDetalleEmpresa() {
     document.getElementById('detalle-empresa-panel').style.display = 'none';
     document.querySelector('.empresas-tarjetas-container').style.display = 'flex';
     empresaSeleccionadaId = null;
-}
+  }
 
-// --- El resto de tu JS para estrategias puede quedarse igual ---
+  // --- El resto de tu JS para estrategias puede quedarse igual ---
 </script>
 
 <a href="{% url 'mentor_solicitudes' %}" class="btn-flotante-solicitudes" title="Empresas que solicitan mentoría">
   Ver empresas que solicitan mentoría
 </a>
 <style>
-.btn-flotante-solicitudes {
-  position: fixed;
-  right: 2.5rem;
-  bottom: 2.5rem;
-  background: #43a047;
-  color: #fff;
-  padding: 1rem 1.7rem;
-  border-radius: 50px;
-  box-shadow: 0 4px 16px #388e3c55;
-  font-size: 1.1rem;
-  font-weight: bold;
-  text-decoration: none;
-  z-index: 1000;
-  transition: background 0.2s, box-shadow 0.2s;
-}
-.btn-flotante-solicitudes:hover {
-  background: #388e3c;
-  box-shadow: 0 6px 24px #388e3c88;
-}
+  .btn-flotante-solicitudes {
+    position: fixed;
+    right: 2.5rem;
+    bottom: 2.5rem;
+    background: #43a047;
+    color: #fff;
+    padding: 1rem 1.7rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 16px #388e3c55;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-decoration: none;
+    z-index: 1000;
+    transition: background 0.2s, box-shadow 0.2s;
+  }
+
+  .btn-flotante-solicitudes:hover {
+    background: #388e3c;
+    box-shadow: 0 6px 24px #388e3c88;
+  }
 </style>
 <script>
-function mostrarEstrategiasEmpresa() {
+  function mostrarEstrategiasEmpresa() {
     document.getElementById('detalle-empresa-panel').style.display = 'none';
     // Muestra el panel de estrategias
     document.getElementById('panel-estrategias-empresa').style.display = 'block';
     cargarEstrategiasEmpresa(empresaSeleccionadaId);
-}
+  }
 
-function cerrarPanelEstrategiasEmpresa() {
+  function cerrarPanelEstrategiasEmpresa() {
     document.getElementById('panel-estrategias-empresa').style.display = 'none';
     document.getElementById('detalle-empresa-panel').style.display = 'block';
-}
+  }
 
-async function cargarEstrategiasEmpresa(empresaId) {
+  async function cargarEstrategiasEmpresa(empresaId) {
     const token = localStorage.getItem('access_token');
     const res = await fetch(`/empresas/api/estrategias/?empresa_id=${empresaId}`, {
-        headers: { 'Authorization': 'Bearer ' + token }
+      headers: { 'Authorization': 'Bearer ' + token }
     });
     const estrategias = await res.json();
     let html = '';
     if (estrategias.length === 0) {
-        html = `<tr><td colspan="8" style="text-align:center;">No hay estrategias registradas.</td></tr>`;
+      html = `<tr><td colspan="8" style="text-align:center;">No hay estrategias registradas.</td></tr>`;
     } else {
-        html = estrategias.map(e => `
+      html = estrategias.map(e => `
             <tr>
               <td><input value="${e.titulo || ''}" onchange="editarCampoEstrategia(${e.id}, 'titulo', this.value)" class="input-estrategia"></td>
               <td><textarea onchange="editarCampoEstrategia(${e.id}, 'descripcion', this.value)" class="input-estrategia">${e.descripcion || ''}</textarea></td>
@@ -328,111 +335,119 @@ async function cargarEstrategiasEmpresa(empresaId) {
         `).join('');
     }
     document.getElementById('estrategias-empresa-lista').innerHTML = html;
-}
-let estrategiasEditadas = {};
+  }
+  let estrategiasEditadas = {};
 
-function editarCampoEstrategia(id, campo, valor) {
+  function editarCampoEstrategia(id, campo, valor) {
     if (!estrategiasEditadas[id]) estrategiasEditadas[id] = {};
     estrategiasEditadas[id][campo] = valor;
-}
+  }
 
-async function guardarEstrategia(id) {
+  async function guardarEstrategia(id) {
     const token = localStorage.getItem('access_token');
     // 1. Obtén la estrategia completa antes de guardar
     const resGet = await fetch(`/empresas/api/estrategias/${id}/`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
     });
     if (!resGet.ok) {
-        alert('No se pudo obtener la estrategia para actualizar.');
-        return;
+      alert('No se pudo obtener la estrategia para actualizar.');
+      return;
     }
     const estrategiaCompleta = await resGet.json();
 
     // 2. Mezcla los cambios editados con la estrategia original
     const cambios = estrategiasEditadas[id] || {};
     const data = {
-        ...estrategiaCompleta,
-        ...cambios
+      ...estrategiaCompleta,
+      ...cambios
     };
-    
-  
+
+
     // 3. Elimina campos de solo lectura o anidados si tu serializer no los acepta en PUT
     delete data.id;
     delete data.etapas;
 
     // 4. Envía el objeto completo
     const res = await fetch(`/empresas/api/estrategias/${id}/`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     if (res.ok) {
-        alert('Estrategia actualizada');
-        cargarEstrategiasEmpresa(empresaSeleccionadaId);
-        estrategiasEditadas[id] = {};
+      alert('Estrategia actualizada');
+      cargarEstrategiasEmpresa(empresaSeleccionadaId);
+      estrategiasEditadas[id] = {};
     } else {
-        const errorData = await res.json().catch(() => ({}));
-        alert('Error al actualizar estrategia: ' + JSON.stringify(errorData));
+      const errorData = await res.json().catch(() => ({}));
+      alert('Error al actualizar estrategia: ' + JSON.stringify(errorData));
     }
-}
+  }
 </script>
 <style>
-.estrategias-container {
-  margin-top: 2rem;
-  width: 100%;
-  overflow-x: auto;
-}
-.estrategias-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  margin-bottom: 2rem;
-}
-.estrategias-table th, .estrategias-table td {
-  border: 1px solid #b2dfdb;
-  padding: 0.7rem;
-  vertical-align: top;
-  text-align: left;
-  /* Elimina min-width si lo tienes */
-  /* Elimina width fijo si lo tienes */
-}
-.estrategias-table th {
-  background: #e0f2f1;
-  font-weight: bold;
-  text-align: center;
-}
-.estrategias-table input.input-estrategia,
-.estrategias-table textarea.input-estrategia {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.3rem;
-  border: 1px solid #b2dfdb;
-  border-radius: 5px;
-  font-size: 1rem;
-  background: #fff;
-  display: block;
-}
-.estrategias-table textarea.input-estrategia {
-  min-height: 2.5rem;
-  resize: vertical;
-}
-.btn-guardar {
-  background: #388e3c;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 1rem;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 0.2rem;
-}
-.btn-guardar:hover {
-  background: #43a047;
-}
+  .estrategias-container {
+    margin-top: 2rem;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .estrategias-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+
+  .estrategias-table th,
+  .estrategias-table td {
+    border: 1px solid #b2dfdb;
+    padding: 0.7rem;
+    vertical-align: top;
+    text-align: left;
+    /* Elimina min-width si lo tienes */
+    /* Elimina width fijo si lo tienes */
+  }
+
+  .estrategias-table th {
+    background: #e0f2f1;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .estrategias-table input.input-estrategia,
+  .estrategias-table textarea.input-estrategia {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.3rem;
+    border: 1px solid #b2dfdb;
+    border-radius: 5px;
+    font-size: 1rem;
+    background: #fff;
+    display: block;
+  }
+
+  .estrategias-table textarea.input-estrategia {
+    min-height: 2.5rem;
+    resize: vertical;
+  }
+
+  .btn-guardar {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 0.2rem;
+  }
+
+  .btn-guardar:hover {
+    background: #43a047;
+  }
 </style>
 <div id="modal-actividades" class="modal-actividades">
   <div class="modal-actividades-content">
@@ -441,156 +456,154 @@ async function guardarEstrategia(id) {
     <div id="actividades-lista"></div>
   </div>
 </div>
-<style>.modal-actividades {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0; top: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
-}
-.modal-actividades-content {
-  background: #fff;
-  margin: 5% auto;
-  padding: 2rem;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 24px #388e3c55;
-  position: relative;
-}
-.close-modal {
-  position: absolute;
-  right: 1.2rem;
-  top: 1.2rem;
-  font-size: 2rem;
-  color: #388e3c;
-  cursor: pointer;
-}
-.actividad-row {
-  display: flex;
-  gap: 0.7rem;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.actividad-row input, .actividad-row textarea {
-  border: 1px solid #b2dfdb;
-  border-radius: 5px;
-  padding: 0.3rem;
-  font-size: 1rem;
-}
-.actividad-row textarea {
-  min-width: 120px;
-  min-height: 2rem;
-  resize: vertical;
-}
-.btn-guardar-actividad {
-  background: #388e3c;
-  color: #fff;
-  border: none;
-  padding: 0.3rem 0.8rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.btn-guardar-actividad:hover {
-  background: #43a047;
-}
+<style>
+  .modal-actividades {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-actividades-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 24px #388e3c55;
+    position: relative;
+  }
+
+  .close-modal {
+    position: absolute;
+    right: 1.2rem;
+    top: 1.2rem;
+    font-size: 2rem;
+    color: #388e3c;
+    cursor: pointer;
+  }
+
+  .actividad-row {
+    display: flex;
+    gap: 0.7rem;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .actividad-row input,
+  .actividad-row textarea {
+    border: 1px solid #b2dfdb;
+    border-radius: 5px;
+    padding: 0.3rem;
+    font-size: 1rem;
+  }
+
+  .actividad-row textarea {
+    min-width: 120px;
+    min-height: 2rem;
+    resize: vertical;
+  }
+
+  .btn-guardar-actividad {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .btn-guardar-actividad:hover {
+    background: #43a047;
+  }
 </style>
 <script>
   // Modal de actividades
-function abrirModalActividades(estrategiaId) {
+  function abrirModalActividades(estrategiaId) {
     window.estrategiaIdModalActual = estrategiaId;
     document.getElementById('modal-actividades').style.display = 'flex';
     cargarActividadesEstrategia(estrategiaId);
-}
-
-function cerrarModalActividades() {
-    document.getElementById('modal-actividades').style.display = 'none';
-    document.getElementById('actividades-lista').innerHTML = '';
-}
-
-async function cargarActividadesEstrategia(estrategiaId) {
-    const token = localStorage.getItem('access_token');
-    const res = await fetch(`/empresas/api/estrategias/${estrategiaId}/`, {
-        headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (!res.ok) {
-        document.getElementById('actividades-lista').innerHTML = '<p>Error al cargar actividades.</p>';
-        return;
-    }
-    const estrategia = await res.json();
-    if (!estrategia.etapas || estrategia.etapas.length === 0) {
-        document.getElementById('actividades-lista').innerHTML = '<p>No hay etapas ni actividades.</p>';
-        return;
-    }
-    let html = '';
-    estrategia.etapas.forEach(etapa => {
-        html += `
-          <div class="etapa-editable" style="margin-bottom:1.5rem; border-bottom:1px solid #b2dfdb; padding-bottom:1rem;">
-            <label>
-              <b>Nombre de etapa:</b>
-              <input type="text" value="${etapa.nombre || ''}" 
-                    onchange="editarCampoEtapa(${etapa.id}, 'nombre', this.value)" 
-                    class="input-estrategia" />
-            </label>
-            <label>
-              <b>Descripción:</b>
-              <textarea onchange="editarCampoEtapa(${etapa.id}, 'descripcion', this.value)" 
-                        class="input-estrategia"
-                        style="min-height:2rem;">${etapa.descripcion || ''}</textarea>
-            </label>
-            <button class="btn-guardar-actividad" onclick="guardarEtapa(${etapa.id}, ${estrategia.id})" type="button">Guardar etapa</button>
-            <div style="margin-top:1rem;">
-              <b>Actividades:</b>
-        `;
-        if (!etapa.actividades || etapa.actividades.length === 0) {
-            html += `<div style="margin-bottom:1rem;">Sin actividades</div>`;
-        } else {
-            etapa.actividades.forEach(act => {
-                html += `
-                  <div class="actividad-row">
-                    <input type="text" value="${act.descripcion || ''}" onchange="editarCampoActividad(${act.id}, 'descripcion', this.value)">
-                    <select onchange="editarCampoActividad(${act.id}, 'completada', this.value)">
-                      <option value="false" ${!act.completada ? 'selected' : ''}>Pendiente</option>
-                      <option value="true" ${act.completada ? 'selected' : ''}>Completada</option>
-                    </select>
-                    <button class="btn-guardar-actividad" onclick="guardarActividad(${act.id})" type="button">Guardar</button>
-                  </div>
-                `;
-            });
-        }
-        html += `</div></div>`;
-    });
-    document.getElementById('actividades-lista').innerHTML = html;
   }
 
-let actividadesEditadas = {};
+  function cerrarModalActividades() {
+    document.getElementById('modal-actividades').style.display = 'none';
+    document.getElementById('actividades-lista').innerHTML = '';
+  }
 
-function editarCampoActividad(id, campo, valor) {
+  async function cargarActividadesEstrategia(estrategiaId) {
+    const token = localStorage.getItem('access_token');
+    const container = document.getElementById('actividades-lista');
+    container.innerHTML = '<p>Cargando actividades...</p>';
+
+    // URL NUEVA Y CORRECTA que apunta a la vista ActividadListByEstrategiaView
+    const url = `/empresas/api/estrategias/${estrategiaId}/actividades/`;
+
+    try {
+      const res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+
+      if (!res.ok) {
+        // Si el backend devuelve un error (ej. 404 por permisos), lo mostramos.
+        throw new Error('Error al cargar actividades o no tienes permiso.');
+      }
+
+      const actividades = await res.json();
+
+      if (!actividades || actividades.length === 0) {
+        container.innerHTML = '<p>No hay actividades registradas para esta estrategia.</p>';
+        return;
+      }
+
+      // Construimos una lista simple con las actividades recibidas
+      let html = '<ul>';
+      actividades.forEach(act => {
+        // Asumiendo que tu ActividadSerializer devuelve 'descripcion' y 'completada'
+        html += `<li>${act.descripcion} - [${act.completada ? 'Completada' : 'Pendiente'}]</li>`;
+      });
+      html += '</ul>';
+
+      container.innerHTML = html;
+
+    } catch (error) {
+      console.error('Error en cargarActividadesEstrategia:', error);
+      container.innerHTML = `<p style="color: red;">${error.message}</p>`;
+    }
+  }
+
+  let actividadesEditadas = {};
+
+  function editarCampoActividad(id, campo, valor) {
     if (!actividadesEditadas[id]) actividadesEditadas[id] = {};
     actividadesEditadas[id][campo] = campo === 'completada' ? (valor === 'true') : valor;
-}
+  }
 
-async function guardarActividad(id) {
+  async function guardarActividad(id) {
     const token = localStorage.getItem('access_token');
     // 1. Obtén la actividad completa antes de guardar
     const resGet = await fetch(`/empresas/api/actividades/${id}/`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
     });
     if (!resGet.ok) {
-        alert('No se pudo obtener la actividad para actualizar.');
-        return;
+      alert('No se pudo obtener la actividad para actualizar.');
+      return;
     }
     const actividadCompleta = await resGet.json();
 
     // 2. Mezcla los cambios editados con la actividad original
     const cambios = actividadesEditadas[id] || {};
     const data = {
-        ...actividadCompleta,
-        ...cambios
+      ...actividadCompleta,
+      ...cambios
     };
 
     // 3. Elimina campos de solo lectura si es necesario
@@ -598,81 +611,81 @@ async function guardarActividad(id) {
 
     // 4. Envía el objeto completo
     const res = await fetch(`/empresas/api/actividades/${id}/`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     if (res.ok) {
-        alert('Actividad actualizada');
-        // Recarga el modal para ver los cambios reflejados
-        const estrategiaId = obtenerEstrategiaIdDesdeActividad(id);
-        cargarActividadesEstrategia(estrategiaId);
-        actividadesEditadas[id] = {};
+      alert('Actividad actualizada');
+      // Recarga el modal para ver los cambios reflejados
+      const estrategiaId = obtenerEstrategiaIdDesdeActividad(id);
+      cargarActividadesEstrategia(estrategiaId);
+      actividadesEditadas[id] = {};
     } else {
-        const errorData = await res.json().catch(() => ({}));
-        alert('Error al actualizar actividad: ' + JSON.stringify(errorData));
+      const errorData = await res.json().catch(() => ({}));
+      alert('Error al actualizar actividad: ' + JSON.stringify(errorData));
     }
-}
+  }
 
-// Utilidad para obtener el id de estrategia desde el modal (puedes guardar el id globalmente si prefieres)
-function obtenerEstrategiaIdDesdeActividad(actividadId) {
+  // Utilidad para obtener el id de estrategia desde el modal (puedes guardar el id globalmente si prefieres)
+  function obtenerEstrategiaIdDesdeActividad(actividadId) {
     // Como el modal siempre se abre para una estrategia, puedes guardar el id en una variable global
     return window.estrategiaIdModalActual;
-}
+  }
 
 
-let etapasEditadas = {};
+  let etapasEditadas = {};
 
-function editarCampoEtapa(id, campo, valor) {
+  function editarCampoEtapa(id, campo, valor) {
     if (!etapasEditadas[id]) etapasEditadas[id] = {};
     etapasEditadas[id][campo] = valor;
-}
+  }
 
-async function guardarEtapa(id, estrategiaId) {
+  async function guardarEtapa(id, estrategiaId) {
     const token = localStorage.getItem('access_token');
     // 1. Obtén la etapa completa antes de guardar
     const resGet = await fetch(`/empresas/api/etapas/${id}/`, {
-        headers: {
-            'Authorization': 'Bearer ' + token
-        }
+      headers: {
+        'Authorization': 'Bearer ' + token
+      }
     });
     if (!resGet.ok) {
-        alert('No se pudo obtener la etapa para actualizar.');
-        return;
+      alert('No se pudo obtener la etapa para actualizar.');
+      return;
     }
     const etapaCompleta = await resGet.json();
 
     // 2. Mezcla los cambios editados con la etapa original
     const cambios = etapasEditadas[id] || {};
     const data = {
-        ...etapaCompleta,
-        ...cambios
+      ...etapaCompleta,
+      ...cambios
     };
 
     // 3. Elimina campos de solo lectura si es necesario
     delete data.id;
     delete data.actividades;
-    
+
     // 4. Envía el objeto completo
     const res = await fetch(`/empresas/api/etapas/${id}/`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
     });
     if (res.ok) {
-        alert('Etapa actualizada');
-        cargarActividadesEstrategia(estrategiaId);
-        etapasEditadas[id] = {};
+      alert('Etapa actualizada');
+      cargarActividadesEstrategia(estrategiaId);
+      etapasEditadas[id] = {};
     } else {
-        const errorData = await res.json().catch(() => ({}));
-        alert('Error al actualizar etapa: ' + JSON.stringify(errorData));
+      const errorData = await res.json().catch(() => ({}));
+      alert('Error al actualizar etapa: ' + JSON.stringify(errorData));
     }
-}
+  }
 </script>
 {% endblock %}

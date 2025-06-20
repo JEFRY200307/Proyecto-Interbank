@@ -1,10 +1,13 @@
-<!-- templates/dashboard_documentos.html -->
 {% extends 'dashboard_base.html' %}
 {% load static %}
 
 {% block content %}
 <div class="estrategias-container">
-  <h2 class="estrategias-title">Estrategias</h2>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+    <h2 class="estrategias-title">Estrategias</h2>
+    <!-- Este contenedor se llenará dinámicamente con JavaScript -->
+    <div id="mentoria-seccion"></div>
+  </div>
 
   <!-- Lista de estrategias (se llenará con JS) -->
   <div class="estrategias-list">
@@ -24,12 +27,16 @@
     </table>
   </div>
 </div>
-
-<script>
-  // Verificación básica del token antes de cargar el script principal
-  if (!localStorage.getItem('access_token')) {
-    window.location.href = '/login/'; // Asegúrate que esta es tu URL de login
-  }
-</script>
+<!-- INICIO: AÑADE EL CÓDIGO DEL MODAL AQUÍ -->
+<div id="modal-actividades" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-button" onclick="cerrarModalActividades()">&times;</span>
+    <h2>Actividades de la estrategia</h2>
+    <div id="actividades-lista">
+      <!-- El contenido de las actividades se cargará aquí con JavaScript -->
+    </div>
+  </div>
+</div>
+<!-- Vinculamos el archivo JavaScript externo -->
 <script src="{% static 'js/estrategias.js' %}"></script>
 {% endblock %}

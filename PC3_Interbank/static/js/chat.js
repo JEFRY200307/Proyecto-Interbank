@@ -34,7 +34,7 @@ function enviarMensaje() {
   if (!mensaje || !categoriaSeleccionada) return;
   const token = localStorage.getItem('access_token');
   const log = document.getElementById('chat-log');
-  
+
   // Mostrar mensaje del usuario
   log.innerHTML += `<div><strong>Tú:</strong> ${mensaje}</div>`;
   document.getElementById('user-message').value = '';
@@ -50,20 +50,20 @@ function enviarMensaje() {
     },
     body: JSON.stringify({ message: mensaje })
   })
-  .then(response => response.json())
-  .then(data => {
-    // Renderiza la respuesta del bot como Markdown
-    const log = document.getElementById('chat-log');
-    if (data.response) {
-      log.innerHTML += `<div><strong>${categoriaNombre} Bot:</strong> <div class="bot-markdown">${marked.parse(data.response)}</div></div>`;
-    } else if (data.error) {
-      log.innerHTML += `<div style="color:red;"><strong>Error:</strong> ${data.error}</div>`;
-    } else {
-      log.innerHTML += `<div style="color:red;"><strong>Error:</strong> No se recibió respuesta del chatbot.</div>`;
-    }
-    localStorage.setItem('chat_historial_' + categoriaSeleccionada, log.innerHTML);
-  })
-  .catch(error => console.error("Error en el chatbot:", error));
+    .then(response => response.json())
+    .then(data => {
+      // Renderiza la respuesta del bot como Markdown
+      const log = document.getElementById('chat-log');
+      if (data.response) {
+        log.innerHTML += `<div><strong>${categoriaNombre} Bot:</strong> <div class="bot-markdown">${marked.parse(data.response)}</div></div>`;
+      } else if (data.error) {
+        log.innerHTML += `<div style="color:red;"><strong>Error:</strong> ${data.error}</div>`;
+      } else {
+        log.innerHTML += `<div style="color:red;"><strong>Error:</strong> No se recibió respuesta del chatbot.</div>`;
+      }
+      localStorage.setItem('chat_historial_' + categoriaSeleccionada, log.innerHTML);
+    })
+    .catch(error => console.error("Error en el chatbot:", error));
 }
 
 function enviarMensajeRoadmap() {
@@ -131,13 +131,13 @@ function guardarRoadmap(titulo, descripcion, actividades) {
       actividades: actividades
     })
   })
-  .then(response => response.json())
-  .then(data => {
-    alert('¡Roadmap guardado en Estrategias!');
-  })
-  .catch(error => {
-    console.error('Error al guardar el roadmap:', error);
-  });
+    .then(response => response.json())
+    .then(data => {
+      alert('¡Roadmap guardado en Estrategias!');
+    })
+    .catch(error => {
+      console.error('Error al guardar el roadmap:', error);
+    });
 }
 
 
@@ -246,17 +246,17 @@ document.addEventListener('DOMContentLoaded', () => {
         'Authorization': 'Bearer ' + token
       }
     })
-    .then(response => response.json())
-    .then(data => {
-      chatLog.innerHTML = '';
-      data.forEach(conversacion => {
-        chatLog.innerHTML += `
+      .then(response => response.json())
+      .then(data => {
+        chatLog.innerHTML = '';
+        data.forEach(conversacion => {
+          chatLog.innerHTML += `
           <div><strong>Tú:</strong> ${conversacion.mensaje_usuario}</div>
           <div><strong>Bot:</strong> ${conversacion.respuesta_chatbot}</div>
         `;
+        });
+        chatLog.scrollTop = chatLog.scrollHeight;
       });
-      chatLog.scrollTop = chatLog.scrollHeight;
-    });
   }
 
   function agregarMensajeUsuario(mensaje) {
@@ -278,14 +278,14 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       body: JSON.stringify({ message: mensaje })
     })
-    .then(response => response.json())
-    .then(data => {
-      callback(data.response || data.respuesta || "");
-    })
-    .catch(error => {
-      agregarMensajeBot("Hubo un error al comunicarse con el chatbot.");
-      console.error(error);
-    });
+      .then(response => response.json())
+      .then(data => {
+        callback(data.response || data.respuesta || "");
+      })
+      .catch(error => {
+        agregarMensajeBot("Hubo un error al comunicarse con el chatbot.");
+        console.error(error);
+      });
   }
 
   function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
@@ -332,14 +332,14 @@ document.addEventListener('DOMContentLoaded', () => {
           etapas: etapasPayload
         })
       })
-      .then(response => response.json())
-      .then(data => {
-        alert('¡Roadmap guardado en Estrategias!');
-      })
-      .catch(error => {
-        alert('Error al guardar el roadmap: ' + error.message);
-        console.error('Error al guardar el roadmap:', error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          alert('¡Roadmap guardado en Estrategias!');
+        })
+        .catch(error => {
+          alert('Error al guardar el roadmap: ' + error.message);
+          console.error('Error al guardar el roadmap:', error);
+        });
 
     } catch (e) {
       alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato.");
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
       agregarMensajeUsuario(mensaje);
       userMessageInput.value = '';
 
-      enviarMensajeAlBackend(mensaje, function(respuesta) {
+      enviarMensajeAlBackend(mensaje, function (respuesta) {
         agregarMensajeBot(respuesta);
         if (esRoadmap) {
           guardarRoadmapComoEstrategia(respuesta, window.categoriaNombre);
@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Botón roadmap
   if (roadmapBtn) {
-    roadmapBtn.addEventListener('click', function() {
+    roadmapBtn.addEventListener('click', function () {
       esRoadmap = true;
       const mensajeCorto = `Hazme el roadmap para la categoría "${window.categoriaNombre}"`;
       const mensajeLargo = `Por favor, genera un roadmap para una pyme peruana en la categoría "${window.categoriaNombre}" siguiendo la estructura JSON de Estrategia, Etapa y Actividad.
@@ -398,7 +398,7 @@ No limites la cantidad de etapas ni de actividades; incluye todas las que consid
 
       agregarMensajeUsuario(mensajeCorto);
 
-      enviarMensajeAlBackend(mensajeLargo, function(respuesta) {
+      enviarMensajeAlBackend(mensajeLargo, function (respuesta) {
         agregarMensajeBot("Revisa el apartado estrategias para ver el roadmap generado.");
         guardarRoadmapComoEstrategia(respuesta, window.categoriaNombre);
       });
