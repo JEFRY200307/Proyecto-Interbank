@@ -257,5 +257,5 @@ class EstrategiaDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         # Solo permite ver estrategias del usuario autenticado
-        return Estrategia.objects.filter(usuario=self.request.user)
+        return super().get_queryset().filter(usuario=self.request.user)
 

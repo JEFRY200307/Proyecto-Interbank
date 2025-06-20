@@ -19,7 +19,22 @@
         </tr>
       </thead>
       <tbody id="estrategias-tbody">
-        <!-- Estrategias se insertan aquí -->
+        {% for estrategia in estrategias %}
+        <tr>
+          <td>{{ estrategia.titulo }}</td>
+          <td>{{ estrategia.descripcion }}</td>
+          <td>{{ estrategia.categoria }}</td>
+          <td>
+            <a href="/users/dashboard/estrategias/{{ estrategia.id }}/actividades/" class="btn-ver-actividades">
+              Ver etapas y actividades
+            </a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4">No tienes estrategias registradas.</td>
+        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>

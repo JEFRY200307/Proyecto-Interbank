@@ -1,0 +1,39 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="actividades-container">
+    <button onclick="window.location.href='{% url 'dashboard_estrategias' %}'">← Volver a Estrategias</button>
+    <h2>{{ estrategia.titulo }}</h2>
+    <p>{{ estrategia.descripcion }}</p>
+    <p><strong>Categoría:</strong> {{ estrategia.categoria }}</p>
+
+    {% if estrategia.etapas.all %}
+        {% for etapa in estrategia.etapas.all %}
+            <div class="etapa">
+                <h3>{{ etapa.nombre }}</h3>
+                <p>{{ etapa.descripcion }}</p>
+                <ul>
+                    {% for actividad in etapa.actividades.all %}
+                        <li>
+                            {{ actividad.descripcion }}
+                            {% if actividad.completada %}
+                                <span style="color:green;">✔ Completada</span>
+                            {% else %}
+                                <span style="color:red;">Pendiente</span>
+                            {% endif %}
+                            {% if actividad.fecha_limite %}
+                                <small>(Fecha límite: {{ actividad.fecha_limite }})</small>
+                            {% endif %}
+                        </li>
+                    {% empty %}
+                        <li>No hay actividades en esta etapa.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No hay etapas para esta estrategia.</p>
+    {% endif %}
+</div>
+{% endblock %}

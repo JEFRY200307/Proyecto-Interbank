@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     home, registro_empresa, login_empresa,
     EmpresaRegistroView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,
-    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView
+    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView,
 )
 
 urlpatterns = [

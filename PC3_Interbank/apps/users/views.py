@@ -14,6 +14,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 import random
 from django.utils.crypto import get_random_string
+from apps.empresas.models import Estrategia
 
 User = get_user_model()
 
@@ -30,7 +31,9 @@ def dashboard_usuarios(request):
     return render(request, 'perfil_y_usuarios/usuarios.html', {'rol': rol})
 
 def dashboard_estrategias(request):
-    return render(request, 'dashboard_estrategias.html')
+    estrategias = Estrategia.objects.filter(usuario=request.user)
+    return render(request, 'dashboard_estrategias.html', {'estrategias': estrategias})
+
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
