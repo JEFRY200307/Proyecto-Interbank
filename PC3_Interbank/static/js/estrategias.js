@@ -83,16 +83,16 @@ document.addEventListener('DOMContentLoaded', function() {
         <td>${estrategia.titulo}</td>
         <td>${estrategia.descripcion}</td>
         <td>${estrategia.categoria || ''}</td>
-        <td><button class="ver-actividades-btn" data-id="${estrategia.id}">Ver actividades</button></td>
+        <td><button class="ver-etapas-btn" data-id="${estrategia.id}">Ver etapas y actividades</button></td>
       `;
       tbody.appendChild(row);
     });
 
-    // 2. Agregar evento a los botones "Ver actividades"
-    document.querySelectorAll('.ver-actividades-btn').forEach(btn => {
+    // 2. Evento para mostrar etapas y actividades
+    document.querySelectorAll('.ver-etapas-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const estrategiaId = this.getAttribute('data-id');
-        mostrarActividades(estrategiaId, token);
+        mostrarEtapasYActividades(estrategiaId, token);
       });
     });
   })
@@ -101,8 +101,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.error(error);
   });
 
-  // 3. Función para mostrar actividades de una estrategia
-  function mostrarActividades(estrategiaId, token) {
+  // 3. Función para mostrar etapas y actividades
+  function mostrarEtapasYActividades(estrategiaId, token) {
     fetch(`/empresas/api/estrategias/${estrategiaId}/`, {
       headers: {
         'Authorization': 'Bearer ' + token
@@ -113,17 +113,33 @@ document.addEventListener('DOMContentLoaded', function() {
       const panel = document.getElementById('panel-actividades');
       const lista = document.getElementById('lista-actividades');
       lista.innerHTML = '';
-      if (estrategia.actividades && estrategia.actividades.length > 0) {
-        estrategia.actividades.forEach(act => {
-          lista.innerHTML += `<li>${act.descripcion} (${act.completada ? 'Completada' : 'Pendiente'})</li>`;
+      if (estrategia.etapas && estrategia.etapas.length > 0) {
+        estrategia.etapas.forEach(etapa => {
+          // Título de la etapa
+          let etapaHTML = `<li><strong>${etapa.nombre}</strong>`;
+          if (etapa.descripcion) {
+            etapaHTML += `<br><em>${etapa.descripcion}</em>`;
+          }
+          // Lista de actividades de la etapa
+          if (etapa.actividades && etapa.actividades.length > 0) {
+            etapaHTML += '<ul>';
+            etapa.actividades.forEach(act => {
+              etapaHTML += `<li>${act.descripcion} (${act.completada ? 'Completada' : 'Pendiente'})</li>`;
+            });
+            etapaHTML += '</ul>';
+          } else {
+            etapaHTML += '<ul><li>No hay actividades</li></ul>';
+          }
+          etapaHTML += '</li>';
+          lista.innerHTML += etapaHTML;
         });
       } else {
-        lista.innerHTML = '<li>No hay actividades</li>';
+        lista.innerHTML = '<li>No hay etapas ni actividades</li>';
       }
       panel.style.display = 'block';
     })
     .catch(error => {
-      alert('Error al cargar actividades: ' + error.message);
+      alert('Error al cargar etapas y actividades: ' + error.message);
       console.error(error);
     });
   }

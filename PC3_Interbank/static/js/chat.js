@@ -330,7 +330,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Función para guardar roadmap como Estrategia
   function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
-    let actividades = [];
     let titulo = `Roadmap para ${categoriaNombre}`;
     let descripcion = "Roadmap generado automáticamente por el chatbot.";
 
@@ -341,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const roadmapObj = JSON.parse(jsonMatch[0]);
       console.log("RoadmapObj parseado:", roadmapObj);
 
-      // Encuentra la clave que contiene las etapas (puede ser 'roadmap', 'roadmap_UX_UI', etc.)
+      // Encuentra la clave que contiene las etapas
       let etapas = [];
       for (const key in roadmapObj) {
         if (roadmapObj[key] && Array.isArray(roadmapObj[key].etapas)) {
@@ -349,23 +348,28 @@ document.addEventListener('DOMContentLoaded', () => {
           break;
         }
       }
-      // Si no encontró, intenta con los casos anteriores
       if (etapas.length === 0) {
         etapas = roadmapObj.roadmap?.etapas || roadmapObj.etapas || [];
       }
       console.log("Etapas extraídas:", etapas);
 
-      etapas.forEach(etapa => {
-        (etapa.actividades || []).forEach(act => {
-          actividades.push({
-            descripcion: `${etapa.nombre}: ${typeof act === "string" ? act : (act.tarea || act)}`,
-            fecha_limite: null,
-            completada: false
-          });
-        });
-      });
+      // Armar el array de etapas con actividades anidadas
+      const etapasPayload = etapas.map(etapa => ({
+        nombre: etapa.nombre || "Etapa sin nombre",
+        descripcion: etapa.descripcion || "",
+        actividades: (etapa.actividades || []).map(act => ({
+          descripcion: typeof act === "string" ? act : (act.descripcion || act.tarea || ""),
+          fecha_limite: null,
+          completada: false
+        }))
+      }));
 
-      console.log("Actividades armadas antes del fetch:", actividades);
+      console.log("Payload a enviar:", {
+        titulo: titulo,
+        descripcion: descripcion,
+        categoria: categoriaNombre,
+        etapas: etapasPayload
+      });
 
       fetch('/empresas/api/estrategias/', {
         method: 'POST',
@@ -376,8 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           titulo: titulo,
           descripcion: descripcion,
-          actividades: actividades,
-          categoria: categoriaNombre
+          categoria: categoriaNombre,
+          etapas: etapasPayload
         })
       })
       .then(response => response.json())
