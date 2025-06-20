@@ -1,0 +1,19 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Bots - Mentor{% endblock %}
+
+{% block content %}
+<h1>Mis Bots</h1>
+
+<div id="chatbots-container">
+    {% for cat in categories %}
+        <a href="{% url 'dashboard_mentor_bots_detail' cat.id %}" class="chatbot-card">
+            <img src="{% static 'img/chatbot_'|add:cat.id|stringformat:'s'|add:'.png' %}" alt="{{ cat.name }}" class="chatbot-img">
+            <div class="chatbot-title">{{ cat.name }}</div>
+        </a>
+    {% empty %}
+        <p>No hay bots disponibles.</p>
+    {% endfor %}
+</div>
+{% endblock %}
