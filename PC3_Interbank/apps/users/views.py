@@ -10,11 +10,12 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions
 from django.contrib.auth import get_user_model
 from .serializers import UsuarioSerializer
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 import random
 from django.utils.crypto import get_random_string
 from apps.empresas.models import Estrategia
+from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 
@@ -30,10 +31,10 @@ def dashboard_usuarios(request):
     rol = getattr(request.user, 'rol', None)
     return render(request, 'perfil_y_usuarios/usuarios.html', {'rol': rol})
 
-def dashboard_estrategias(request):
-    estrategias = Estrategia.objects.filter(usuario=request.user)
-    return render(request, 'dashboard_estrategias.html', {'estrategias': estrategias})
 
+
+def dashboard_estrategias(request):
+    return render(request, 'dashboard_estrategias.html')
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -112,3 +113,4 @@ def cuenta_usuario(request):
             "telefono": user.empresa.telefono,
         }
     return Response(data)
+

@@ -15,6 +15,7 @@ from .views import (
     # ...otros
 )
 
+
 urlpatterns = [
     path('', DashboardHomeView.as_view(), name='dashboard_home'),
     path('perfil/', DashboardPerfilView.as_view(), name='dashboard_perfil'),
@@ -28,4 +29,4 @@ urlpatterns = [
     path('recursos/', DashboardRecursosView.as_view(), name='dashboard_recursos'),
     path('notificaciones/', DashboardNotificacionesView.as_view(), name='dashboard_notificaciones'),
     path('configuracion/', DashboardConfiguracionView.as_view(), name='dashboard_configuracion'),
-]
+    ]
