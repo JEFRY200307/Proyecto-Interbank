@@ -14,7 +14,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
 import random
 from django.utils.crypto import get_random_string
-from rest_framework.permissions import BasePermission, Estrategia
+from rest_framework.permissions import BasePermission
+from apps.empresas.models import Estrategia
 from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
