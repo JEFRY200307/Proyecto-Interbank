@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions
 from django.contrib.auth import get_user_model
 from .serializers import UsuarioSerializer
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.mail import send_mail
 import random
 from django.utils.crypto import get_random_string
@@ -113,4 +113,12 @@ def cuenta_usuario(request):
             "telefono": user.empresa.telefono,
         }
     return Response(data)
+
+@login_required
+def dashboard_actividades(request, pk):
+    # Buscamos la estrategia por su ID (pk) y nos aseguramos que pertenezca al usuario logueado
+    estrategia = get_object_or_404(Estrategia, pk=pk, usuario=request.user)
+    
+    # Renderizamos el template de actividades, pasándole la estrategia encontrada
+    return render(request, 'dashboard_actividades.html', {'estrategia': estrategia})
 
