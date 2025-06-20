@@ -79,7 +79,7 @@ function enviarMensajeRoadmap() {
     "titulo": "Título de la estrategia",
     "descripcion": "Descripción breve",
     "categoria": "${categoriaNombre}",
-    "fecha_cumplimiento": "YYYY-MM-DD",  // opcional
+    "fecha_cumplimiento": "YYYY-MM-DD",  
     "estado": "pendiente",
     "etapas": [
       {
@@ -88,7 +88,7 @@ function enviarMensajeRoadmap() {
         "actividades": [
           {
             "descripcion": "Descripción de la actividad",
-            "fecha_limite": "YYYY-MM-DD",  // opcional
+            "fecha_limite": "YYYY-MM-DD", 
             "completada": false
           }
         ]
