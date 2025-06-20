@@ -1,0 +1,491 @@
+{% extends "dashboard_base.html" %}
+{% load static %}
+
+{% block title %}Estrategias del Bot{% endblock %}
+
+{% block content %}
+<h2>Estrategias del Bot: {{ bot.name }}</h2>
+
+<button onclick="mostrarFormularioNuevaEstrategia()">Añadir Estrategia</button>
+
+<div class="tabla-scroll">
+  <table class="estrategias-table" id="tabla-estrategias-bot">
+    <colgroup>
+      <col style="width: 25%;">
+      <col style="width: 45%;">
+      <col style="width: 15%;">
+      <col style="width: 15%;">
+    </colgroup>
+    <thead>
+      <tr>
+        <th>Título</th>
+        <th>Descripción</th>
+        <th>Etapas</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="estrategias-bot-lista">
+      <!-- JS insertará aquí las filas -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal para añadir/editar estrategia -->
+<div id="modal-estrategia" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="cerrarModalEstrategia()">&times;</span>
+    <h3 id="modal-estrategia-titulo">Nueva Estrategia</h3>
+    <form id="form-estrategia">
+      <label>Título: <input name="titulo" required></label>
+      <label>Descripción: <textarea name="descripcion" required></textarea></label>
+      <button type="submit" class="btn-guardar">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para etapas y actividades -->
+<div id="modal-etapas" class="modal" style="display:none;">
+  <div class="modal-content" style="max-width:700px;">
+    <span class="close-modal" onclick="cerrarModalEtapas()">&times;</span>
+    <h3>Etapas y Actividades</h3>
+    <div id="etapas-lista"></div>
+    <button onclick="mostrarFormularioNuevaEtapa()" class="btn-guardar" style="margin-top:1rem;">Añadir Etapa</button>
+  </div>
+</div>
+
+<!-- Modal para añadir/editar etapa -->
+<div id="modal-etapa" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="cerrarModalEtapa()">&times;</span>
+    <h3 id="modal-etapa-titulo">Nueva Etapa</h3>
+    <form id="form-etapa">
+      <label>Nombre: <input name="nombre" required></label>
+      <label>Descripción: <textarea name="descripcion"></textarea></label>
+      <button type="submit" class="btn-guardar">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal para añadir/editar actividad -->
+<div id="modal-actividad" class="modal" style="display:none;">
+  <div class="modal-content">
+    <span class="close-modal" onclick="cerrarModalActividad()">&times;</span>
+    <h3 id="modal-actividad-titulo">Actividades</h3>
+    <div id="actividades-lista"></div>
+    <button onclick="mostrarFormularioNuevaActividad()" class="btn-guardar" style="margin-top:1rem;">Añadir Actividad</button>
+    <form id="form-actividad" style="display:none; margin-top:1rem;">
+      <label>Descripción: <input name="descripcion" required></label>
+      <button type="submit" class="btn-guardar">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<style>
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+.estrategias-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+.estrategias-table th, .estrategias-table td {
+  border: 1px solid #b2dfdb;
+  padding: 0.7rem;
+  vertical-align: top;
+  text-align: left;
+}
+.estrategias-table th {
+  background: #e0f2f1;
+  font-weight: bold;
+  text-align: center;
+}
+.estrategias-table input, .estrategias-table textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.3rem;
+  border: 1px solid #b2dfdb;
+  border-radius: 5px;
+  font-size: 1rem;
+  background: #fff;
+  display: block;
+}
+.estrategias-table textarea {
+  min-height: 2.5rem;
+  resize: vertical;
+}
+.btn-guardar {
+  background: #388e3c;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 0.2rem;
+}
+.btn-guardar:hover {
+  background: #43a047;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 24px #388e3c55;
+  position: relative;
+}
+.close-modal {
+  position: absolute;
+  right: 1.2rem;
+  top: 1.2rem;
+  font-size: 2rem;
+  color: #388e3c;
+  cursor: pointer;
+}
+.etapa-row {
+  border-bottom: 1px solid #b2dfdb;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+}
+.actividad-row {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.actividad-row input {
+  border: 1px solid #b2dfdb;
+  border-radius: 5px;
+  padding: 0.3rem;
+  font-size: 1rem;
+}
+</style>
+
+<script>
+const botId = "{{ bot.id|escapejs }}";
+let estrategiasBot = [];
+let estrategiaActualId = null;
+let etapaActualId = null;
+
+// Cargar estrategias al iniciar
+document.addEventListener('DOMContentLoaded', cargarEstrategiasBot);
+
+async function cargarEstrategiasBot() {
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/bots/${botId}/estrategias/`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) {
+        document.getElementById('estrategias-bot-lista').innerHTML = '<tr><td colspan="4">Error al cargar estrategias.</td></tr>';
+        return;
+    }
+    estrategiasBot = await res.json();
+    let html = '';
+    if (estrategiasBot.length === 0) {
+        html = `<tr><td colspan="4" style="text-align:center;">No hay estrategias registradas.</td></tr>`;
+    } else {
+        html = estrategiasBot.map(e => `
+            <tr>
+              <td>${e.titulo}</td>
+              <td>${e.descripcion}</td>
+              <td>
+                <button onclick="abrirModalEtapas(${e.id})" class="btn-guardar" type="button">Ver Etapas</button>
+              </td>
+              <td>
+                <button onclick="editarEstrategia(${e.id})" class="btn-guardar" type="button">Editar</button>
+                <button onclick="eliminarEstrategia(${e.id})" class="btn-guardar" type="button" style="background:#c62828;">Eliminar</button>
+              </td>
+            </tr>
+        `).join('');
+    }
+    document.getElementById('estrategias-bot-lista').innerHTML = html;
+}
+
+// --------- CRUD Estrategia ---------
+function mostrarFormularioNuevaEstrategia() {
+    document.getElementById('modal-estrategia-titulo').innerText = 'Nueva Estrategia';
+    document.getElementById('form-estrategia').reset();
+    estrategiaActualId = null;
+    document.getElementById('modal-estrategia').style.display = 'flex';
+}
+function cerrarModalEstrategia() {
+    document.getElementById('modal-estrategia').style.display = 'none';
+}
+document.getElementById('form-estrategia').onsubmit = async function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    const data = {
+        titulo: form.titulo.value,
+        descripcion: form.descripcion.value,
+        chatbot: botId
+    };
+    let url = `/mentor/api/bots/${botId}/estrategias/`;
+    let method = 'POST';
+    if (estrategiaActualId) {
+        url = `/mentor/api/estrategias/${estrategiaActualId}/`;
+        method = 'PUT';
+    }
+    const res = await fetch(url, {
+        method,
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) {
+        cerrarModalEstrategia();
+        cargarEstrategiasBot();
+    } else {
+        alert('Error al guardar estrategia');
+    }
+};
+async function editarEstrategia(id) {
+    const estrategia = estrategiasBot.find(e => e.id === id);
+    if (!estrategia) return;
+    estrategiaActualId = id;
+    document.getElementById('modal-estrategia-titulo').innerText = 'Editar Estrategia';
+    const form = document.getElementById('form-estrategia');
+    form.titulo.value = estrategia.titulo;
+    form.descripcion.value = estrategia.descripcion;
+    document.getElementById('modal-estrategia').style.display = 'flex';
+}
+async function eliminarEstrategia(id) {
+    if (!confirm('¿Eliminar esta estrategia?')) return;
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/estrategias/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+        cargarEstrategiasBot();
+    } else {
+        alert('Error al eliminar estrategia');
+    }
+}
+
+// --------- CRUD Etapas ---------
+async function abrirModalEtapas(estrategiaId) {
+    estrategiaActualId = estrategiaId;
+    document.getElementById('modal-etapas').style.display = 'flex';
+    cargarEtapasEstrategia(estrategiaId);
+}
+function cerrarModalEtapas() {
+    document.getElementById('modal-etapas').style.display = 'none';
+    document.getElementById('etapas-lista').innerHTML = '';
+}
+async function cargarEtapasEstrategia(estrategiaId) {
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/estrategias/${estrategiaId}/etapas/`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const etapas = await res.json();
+    let html = '';
+    if (etapas.length === 0) {
+        html = `<div>No hay etapas.</div>`;
+    } else {
+        html = etapas.map(etapa => `
+            <div class="etapa-row">
+                <b>${etapa.nombre}</b>
+                <p>${etapa.descripcion || ''}</p>
+                <button onclick="editarEtapa(${etapa.id})" class="btn-guardar" type="button">Editar</button>
+                <button onclick="eliminarEtapa(${etapa.id})" class="btn-guardar" type="button" style="background:#c62828;">Eliminar</button>
+                <button onclick="abrirModalActividades(${etapa.id})" class="btn-guardar" type="button">Ver Actividades</button>
+            </div>
+        `).join('');
+    }
+    document.getElementById('etapas-lista').innerHTML = html;
+}
+function mostrarFormularioNuevaEtapa() {
+    document.getElementById('modal-etapa-titulo').innerText = 'Nueva Etapa';
+    document.getElementById('form-etapa').reset();
+    etapaActualId = null;
+    document.getElementById('modal-etapa').style.display = 'flex';
+}
+function cerrarModalEtapa() {
+    document.getElementById('modal-etapa').style.display = 'none';
+}
+document.getElementById('form-etapa').onsubmit = async function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    const data = {
+        nombre: form.nombre.value,
+        descripcion: form.descripcion.value,
+        estrategia: estrategiaActualId
+    };
+    let url = `/mentor/api/estrategias/${estrategiaActualId}/etapas/`;
+    let method = 'POST';
+    if (etapaActualId) {
+        url = `/mentor/api/etapas/${etapaActualId}/`;
+        method = 'PUT';
+    }
+    const res = await fetch(url, {
+        method,
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) {
+        cerrarModalEtapa();
+        cargarEtapasEstrategia(estrategiaActualId);
+    } else {
+        alert('Error al guardar etapa');
+    }
+};
+async function editarEtapa(id) {
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/etapas/${id}/`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) return;
+    const etapa = await res.json();
+    etapaActualId = id;
+    document.getElementById('modal-etapa-titulo').innerText = 'Editar Etapa';
+    const form = document.getElementById('form-etapa');
+    form.nombre.value = etapa.nombre;
+    form.descripcion.value = etapa.descripcion;
+    document.getElementById('modal-etapa').style.display = 'flex';
+}
+async function eliminarEtapa(id) {
+    if (!confirm('¿Eliminar esta etapa?')) return;
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/etapas/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+        cargarEtapasEstrategia(estrategiaActualId);
+    } else {
+        alert('Error al eliminar etapa');
+    }
+}
+
+// --------- CRUD Actividades ---------
+async function abrirModalActividades(etapaId) {
+    etapaActualId = etapaId;
+    document.getElementById('modal-actividad').style.display = 'flex';
+    cargarActividadesEtapa(etapaId);
+}
+function cerrarModalActividad() {
+    document.getElementById('modal-actividad').style.display = 'none';
+    document.getElementById('form-actividad').reset();
+    document.getElementById('form-actividad').style.display = 'none';
+}
+async function cargarActividadesEtapa(etapaId) {
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/etapas/${etapaId}/actividades/`, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const actividades = await res.json();
+    let html = '';
+    if (actividades.length === 0) {
+        html = `<div>No hay actividades.</div>`;
+    } else {
+        html = actividades.map(act => `
+            <div class="actividad-row">
+                <input type="text" value="${act.descripcion || ''}" onchange="editarActividad(${act.id}, this.value)">
+                <button onclick="guardarActividad(${act.id})" class="btn-guardar" type="button">Guardar</button>
+                <button onclick="eliminarActividad(${act.id})" class="btn-guardar" type="button" style="background:#c62828;">Eliminar</button>
+            </div>
+        `).join('');
+    }
+    document.getElementById('actividades-lista').innerHTML = html;
+    document.getElementById('form-actividad').style.display = 'none'; // Oculta el form por defecto
+}
+function mostrarFormularioNuevaActividad() {
+    document.getElementById('modal-actividad-titulo').innerText = 'Nueva Actividad';
+    document.getElementById('form-actividad').reset();
+    document.getElementById('form-actividad').style.display = 'block';
+}
+document.getElementById('form-actividad').onsubmit = async function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    const data = {
+        descripcion: form.descripcion.value,
+        etapa: etapaActualId
+    };
+    let url = `/mentor/api/etapas/${etapaActualId}/actividades/`;
+    let method = 'POST';
+    if (form.dataset.editId) {
+        url = `/mentor/api/actividades/${form.dataset.editId}/`;
+        method = 'PUT';
+    }
+    const res = await fetch(url, {
+        method,
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) {
+        cerrarModalActividad();
+        cargarActividadesEtapa(etapaActualId);
+        form.removeAttribute('data-edit-id');
+    } else {
+        alert('Error al guardar actividad');
+    }
+};
+function editarActividad(id, descripcion) {
+    const form = document.getElementById('form-actividad');
+    form.descripcion.value = descripcion;
+    form.dataset.editId = id;
+    document.getElementById('modal-actividad-titulo').innerText = 'Editar Actividad';
+    document.getElementById('modal-actividad').style.display = 'flex';
+}
+async function guardarActividad(id) {
+    const token = localStorage.getItem('access_token');
+    const form = document.getElementById('form-actividad');
+    const data = {
+        descripcion: form.descripcion.value,
+        etapa: etapaActualId
+    };
+    const res = await fetch(`/mentor/api/actividades/${id}/`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': 'Bearer ' + token,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+    if (res.ok) {
+        cerrarModalActividad();
+        cargarActividadesEtapa(etapaActualId);
+        form.removeAttribute('data-edit-id');
+    } else {
+        alert('Error al actualizar actividad');
+    }
+}
+async function eliminarActividad(id) {
+    if (!confirm('¿Eliminar esta actividad?')) return;
+    const token = localStorage.getItem('access_token');
+    const res = await fetch(`/mentor/api/actividades/${id}/`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (res.ok) {
+        cargarActividadesEtapa(etapaActualId);
+    } else {
+        alert('Error al eliminar actividad');
+    }
+}
+</script>
+{% endblock %}

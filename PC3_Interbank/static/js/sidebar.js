@@ -62,8 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (rol === 'mentor') {
         menu += `<li style="list-style:none;"><h3>Mentor</h3></li>
             <li><a href="/mentor/dashboard/">Gestión de empresas</a></li>
-            <li><a href="/bots/">Acceso a bots</a></li>
-            <li><a href="/bots/alimentar/">Alimentar al bot</a></li>`;
+            <li><a href="/mentor/dashboard/bots/">Alimentar al bot</a></li>`;
         }
         menu += `<li><a href="#" id="logout-link">Cerrar sesión</a></li>`;
         sidebar.innerHTML = menu;
