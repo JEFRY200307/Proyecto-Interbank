@@ -23,7 +23,7 @@
         <button id="enviar-btn">Enviar</button>
     </div>
     <div id="chat-buttons">
-        <button id="roadmap-btn">Estoy listo para que me des el roadmap</button>
+        <button id="roadmap-btn">Generar Roadmap</button>
     </div>
 
 </div>
@@ -33,7 +33,9 @@
   window.chatbotId = "{{ chatbot_id|default:'' }}";
   window.categoriaNombre = "{{ category.name|default:'' }}";
 </script>
+{% load static %}
 <script src="{% static 'js/chat.js' %}"></script>
+
 
 {% endblock %}
 

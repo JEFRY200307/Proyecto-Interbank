@@ -101,22 +101,27 @@ class EmpresaLoginView(APIView):
     def post(self, request):
         correo = request.data.get('correo')
         password = request.data.get('password')
-        user = authenticate(request, correo=correo, password=password)
+
+        # Autenticamos al usuario con las credenciales
+        user = authenticate(request, username=correo, password=password)
+
         if user is not None:
-            # Solo exige empresa activa si el rol NO es mentor
-            if user.rol == 'mentor' or (user.empresa and user.empresa.estado == 'activo'):
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                    'nombre': user.nombre,
-                    'rol': user.rol,
-                    'mensaje': 'Login exitoso.'
-                })
-            else:
-                return Response({'error': 'Tu empresa aún no está activa o no tienes empresa asociada.'}, status=403)
+            # ¡LÍNEA CLAVE! Inicia la sesión en Django para este usuario.
+            # Esto crea la cookie de sesión que las vistas con @login_required necesitan.
+            login(request, user)
+
+            # Ahora, generamos los tokens JWT como ya lo hacías
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'rol': user.rol,
+                'nombre': user.nombre,
+            }, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Credenciales incorrectas.'}, status=400)
+            # Si la autenticación falla, devolvemos un error
+            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
         
 class EmpresaLogoutView(APIView):
     permission_classes = [IsAuthenticated]

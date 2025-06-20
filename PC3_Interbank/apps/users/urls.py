@@ -1,5 +1,10 @@
 from django.urls import path
-from .views import UsuarioListCreateAPIView,UsuariosEmpresaAPIView,cuenta_usuario,dashboard_usuarios,dashboard_panel,dashboard_perfil, UsuarioRetrieveUpdateDestroyAPIView, dashboard_estrategias
+from .views import (
+    UsuarioListCreateAPIView, UsuariosEmpresaAPIView, cuenta_usuario, 
+    dashboard_usuarios, dashboard_panel, dashboard_perfil, 
+    UsuarioRetrieveUpdateDestroyAPIView, dashboard_estrategias, 
+    dashboard_actividades 
+)
 
 
 urlpatterns = [
@@ -12,4 +17,5 @@ urlpatterns = [
    path('api/usuarios/', UsuarioListCreateAPIView.as_view(), name='usuarios_api'),
    path('api/usuarios/<int:pk>/', UsuarioRetrieveUpdateDestroyAPIView.as_view(), name='usuario_api'),
    path('dashboard/estrategias/', dashboard_estrategias, name='dashboard_estrategias'),
+   path('dashboard/estrategias/<int:pk>/actividades/', dashboard_actividades, name='dashboard_actividades'),
 ]
