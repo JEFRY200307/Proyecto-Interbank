@@ -6,7 +6,7 @@
 <div class="estrategias-container">
   <h2 class="estrategias-title">Estrategias</h2>
 
-  <!-- Lista de estrategias -->
+  <!-- Lista de estrategias (se llenará con JS) -->
   <div class="estrategias-list">
     <h3>Mis Estrategias</h3>
     <table class="estrategias-table" id="tabla-estrategias" border="1">
@@ -15,57 +15,20 @@
           <th>Título</th>
           <th>Descripción</th>
           <th>Categoría</th>
-          <th>Ver etapas y actividades</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody id="estrategias-tbody">
-        {% for estrategia in estrategias %}
-        <tr>
-          <td>{{ estrategia.titulo }}</td>
-          <td>{{ estrategia.descripcion }}</td>
-          <td>{{ estrategia.categoria }}</td>
-          <td>
-            <a href="/users/dashboard/estrategias/{{ estrategia.id }}/actividades/" class="btn-ver-actividades">
-              Ver etapas y actividades
-            </a>
-          </td>
-        </tr>
-        {% empty %}
-        <tr>
-          <td colspan="4">No tienes estrategias registradas.</td>
-        </tr>
-        {% endfor %}
+        <!-- Las filas se insertan aquí dinámicamente -->
       </tbody>
     </table>
   </div>
-
-  <!-- Detalle de estrategia -->
-  <div class="estrategia-detalle" id="estrategia-detalle" style="display: none;">
-    <h3 id="detalle-titulo">Detalle de Estrategia</h3>
-    <p><strong>Descripción:</strong> <span id="detalle-descripcion"></span></p>
-    <p><strong>Estado:</strong> <span id="detalle-estado"></span></p>
-    <p><strong>Fecha de Creación:</strong> <span id="detalle-fecha-creacion"></span></p>
-    <p><strong>Fecha de Cumplimiento:</strong> <span id="detalle-fecha-cumplimiento"></span></p>
-
-    <h4>Actividades</h4>
-    <ul id="detalle-actividades">
-      <!-- Actividades se cargarán dinámicamente -->
-    </ul>
-
-    <button onclick="volverALaLista()">Volver a la lista</button>
-  </div>
-
-  <!-- Panel para mostrar actividades -->
-  <div id="panel-actividades" style="margin-top:20px; display:none;">
-    <h3>Etapas y Actividades de la Estrategia</h3>
-    <ul id="lista-actividades"></ul>
-  </div>
-  
 </div>
 
 <script>
+  // Verificación básica del token antes de cargar el script principal
   if (!localStorage.getItem('access_token')) {
-    window.location.href = '/login/'; // Cambia la ruta si tu login es diferente
+    window.location.href = '/login/'; // Asegúrate que esta es tu URL de login
   }
 </script>
 <script src="{% static 'js/estrategias.js' %}"></script>

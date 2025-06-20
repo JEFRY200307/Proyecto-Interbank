@@ -61,86 +61,55 @@ function volverALaLista() {
 // Cargar estrategias al inicio
 document.addEventListener('DOMContentLoaded', function() {
   const token = localStorage.getItem('access_token');
+
+  // Si no hay token, no continuamos
   if (!token) {
     alert('Debes iniciar sesión para ver tus estrategias.');
-    window.location.href = '/login/';
+    window.location.href = '/login/'; // Asegúrate que esta es tu URL de login
     return;
   }
 
-  // 1. Cargar todas las estrategias
+  // Hacemos la llamada a la API para obtener las estrategias
   fetch('/empresas/api/estrategias/', {
     headers: {
       'Authorization': 'Bearer ' + token
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error al obtener las estrategias. Código: ' + response.status);
+    }
+    return response.json();
+  })
   .then(estrategias => {
     const tbody = document.getElementById('estrategias-tbody');
-    tbody.innerHTML = '';
+    tbody.innerHTML = ''; // Limpiamos la tabla antes de llenarla
+
+    if (estrategias.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">No tienes estrategias registradas.</td></tr>';
+        return;
+    }
+
     estrategias.forEach(estrategia => {
       let row = document.createElement('tr');
+      
+      // **AQUÍ ESTÁ EL CAMBIO CLAVE**
+      // Creamos un enlace (<a>) en lugar de un botón con evento.
       row.innerHTML = `
         <td>${estrategia.titulo}</td>
         <td>${estrategia.descripcion}</td>
-        <td>${estrategia.categoria || ''}</td>
-        <td><button class="ver-etapas-btn" data-id="${estrategia.id}">Ver etapas y actividades</button></td>
+        <td>${estrategia.categoria || 'Sin categoría'}</td>
+        <td>
+          <a href="/users/dashboard/estrategias/${estrategia.id}/actividades/" class="btn-ver-actividades">
+            Ver etapas y actividades
+          </a>
+        </td>
       `;
       tbody.appendChild(row);
     });
-
-    // 2. Evento para mostrar etapas y actividades
-    document.querySelectorAll('.ver-etapas-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const estrategiaId = this.getAttribute('data-id');
-        mostrarEtapasYActividades(estrategiaId, token);
-      });
-    });
   })
   .catch(error => {
-    alert('Error al cargar estrategias: ' + error.message);
-    console.error(error);
+    console.error('Error en el fetch de estrategias:', error);
+    alert('Hubo un problema al cargar tus estrategias. Por favor, intenta de nuevo.');
   });
-
-  // 3. Función para mostrar etapas y actividades
-  function mostrarEtapasYActividades(estrategiaId, token) {
-    fetch(`/empresas/api/estrategias/${estrategiaId}/`, {
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    })
-    .then(response => response.json())
-    .then(estrategia => {
-      const panel = document.getElementById('panel-actividades');
-      const lista = document.getElementById('lista-actividades');
-      lista.innerHTML = '';
-      if (estrategia.etapas && estrategia.etapas.length > 0) {
-        estrategia.etapas.forEach(etapa => {
-          // Título de la etapa
-          let etapaHTML = `<li><strong>${etapa.nombre}</strong>`;
-          if (etapa.descripcion) {
-            etapaHTML += `<br><em>${etapa.descripcion}</em>`;
-          }
-          // Lista de actividades de la etapa
-          if (etapa.actividades && etapa.actividades.length > 0) {
-            etapaHTML += '<ul>';
-            etapa.actividades.forEach(act => {
-              etapaHTML += `<li>${act.descripcion} (${act.completada ? 'Completada' : 'Pendiente'})</li>`;
-            });
-            etapaHTML += '</ul>';
-          } else {
-            etapaHTML += '<ul><li>No hay actividades</li></ul>';
-          }
-          etapaHTML += '</li>';
-          lista.innerHTML += etapaHTML;
-        });
-      } else {
-        lista.innerHTML = '<li>No hay etapas ni actividades</li>';
-      }
-      panel.style.display = 'block';
-    })
-    .catch(error => {
-      alert('Error al cargar etapas y actividades: ' + error.message);
-      console.error(error);
-    });
-  }
 });
