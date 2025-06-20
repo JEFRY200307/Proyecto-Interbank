@@ -2,38 +2,40 @@
 {% load static %}
 
 {% block content %}
-<div class="actividades-container">
-    <button onclick="window.location.href='{% url 'dashboard_estrategias' %}'">← Volver a Estrategias</button>
-    <h2>{{ estrategia.titulo }}</h2>
-    <p>{{ estrategia.descripcion }}</p>
-    <p><strong>Categoría:</strong> {{ estrategia.categoria }}</p>
+<div class="roadmap-container">
+  <!-- Botón para regresar a la lista de estrategias -->
+  <a href="{% url 'dashboard_estrategias' %}" class="btn-volver">← Volver a Estrategias</a>
 
-    {% if estrategia.etapas.all %}
-        {% for etapa in estrategia.etapas.all %}
-            <div class="etapa">
-                <h3>{{ etapa.nombre }}</h3>
-                <p>{{ etapa.descripcion }}</p>
-                <ul>
-                    {% for actividad in etapa.actividades.all %}
-                        <li>
-                            {{ actividad.descripcion }}
-                            {% if actividad.completada %}
-                                <span style="color:green;">✔ Completada</span>
-                            {% else %}
-                                <span style="color:red;">Pendiente</span>
-                            {% endif %}
-                            {% if actividad.fecha_limite %}
-                                <small>(Fecha límite: {{ actividad.fecha_limite }})</small>
-                            {% endif %}
-                        </li>
-                    {% empty %}
-                        <li>No hay actividades en esta etapa.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>No hay etapas para esta estrategia.</p>
-    {% endif %}
+  <h2>{{ estrategia.titulo }}</h2>
+  <p class="estrategia-descripcion">{{ estrategia.descripcion }}</p>
+
+  <div class="timeline">
+    {% for etapa in estrategia.etapas.all %}
+      <div class="timeline-etapa">
+        <h3>{{ etapa.nombre }}</h3>
+        <p>{{ etapa.descripcion }}</p>
+
+        <ul class="timeline-actividades">
+          {% for actividad in etapa.actividades.all %}
+            <!-- Aplicamos la clase 'completada' si la actividad lo está -->
+            <li class="timeline-item {% if actividad.completada %}completada{% endif %}">
+              <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
+              <small class="actividad-estado">
+                {% if actividad.completada %}
+                  ✔ Completada
+                {% else %}
+                  Pendiente
+                {% endif %}
+              </small>
+            </li>
+          {% empty %}
+            <li class="timeline-item">No hay actividades en esta etapa.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% empty %}
+      <p>No hay etapas definidas para esta estrategia.</p>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}
