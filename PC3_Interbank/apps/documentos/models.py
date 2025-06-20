@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
+from django.conf import settings
 
 User = get_user_model()
 
@@ -23,7 +24,11 @@ class Documento(models.Model):
     ], default='contrato')
     etiquetas = models.CharField(max_length=255, blank=True, null=True)
     contenido = models.TextField(blank=True, null=True)
-    # ...otros campos si necesitas
+    creador = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='documentos_creados'
+    )
 
     def __str__(self):
         return self.nombre
@@ -43,4 +48,4 @@ class Firma(models.Model):
     sello_tiempo = models.DateTimeField(null=True, blank=True)
     trazabilidad = models.JSONField(default=dict, blank=True)
     certificado = models.TextField(blank=True, null=True)
-    posicion = models.JSONField(null=True, blank=True) 
+    posicion = models.JSONField(null=True, blank=True)

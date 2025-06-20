@@ -11,10 +11,7 @@
 
     <!-- Lista de firmas pendientes -->
     <div id="pendientesFirma" class="firmas-grid">
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <p>Cargando firmas pendientes...</p>
-        </div>
+        <!-- Las tarjetas de firmas se renderizan dinámicamente en JS -->
     </div>
     <h3>Historial de Firmas</h3>
     <div id="historialFirma" class="firmas-grid"></div>
@@ -24,7 +21,7 @@
 <div id="firmarModal" style="display:none;">
     <form id="firmarForm">
         <input type="hidden" id="firma_doc_id" />
-        <div id="firmaDocInfo"></div> <!-- AGREGA ESTA LÍNEA -->
+        <div id="firmaDocInfo"></div>
         <label>PIN de firma:</label>
         <input type="password" id="claveFirma" required />
         <br>

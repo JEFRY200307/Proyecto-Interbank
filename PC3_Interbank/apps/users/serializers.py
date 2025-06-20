@@ -13,25 +13,24 @@ User = get_user_model()
 class UsuarioSerializer(serializers.ModelSerializer):
     class Meta:
         model = Usuario
-        fields = ['id', 'nombre', 'correo', 'rol', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
+        fields = ['id', 'nombre', 'correo', 'rol', 'rol_interno', 'password']
+        extra_kwargs = {'password': {'write_only': True, 'required': False}}
 
     def create(self, validated_data):
         password = validated_data.pop('password', None)
-        usuario = Usuario(**validated_data)
+        usuario = super().create(validated_data)
         if password:
             usuario.set_password(password)
-        usuario.save()
+            usuario.save()
         return usuario
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+        usuario = super().update(instance, validated_data)
         if password:
-            instance.set_password(password)
-        instance.save()
-        return instance
+            usuario.set_password(password)
+            usuario.save()
+        return usuario
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod

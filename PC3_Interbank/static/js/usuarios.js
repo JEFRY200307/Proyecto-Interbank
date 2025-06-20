@@ -2,8 +2,15 @@
 
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');
+    const rolInterno = localStorage.getItem('rol_interno');
     if (!token) {
         window.location.href = '/login/';
+        return;
+    }
+    // Solo permite acceso a representante
+    if (rolInterno !== 'representante') {
+        document.getElementById('usuarios-lista').innerHTML = '<p>No tienes permisos para gestionar usuarios.</p>';
+        document.getElementById('agregarUsuarioBtn').style.display = 'none';
         return;
     }
 
@@ -19,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('usuario_id').value = usuario.id;
             document.getElementById('nombre').value = usuario.nombre;
             document.getElementById('correo').value = usuario.correo;
-            document.getElementById('rol').value = usuario.rol;
+            document.getElementById('rol_interno').value = usuario.rol_interno;
             // No llenes password por seguridad
         } else {
             document.getElementById('usuario_id').value = '';
@@ -36,10 +43,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cargar usuarios (igual que antes)
     function cargarUsuarios() {
         fetch('/users/api/usuarios/', {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json'
-            }
+            headers:
+                {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
         })
             .then(r => {
                 if (r.status === 401 || r.status === 403) {
@@ -116,9 +124,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = {
             nombre: document.getElementById('nombre').value,
             correo: document.getElementById('correo').value,
-            rol: document.getElementById('rol').value,
-            password: document.getElementById('password').value
+            rol: 'empresa',
+            rol_interno: document.getElementById('rol_interno').value
         };
+        const password = document.getElementById('password').value;
+        if (password) {
+            formData.password = password;
+        }
         fetch(url, {
             method: method,
             headers: {

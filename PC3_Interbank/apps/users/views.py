@@ -14,6 +14,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 import random
 from django.utils.crypto import get_random_string
+from rest_framework.permissions import BasePermission
 
 User = get_user_model()
 
@@ -51,10 +52,14 @@ class DashboardUsuariosView(LoginRequiredMixin, TemplateView):
         context['active_tab'] = 'usuarios'
         return context
     
+class IsRepresentante(BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and getattr(request.user, 'rol_interno', None) == 'representante'
+
 class UsuarioListCreateAPIView(generics.ListCreateAPIView):
-    serializer_class = UsuarioSerializer
     queryset = Usuario.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UsuarioSerializer
+    permission_classes = [permissions.IsAuthenticated, IsRepresentante]
 
     def get_queryset(self):
         empresa = self.request.user.empresa
@@ -80,7 +85,7 @@ class UsuarioListCreateAPIView(generics.ListCreateAPIView):
 class UsuarioRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsRepresentante]
 
 class UsuariosEmpresaAPIView(generics.ListAPIView):
     serializer_class = UsuarioSerializer
@@ -93,19 +98,39 @@ class UsuariosEmpresaAPIView(generics.ListAPIView):
 @permission_classes([IsAuthenticated])
 def cuenta_usuario(request):
     user = request.user
-    data = {
-        "correo": user.correo,
-        "rol": user.rol,
-        "nombre": user.nombre,
-        "dni": user.dni,
-    }
-    # Si es empresa, agrega datos de empresa
-    if user.rol == "empresa" and user.empresa:
-        data["empresa"] = {
-            "razon_social": user.empresa.razon_social,
-            "ruc": user.empresa.ruc,
-            "representante": user.empresa.representante,
-            "direccion": user.empresa.direccion,
-            "telefono": user.empresa.telefono,
+    if request.method == 'GET':
+        data = {
+            "id": user.id,
+            "correo": user.correo,
+            "rol": user.rol,
+            "rol_interno": user.rol_interno,
+            "nombre": user.nombre,
+            "dni": user.dni,
         }
-    return Response(data)
+        # Cambia aquí: incluye datos de empresa si el usuario es representante o administrador
+        if user.rol_interno in ["representante", "administrador"] and user.empresa:
+            data["empresa"] = {
+                "razon_social": user.empresa.razon_social,
+                "ruc": user.empresa.ruc,
+                "representante": user.empresa.representante,
+                "direccion": user.empresa.direccion,
+                "departamento": user.empresa.departamento,
+                "provincia": user.empresa.provincia,
+                "distrito": user.empresa.distrito,
+                "telefono": user.empresa.telefono,
+                "objetivo": user.empresa.objetivo,
+                "mision": user.empresa.mision,
+                "vision": user.empresa.vision,
+                "valores": user.empresa.valores,
+                "historia": user.empresa.historia,
+                "web": user.empresa.web,
+                "facebook": user.empresa.facebook,
+                "instagram": user.empresa.instagram,
+            }
+        return Response(data)
+    elif request.method == 'PUT':
+        serializer = UsuarioSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"mensaje": "Perfil actualizado correctamente."})
+        return Response(serializer.errors, status=400)

@@ -1,7 +1,7 @@
 console.log('firmas.js cargado');
 document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem('access_token');
-    const rol = localStorage.getItem('rol');
+    const rolInterno = localStorage.getItem('rol_interno');
     const titulo = document.getElementById('titulo-firmas');
     const acciones = document.getElementById('acciones-firmas');
     let pdfDoc = null;
@@ -12,12 +12,12 @@ document.addEventListener('DOMContentLoaded', function () {
     let signaturePad = null;
 
 
-    if (!token || !rol) {
+    if (!token || !rolInterno) {
         alert('No hay token o rol en localStorage. Por favor, inicia sesión.');
         return;
     }
 
-    if (rol === 'lector' || rol === 'editor') {
+    if (['representante', 'socio', 'contador', 'administrador'].includes(rolInterno)) {
         titulo.textContent = 'Firmar documentos asignados';
         acciones.innerHTML = `<li><button id="verFirmasBtn">Actualizar lista</button></li>`;
         cargarFirmasPendientes();
@@ -47,8 +47,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderTablaFirmas(data, contenedorId, cargarPagina) {
         const firmas = data.results || data || [];
         let html = '<table><thead><tr><th>Documento</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
+        const userNombre = localStorage.getItem('nombre');
         firmas.forEach(firma => {
-            // Si está firmado, muestra el PDF firmado; si no, el original
+            const puedeFirmar = firma.estado === 'pendiente' && firma.firmante_nombre === userNombre;
             const pdfUrl = firma.estado === 'firmado'
                 ? (firma.documento.archivo_firmado || firma.documento.archivo)
                 : firma.documento.archivo;
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <td>${firma.fecha_firma || '-'}</td>
             <td>
                 <a href="${pdfUrl}" target="_blank">Ver PDF</a>
-                ${firma.estado === 'pendiente' ? `<button class="abrirFirmarModalBtn" data-id="${firma.id}" data-nombre="${firma.documento.nombre}">Firmar</button>` : ''}
+                ${puedeFirmar ? `<button class="abrirFirmarModalBtn" data-id="${firma.id}" data-nombre="${firma.documento.nombre}">Firmar</button>` : ''}
             </td>
         </tr>`;
         });

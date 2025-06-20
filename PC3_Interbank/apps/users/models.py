@@ -34,6 +34,20 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
             ('lector', 'Lector'),
         ]
     )
+    ROL_INTERNO_CHOICES = [
+        ('representante', 'Representante legal'),
+        ('socio', 'Socio/accionista'),
+        ('administrador', 'Administrador de empresa'),
+        ('contador', 'Contador/asesor legal interno'),
+        ('empleado', 'Empleado operativo'),
+    ]
+    rol_interno = models.CharField(
+        max_length=30,
+        choices=ROL_INTERNO_CHOICES,
+        default='representante',
+        blank=True,
+        null=True
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

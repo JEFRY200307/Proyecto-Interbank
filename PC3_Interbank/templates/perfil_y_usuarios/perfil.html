@@ -5,55 +5,70 @@
 <div class="perfil-tabs" id="perfil-tabs"></div>
 <div class="perfil-content">
     {% block perfil_content %}
-    <form id="perfilForm">
-        <!-- Campos para empresa -->
-        <div id="empresaFields" style="display:none;">
-            <label>Razón Social</label>
-            <input type="text" id="razon_social" name="razon_social" readonly>
-            <label>RUC</label>
-            <input type="text" id="ruc" name="ruc" readonly>
-            <label>Representante</label>
-            <input type="text" id="representante" name="representante">
-            <label>Dirección</label>
-            <input type="text" id="direccion" name="direccion" readonly>
-            <label>Departamento</label>
-            <input type="text" id="departamento" name="departamento" readonly>
-            <label>Provincia</label>
-            <input type="text" id="provincia" name="provincia" readonly>
-            <label>Distrito</label>
-            <input type="text" id="distrito" name="distrito" readonly>
-            <label>Teléfono</label>
-            <input type="text" id="telefono" name="telefono">
-            <label for="objetivo">Objetivo</label>
-            <textarea id="objetivo" name="objetivo"></textarea>
-            <label for="mision">Misión</label>
-            <textarea id="mision" name="mision"></textarea>
-            <label for="vision">Visión</label>
-            <textarea id="vision" name="vision"></textarea>
-            <label for="valores">Valores</label>
-            <textarea id="valores" name="valores"></textarea>
-            <label for="historia">Historia</label>
-            <textarea id="historia" name="historia"></textarea>
-            <label for="web">Web</label>
-            <textarea id="web" name="web"></textarea>
-            <label for="facebook">Facebook</label>
-            <textarea id="facebook" name="facebook"></textarea>
-            <label for="instagram">Instagram</label>
-            <textarea id="instagram" name="instagram"></textarea>
-
-        </div>
-        <!-- Campos para editor/lector -->
-        <div id="usuarioFields" style="display:none;">
-            <label>Nombre</label>
-            <input type="text" id="nombre" name="nombre">
-            <label>DNI</label>
-            <input type="text" id="dni" name="dni">
-        </div>
-        <label>Correo</label>
-        <input type="email" id="correo" name="correo">
-        <button type="submit">Guardar cambios</button>
-        <div id="perfilMensaje"></div>
-    </form>
+    <!-- Sección Empresa -->
+    <section id="seccionEmpresa" style="margin-bottom:2em;">
+        <h4>Datos de la Empresa</h4>
+        <form id="empresaForm">
+            <div id="empresaFields" style="display:none;">
+                <label>Razón Social</label>
+                <input type="text" id="razon_social" name="razon_social" readonly>
+                <label>RUC</label>
+                <input type="text" id="ruc" name="ruc" readonly>
+                <label>Representante</label>
+                <input type="text" id="representante" name="representante">
+                <label>Dirección</label>
+                <input type="text" id="direccion" name="direccion" readonly>
+                <label>Departamento</label>
+                <input type="text" id="departamento" name="departamento" readonly>
+                <label>Provincia</label>
+                <input type="text" id="provincia" name="provincia" readonly>
+                <label>Distrito</label>
+                <input type="text" id="distrito" name="distrito" readonly>
+                <label>Teléfono</label>
+                <input type="text" id="telefono" name="telefono">
+                <label for="objetivo">Objetivo</label>
+                <textarea id="objetivo" name="objetivo"></textarea>
+                <label for="mision">Misión</label>
+                <textarea id="mision" name="mision"></textarea>
+                <label for="vision">Visión</label>
+                <textarea id="vision" name="vision"></textarea>
+                <label for="valores">Valores</label>
+                <textarea id="valores" name="valores"></textarea>
+                <label for="historia">Historia</label>
+                <textarea id="historia" name="historia"></textarea>
+                <label for="web">Web</label>
+                <textarea id="web" name="web"></textarea>
+                <label for="facebook">Facebook</label>
+                <textarea id="facebook" name="facebook"></textarea>
+                <label for="instagram">Instagram</label>
+                <textarea id="instagram" name="instagram"></textarea>
+            </div>
+            <button type="submit">Guardar datos de empresa</button>
+            <div id="empresaMensaje"></div>
+        </form>
+    </section>
+    <!-- Sección Cuenta/Usuario -->
+    <section id="seccionUsuario">
+        <h4>Datos de Usuario / Cuenta</h4>
+        <form id="perfilForm">
+            <div id="usuarioFields" style="display:none;">
+                <label>Nombre</label>
+                <input type="text" id="nombre" name="nombre">
+                <label>DNI</label>
+                <input type="text" id="dni" name="dni">
+                <label>Rol interno</label>
+                <input type="text" id="rol_interno" name="rol_interno" readonly>
+                <label>Correo</label>
+                <input type="email" id="correo" name="correo">
+                <label>Nueva contraseña</label>
+                <input type="password" id="password" name="password" autocomplete="new-password">
+                <label>Confirmar contraseña</label>
+                <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password">
+            </div>
+            <button type="submit">Guardar cambios de usuario</button>
+            <div id="perfilMensaje"></div>
+        </form>
+    </section>
     {% endblock %}
 </div>
 {% endblock %}

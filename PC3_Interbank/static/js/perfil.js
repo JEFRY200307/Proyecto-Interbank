@@ -1,59 +1,81 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const rol = localStorage.getItem('rol');
     const access = localStorage.getItem('access_token');
+    const rolInterno = localStorage.getItem('rol_interno');
 
-    // Mostrar campos según el rol
-    if (rol === 'empresa') {
+    // Mostrar campos según el rol interno
+    if (rolInterno === 'representante' || rolInterno === 'administrador') {
         document.getElementById('empresaFields').style.display = '';
-        document.getElementById('usuarioFields').style.display = 'none';
-    } else if (rol === 'editor' || rol === 'lector') {
+        document.getElementById('usuarioFields').style.display = '';
+        // Habilitar edición de campos de empresa
+        [
+            'razon_social', 'ruc', 'representante', 'direccion', 'departamento',
+            'provincia', 'distrito', 'telefono', 'objetivo', 'mision', 'vision',
+            'valores', 'historia', 'web', 'facebook', 'instagram'
+        ].forEach(id => {
+            const campo = document.getElementById(id);
+            if (campo) campo.removeAttribute('readonly');
+        });
+    } else {
         document.getElementById('empresaFields').style.display = 'none';
         document.getElementById('usuarioFields').style.display = '';
+        // Solo lectura para usuario (si quieres, puedes deshabilitar aquí los campos de usuario)
     }
 
-    // Cargar datos del perfil
+    // Cargar datos de perfil
     fetch('/users/api/cuenta/', {
         headers: {
             'Authorization': 'Bearer ' + access,
             'Accept': 'application/json'
         }
     })
-        .then(r => r.json())
-        .then(data => {
-            document.getElementById('correo').value = data.correo || '';
-            if (rol === 'empresa' && data.empresa) {
-                document.getElementById('razon_social').value = data.empresa.razon_social || '';
-                document.getElementById('ruc').value = data.empresa.ruc || '';
-                document.getElementById('representante').value = data.empresa.representante || '';
-                document.getElementById('direccion').value = data.empresa.direccion || '';
-                document.getElementById('departamento').value = data.empresa.departamento || '';
-                document.getElementById('provincia').value = data.empresa.provincia || '';
-                document.getElementById('distrito').value = data.empresa.distrito || '';
-                document.getElementById('telefono').value = data.empresa.telefono || '';
-                document.getElementById('objetivo').value = data.empresa.objetivo || '';
-                document.getElementById('mision').value = data.empresa.mision || '';
-                document.getElementById('vision').value = data.empresa.vision || '';
-                document.getElementById('valores').value = data.empresa.telefono || '';
-                document.getElementById('historia').value = data.empresa.objetivo || '';
-                document.getElementById('web').value = data.empresa.mision || '';
-                document.getElementById('facebook').value = data.empresa.vision || '';
-                document.getElementById('instagram').value = data.empresa.vision || '';
-            } else if ((rol === 'editor' || rol === 'lector')) {
-                document.getElementById('nombre').value = data.nombre || '';
-                document.getElementById('dni').value = data.dni || '';
-            }
-        });
+    .then(r => r.json())
+    .then(data => {
+        // Datos de usuario
+        document.getElementById('nombre').value = data.nombre || '';
+        document.getElementById('dni').value = data.dni || '';
+        document.getElementById('rol_interno').value = data.rol_interno || '';
+        document.getElementById('correo').value = data.correo || '';
+        // Datos de empresa (solo si existen)
+        if (data.empresa) {
+            document.getElementById('razon_social').value = data.empresa.razon_social || '';
+            document.getElementById('ruc').value = data.empresa.ruc || '';
+            document.getElementById('representante').value = data.empresa.representante || '';
+            document.getElementById('direccion').value = data.empresa.direccion || '';
+            document.getElementById('departamento').value = data.empresa.departamento || '';
+            document.getElementById('provincia').value = data.empresa.provincia || '';
+            document.getElementById('distrito').value = data.empresa.distrito || '';
+            document.getElementById('telefono').value = data.empresa.telefono || '';
+            document.getElementById('objetivo').value = data.empresa.objetivo || '';
+            document.getElementById('mision').value = data.empresa.mision || '';
+            document.getElementById('vision').value = data.empresa.vision || '';
+            document.getElementById('valores').value = data.empresa.valores || '';
+            document.getElementById('historia').value = data.empresa.historia || '';
+            document.getElementById('web').value = data.empresa.web || '';
+            document.getElementById('facebook').value = data.empresa.facebook || '';
+            document.getElementById('instagram').value = data.empresa.instagram || '';
+        }
+    });
 
-    // Guardar cambios en el perfil
+    // Guardar cambios de perfil y empresa
     document.getElementById('perfilForm').addEventListener('submit', function (e) {
         e.preventDefault();
-        const mensaje = document.getElementById('perfilMensaje');
-        mensaje.textContent = '';
-        mensaje.className = 'mensaje';
+        const perfilMensaje = document.getElementById('perfilMensaje');
+        perfilMensaje.textContent = '';
+        perfilMensaje.className = 'mensaje';
 
-        let payload = { correo: document.getElementById('correo').value };
+        // Prepara los datos a enviar
+        const payload = {
+            nombre: document.getElementById('nombre').value,
+            dni: document.getElementById('dni').value,
+            correo: document.getElementById('correo').value
+        };
+        const password = document.getElementById('password').value;
+        if (password) {
+            payload.password = password;
+        }
 
-        if (rol === 'empresa') {
+        // Si es representante o administrador, agrega los campos de empresa
+        if (rolInterno === 'representante' || rolInterno === 'administrador') {
             payload.empresa = {
                 razon_social: document.getElementById('razon_social').value,
                 ruc: document.getElementById('ruc').value,
@@ -72,9 +94,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 facebook: document.getElementById('facebook').value,
                 instagram: document.getElementById('instagram').value
             };
-        } else if (rol === 'editor' || rol === 'lector') {
-            payload.nombre = document.getElementById('nombre').value;
-            payload.dni = document.getElementById('dni').value;
         }
 
         fetch('/users/api/cuenta/', {
@@ -86,27 +105,15 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: JSON.stringify(payload)
         })
-            .then(r => r.json())
-            .then(data => {
-                mensaje.textContent = data.mensaje || 'Cambios guardados correctamente.';
-                mensaje.classList.add('success');
-            })
-            .catch(() => {
-                mensaje.textContent = 'Error al guardar cambios.';
-                mensaje.classList.add('error');
-            });
+        .then(r => r.json())
+        .then(data => {
+            perfilMensaje.textContent = data.mensaje || 'Perfil actualizado correctamente.';
+            perfilMensaje.classList.add('success');
+            document.getElementById('password').value = '';
+        })
+        .catch(() => {
+            perfilMensaje.textContent = 'Error al actualizar perfil.';
+            perfilMensaje.classList.add('error');
+        });
     });
-
-    // Tabs dinámicas según el rol
-    const tabs = document.getElementById('perfil-tabs');
-    if (tabs) {
-        let html = '';
-        if (rol === 'empresa') {
-            html += `<a href="/users/dashboard/perfil/">Perfil</a>
-                     <a href="/users/dashboard/usuarios/">Usuarios</a>`;
-        } else if (rol === 'editor' || rol === 'lector') {
-            html += `<a href="/users/dashboard/perfil/">Perfil</a>`;
-        }
-        tabs.innerHTML = html;
-    }
 });

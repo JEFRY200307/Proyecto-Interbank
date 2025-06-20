@@ -15,11 +15,13 @@
         <input type="text" id="nombre" name="nombre" required>
         <label>Correo</label>
         <input type="email" id="correo" name="correo" required>
-        <label>Rol</label>
-        <select id="rol" name="rol" required>
-            <option value="admin">Administrador</option>
-            <option value="editor">Editor</option>
-            <option value="lector">Lector</option>
+        <label for="rol_interno">Rol interno:</label>
+        <select id="rol_interno" name="rol_interno" required>
+            <option value="representante">Representante legal</option>
+            <option value="socio">Socio/accionista</option>
+            <option value="administrador">Administrador de empresa</option>
+            <option value="contador">Contador/asesor legal interno</option>
+            <option value="empleado">Empleado operativo</option>
         </select>
         <label>Contraseña</label>
         <input type="password" id="password" name="password" autocomplete="new-password">

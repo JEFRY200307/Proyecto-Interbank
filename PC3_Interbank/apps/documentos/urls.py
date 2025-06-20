@@ -11,7 +11,12 @@ from .views import (
     HistorialFirmasAPIView,
     dashboard_firmas,
     dashboard_documentos,
-    AsignarFirmantesAPIView
+    AsignarFirmantesAPIView,
+    DocumentosAdministradorView,
+    DocumentosRepresentanteView,
+    DocumentosSocioView,
+    DocumentosContadorView,
+    DocumentosEmpleadoView,
 )
 router = DefaultRouter()
 router.register(r'documentos', DocumentoViewSet, basename='documento')
@@ -39,5 +44,9 @@ urlpatterns = [
     # CRUD de documentos y firmas (RESTful)
     path('api/', include(router.urls)),
 
-   
+    path('admin/', DocumentosAdministradorView.as_view(), name='documentos_admin'),
+    path('representante/', DocumentosRepresentanteView.as_view(), name='documentos_representante'),
+    path('socio/', DocumentosSocioView.as_view(), name='documentos_socio'),
+    path('contador/', DocumentosContadorView.as_view(), name='documentos_contador'),
+    path('empleado/', DocumentosEmpleadoView.as_view(), name='documentos_empleado'),
 ]

@@ -17,11 +17,28 @@
     </select>
 </div>
 
-<!-- Botón para crear/subir documento (solo para editor/empresa) -->
-<div id="botones-doc"></div>
+<!-- Botones de acción para documentos -->
+<div id="botones-doc">
+    <button id="btnSubir" style="display:none;">Subir documento</button>
+    <button id="btnEliminar" style="display:none;">Eliminar documento</button>
+    <button id="btnAsignarFirmantes" style="display:none;">Asignar firmantes</button>
+    <button id="btnFirmar" style="display:none;">Firmar documento</button>
+</div>
 
 <!-- Lista de documentos -->
 <div id="listaDocumentos"></div>
+
+<!-- Mis documentos subidos -->
+<div>
+  <h3>Mis documentos subidos</h3>
+  <div id="misDocumentos"></div>
+</div>
+
+<!-- Documentos asignados para firmar -->
+<div>
+  <h3>Documentos asignados para firmar</h3>
+  <div id="documentosAsignados"></div>
+</div>
 
 <!-- Modal para crear/editar documento -->
 <div id="documentoModal" style="display:none;">

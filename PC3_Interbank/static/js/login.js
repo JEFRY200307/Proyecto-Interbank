@@ -16,6 +16,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
         const result = await response.json();
 
         if (response.ok) {
+            console.log('Respuesta de /api/login/:', result); // <-- Agrega esto
             // Guarda el token JWT
             if (result.access) {
                 localStorage.setItem('access_token', result.access);
@@ -34,15 +35,24 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             })
                 .then(r => r.json())
                 .then(data => {
-                    console.log(data); // <-- Agrega esto para depurar
+                    console.log('Respuesta de /users/api/cuenta/:', data); // <-- Agrega esto
+                    console.log('DATA DE CUENTA:', data);
+                    alert('Rol interno recibido: ' + data.rol_interno);
                     if (data.rol) {
                         localStorage.setItem('rol', data.rol);
+                    }
+                    if (data.rol_interno) {
+                        localStorage.setItem('rol_interno', data.rol_interno);
                     }
                     if (data.nombre) {
                         localStorage.setItem('nombre', data.nombre);
                     }
-                    // Redirige siempre al dashboard único
-                    window.location.href = '/users/dashboard/';
+                    if (data.id) {
+                        localStorage.setItem('user_id', data.id);
+                    }
+                    setTimeout(() => {
+                        window.location.href = '/users/dashboard/';
+                    }, 200);
                 })
                 .catch((err) => {
                     console.log('Error al consultar cuenta:', err);
