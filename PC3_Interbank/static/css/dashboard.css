@@ -6,7 +6,7 @@ body {
 
 .sidebar {
     width: 240px;
-    background: #00953b;
+    background: #10dd62;
     color: #fff;
     height: 100vh;
     position: fixed;
@@ -97,64 +97,116 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* --- ESTILOS MEJORADOS PARA EL CHAT --- */
+
 /* Área de conversación */
 #chat-log {
-  background: #fff;
+  background: #ffffff;
+  border: 1px solid #e5e7eb; /* Borde sutil */
   border-radius: 12px;
   min-height: 320px;
-  max-height: 48vh;
+  max-height: 55vh; /* Un poco más de altura */
   overflow-y: auto;
-  padding: 18px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(79, 140, 255, 0.06);
-  font-size: 1.08em;
+  padding: 24px; /* Más espaciado interno */
+  margin-bottom: 16px;
+  font-size: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Espacio entre mensajes */
 }
 
-#chat-log div {
-  margin-bottom: 10px;
+/* Estilo para la barra de scroll (navegadores Webkit) */
+#chat-log::-webkit-scrollbar {
+  width: 8px;
+}
+#chat-log::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+#chat-log::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+#chat-log::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
+/* Estilos base para los contenedores de mensajes (burbujas) */
+#chat-log > div {
+  max-width: 75%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+/* Mensajes del bot (izquierda) */
+.bot-message {
+  background-color: #f3f4f6; /* Gris claro */
+  color: #1f2937;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px; /* Forma de burbuja */
+}
+
+/* Mensajes del usuario (derecha) */
+#chat-log > div[style*="text-align: right"] {
+  background-color: #00953b; /* Verde Interbank */
+  color: #ffffff;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px; /* Forma de burbuja */
+}
+
+/* Nombres en los mensajes */
 #chat-log strong {
-  color: #1cb5e0;
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+  color: #007a2f; /* Verde oscuro para el bot */
+}
+#chat-log > div[style*="text-align: right"] strong {
+  color: #e2f5e8; /* Un verde muy claro para el usuario */
 }
 
-/* Input y botón de enviar */
+/* Barra de entrada de texto */
 #chat-input {
   display: flex;
+  gap: 10px; /* Espacio entre input y botón */
+  padding: 10px;
+  background-color: #f9fafb;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
   align-items: center;
-  justify-content: space-between;
 }
 
 #user-message {
-  width: 80%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #b6c7e3;
+  flex-grow: 1; /* Ocupa el espacio disponible */
+  border: none; /* Quitamos el borde, ya que el contenedor lo tiene */
+  background-color: transparent; /* Fondo transparente */
+  padding: 12px 15px;
   font-size: 1em;
-  outline: none;
-  transition: border 0.2s;
-}
-
-#user-message:focus {
-  border: 1.5px solid #2563eb;
+  color: #1f2937;
+  outline: none; /* Sin borde al hacer foco */
 }
 
 #enviar-btn {
-  background: linear-gradient(90deg, #4f8cff 0%, #1cb5e0 100%);
+  background: #00953b; /* Verde Interbank */
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 10px 22px;
+  padding: 12px 25px;
   font-size: 1em;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
+  flex-shrink: 0; /* Evita que el botón se encoja */
 }
 
 #enviar-btn:hover {
-  background: linear-gradient(90deg, #1cb5e0 0%, #4f8cff 100%);
-  transform: scale(1.04);
+  background: #007a2f; /* Verde más oscuro */
+  transform: scale(1.03);
 }
+
+/* --- FIN DE ESTILOS MEJORADOS PARA EL CHAT --- */
 
 /* Botones de selección de chatbot */
 .chatbot-btn, .roadmap-btn {
