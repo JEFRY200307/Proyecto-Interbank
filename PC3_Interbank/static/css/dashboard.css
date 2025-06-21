@@ -462,10 +462,10 @@ body {
 
 /* --- ESTILOS MEJORADOS PARA LA TABLA DE ESTRATEGIAS --- */
 .estrategias-container {
-    background-color: #fff;
-    padding: 2rem;
+    background-color: transparent; /* Sin fondo, para que se vea el de la página */
+    padding: 0;
     border-radius: 12px;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
 }
 
 .estrategias-title {
@@ -474,49 +474,83 @@ body {
     margin-bottom: 1.5rem;
 }
 
+/* Ocultamos la tabla original */
 .estrategias-table {
-    width: 100%;
-    border-collapse: collapse; /* Clave para eliminar espacios entre bordes */
-    font-size: 1em;
+    display: none;
 }
 
-.estrategias-table th, .estrategias-table td {
-    padding: 1rem;
-    text-align: left;
-    /* Se elimina el borde en todas las celdas */
-    border: none; 
-    /* Se añade un borde solo en la parte inferior de cada fila */
-    border-bottom: 1px solid #e9ecef;
+/* Contenedor para las nuevas tarjetas */
+.estrategias-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
 }
 
-.estrategias-table th {
-    background-color: #f8f9fa;
-    font-weight: 600;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-size: 0.85em;
+.estrategia-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Efecto hover para resaltar la fila sobre la que está el cursor */
-.estrategias-table tbody tr:hover {
-    background-color: #f1f3f5;
+.estrategia-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
-.btn-ver-actividades {
+.card-header h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.3em;
+    color: #00843D;
+}
+
+.card-header .categoria {
     background-color: #e2f5e8;
     color: #007a2f;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 0.8em;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.card-body p {
+    color: #555;
+    line-height: 1.6;
+    flex-grow: 1; /* Empuja el footer hacia abajo */
+}
+
+.card-footer {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-footer .fecha {
+    font-size: 0.9em;
+    color: #777;
+    font-weight: 500;
+}
+
+.card-footer .btn-ver-actividades {
+    background-color: #00953b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9em;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s;
 }
 
-.btn-ver-actividades:hover {
-    background-color: #00953b;
-    color: #fff;
+.card-footer .btn-ver-actividades:hover {
+    background-color: #006b28;
 }
 
 /* dashboard.css */
@@ -742,4 +776,32 @@ body {
 
 .btn-volver:hover {
     background-color: #5a6268;
+}
+
+/* --- ESTILO MEJORADO PARA EL BOTÓN DE MENTORÍA --- */
+#mentoria-seccion button {
+    background: linear-gradient(45deg, #00b09b, #96c93d);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 24px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#mentoria-seccion button:before {
+    content: '👥'; /* Ícono simple de personas */
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+#mentoria-seccion button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(0, 176, 155, 0.3);
 }

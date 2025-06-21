@@ -14,7 +14,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
@@ -132,8 +132,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# --- CONFIGURACIÓN DE ARCHIVOS ESTÁTICOS ---
+
+# La URL para referirse a los archivos estáticos en las plantillas.
+STATIC_URL = 'static/'
+
+# La lista de carpetas donde Django buscará archivos estáticos.
+# Ahora que BASE_DIR es un objeto Path, esta línea funcionará sin error.
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Esto es para producción (cuando usas 'collectstatic'), no es crucial para desarrollo
+# pero es bueno tenerlo.
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
