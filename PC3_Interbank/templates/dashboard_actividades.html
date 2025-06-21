@@ -13,32 +13,30 @@
     {% for etapa in estrategia.etapas.all %}
       <div class="timeline-etapa">
         <h3>{{ etapa.nombre }}</h3>
-        <p>{{ etapa.descripcion }}</p>
-
-        <ul class="timeline-actividades">
-          {% for actividad in etapa.actividades.all %}
-            <!-- Aplicamos la clase 'completada' si la actividad lo está -->
-            <li class="timeline-item {% if actividad.completada %}completada{% endif %}">
-              <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
-              <small class="actividad-estado">
-                {% if actividad.fecha_limite %}
-                  Fecha Límite: {{ actividad.fecha_limite|date:"d-m-Y" }} |
-                {% endif %}
-                {% if actividad.completada %}
-                  ✔ Completada
-                {% else %}
-                  Pendiente
-                {% endif %}
-              </small>
-            </li>
-          {% empty %}
-            <li class="timeline-item">No hay actividades en esta etapa.</li>
-          {% endfor %}
-        </ul>
       </div>
-    {% empty %}
-      <p>No hay etapas definidas para esta estrategia.</p>
+      {% for actividad in etapa.actividades.all %}
+        <li class="timeline-item {% if actividad.completada %}completada{% endif %}" data-actividad-id="{{ actividad.id }}">
+          <div class="actividad-info">
+            <input type="checkbox" class="completada-checkbox" {% if actividad.completada %}checked{% endif %}>
+            <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
+          </div>
+          <small class="actividad-meta">
+            {% if actividad.fecha_limite %}
+              Fecha Límite: {{ actividad.fecha_limite|date:"d-m-Y" }}
+            {% else %}
+              Sin fecha límite
+            {% endif %}
+          </small>
+        </li>
+      {% empty %}
+        <li class="timeline-item">No hay actividades en esta etapa.</li>
+      {% endfor %}
     {% endfor %}
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/actividades.js' %}"></script>
 {% endblock %}

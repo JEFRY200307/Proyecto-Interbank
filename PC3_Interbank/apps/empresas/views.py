@@ -20,7 +20,7 @@ from apps.users.models import Usuario
 from .services import validar_ruc
 from rest_framework import generics, permissions
 from .models import Estrategia, Etapa, Actividad
-from .serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer
+from .serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer, ActividadUpdateSerializer
 
 class PanelEmpresaView(APIView):
     permission_classes = [IsAuthenticated]
@@ -354,6 +354,17 @@ class ActividadDetailView(generics.RetrieveUpdateAPIView):
         elif user.rol == 'mentor':
             return Actividad.objects.filter(etapa__estrategia__empresa__mentores=user)
         return Actividad.objects.none()
+    
+class ActividadUpdateView(generics.UpdateAPIView):
+    """
+    Endpoint para actualizar el estado 'completada' de una actividad.
+    """
+    serializer_class = ActividadUpdateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Asegura que el usuario solo pueda modificar actividades de sus propias estrategias."""
+        return Actividad.objects.filter(etapa__estrategia__usuario=self.request.user)
     
 class EtapaListByEstrategiaView(generics.ListAPIView):
     serializer_class = EtapaSerializer

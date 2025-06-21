@@ -49,51 +49,65 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
 class ActividadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Actividad
-        fields = ['id', 'descripcion', 'completada']
+        fields = '__all__'
 
-# Serializer para Etapa, que anida Actividades
+class ActividadUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Actividad
+        fields = ['completada']
+
+# --- AÑADE ESTA CLASE ANTES DE EstrategiaSerializer ---
 class EtapaSerializer(serializers.ModelSerializer):
+    # Define que las actividades son anidadas y opcionales
     actividades = ActividadSerializer(many=True, required=False)
 
     class Meta:
         model = Etapa
         fields = ['id', 'nombre', 'descripcion', 'actividades']
+        read_only_fields = ['id']
+
 
 class EstrategiaSerializer(serializers.ModelSerializer):
+    # Ahora EtapaSerializer está definido y puede ser usado aquí
     etapas = EtapaSerializer(many=True, required=False)
 
     class Meta:
         model = Estrategia
         fields = [
             'id', 'titulo', 'descripcion', 'categoria', 
-            'fecha_registro', 'fecha_cumplimiento', 'estado', 
-            'empresa', 'usuario', 'etapas'
+            'fecha_cumplimiento', 'estado', 'etapas'
         ]
-        read_only_fields = ['empresa', 'usuario', 'fecha_registro']
+        read_only_fields = ['id']
 
-    @transaction.atomic # Asegura que todo se cree correctamente o no se cree nada
     def create(self, validated_data):
-        # Extraemos los datos de las etapas anidadas antes de crear la estrategia
-        etapas_data = validated_data.pop('etapas')
+        """
+        Crea una Estrategia junto con sus Etapas y Actividades anidadas.
+        """
+        # Extrae los datos de las etapas. Si no vienen, usa una lista vacía.
+        etapas_data = validated_data.pop('etapas', [])
         
-        # Creamos el objeto principal: la Estrategia
+        # Crea el objeto principal de la Estrategia
         estrategia = Estrategia.objects.create(**validated_data)
-        
-        # Iteramos sobre los datos de cada etapa para crearla
+
+        # Itera sobre los datos de cada etapa para crear los objetos Etapa
         for etapa_data in etapas_data:
-            # Extraemos los datos de las actividades de esta etapa
-            actividades_data = etapa_data.pop('actividades')
             
-            # Creamos la Etapa, vinculándola a la Estrategia recién creada
+            # --- AQUÍ ESTÁ LA CORRECCIÓN ---
+            # Extrae las actividades de la etapa. Si no hay, usa una lista vacía.
+            # Esto evita el error 'KeyError: actividades'.
+            actividades_data = etapa_data.pop('actividades', [])
+            
+            # Crea el objeto Etapa, asociándolo a la Estrategia recién creada
             etapa = Etapa.objects.create(estrategia=estrategia, **etapa_data)
-            
-            # Iteramos sobre las actividades para crearlas y vincularlas a la Etapa
+
+            # Itera sobre las actividades para crear los objetos Actividad
             for actividad_data in actividades_data:
                 Actividad.objects.create(etapa=etapa, **actividad_data)
-                
+        
         return estrategia
 
-    
+# --- FIN DE LA SECCIÓN A REEMPLAZAR ---
+
 class EmpresaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Empresa

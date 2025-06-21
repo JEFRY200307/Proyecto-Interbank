@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     ActividadListByEtapaView, EtapaListByEstrategiaView, home, registro_empresa, login_empresa,
     EmpresaRegistroView,ActividadListByEstrategiaView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,SolicitarMentoriaAPIView,
-    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView, EtapaDetailView, ActividadDetailView
+    perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView, EtapaDetailView, ActividadDetailView, ActividadUpdateView
 )
 
 urlpatterns = [
@@ -21,6 +21,7 @@ urlpatterns = [
      path('api/estrategias/<int:estrategia_pk>/actividades/', ActividadListByEstrategiaView.as_view(), name='actividad-list-by-estrategia'),
     path('api/etapas/<int:pk>/', EtapaDetailView.as_view(), name='etapa_detail_api'),
     path('api/actividades/<int:pk>/', ActividadDetailView.as_view(), name='actividad_detail_api'),
+    path('api/actividades/<int:pk>/actualizar/', ActividadUpdateView.as_view(), name='actividad-update-api'),
     path('api/estrategias/<int:estrategia_id>/etapas/', EtapaListByEstrategiaView.as_view(), name='etapa-list-by-estrategia'),
     path('api/etapas/<int:etapa_id>/actividades/', ActividadListByEtapaView.as_view(), name='actividad-list-by-etapa'),
     # Admin/gestion
