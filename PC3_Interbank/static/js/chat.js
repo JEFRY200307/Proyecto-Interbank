@@ -223,56 +223,76 @@ function cargarConversaciones(chatbotId) {
     });
 }
 
-// Llamar a cargar conversaciones al iniciar el chat
+// Se ejecuta cuando todo el contenido del DOM (la página) ha sido cargado.
 document.addEventListener('DOMContentLoaded', () => {
-  const chatLog = document.getElementById('chat-log');
-  const enviarBtn = document.getElementById('enviar-btn');
-  const userMessageInput = document.getElementById('user-message');
-  const roadmapBtn = document.getElementById('roadmap-btn');
-  const token = localStorage.getItem('access_token');
-  let esRoadmap = false;
+  // --- Obtención de Elementos del DOM ---
+  const chatLog = document.getElementById('chat-log'); // El contenedor donde se muestran los mensajes.
+  const enviarBtn = document.getElementById('enviar-btn'); // El botón para enviar mensajes.
+  const userMessageInput = document.getElementById('user-message'); // El campo de texto para escribir mensajes.
+  const roadmapBtn = document.getElementById('roadmap-btn'); // El botón para generar un roadmap.
+  
+  // --- Variables de Estado y Autenticación ---
+  const token = localStorage.getItem('access_token'); // Obtiene el token de autenticación del almacenamiento local.
+  let esRoadmap = false; // Un flag para saber si el próximo mensaje del bot debe ser tratado como un roadmap.
+  let conversationHistory = []; // Un array para almacenar el historial de la conversación actual.
 
+  // --- Verificación de Seguridad ---
+  // Si no hay token, el usuario no está autenticado. Se le redirige al login.
   if (!token) {
     alert('Debes iniciar sesión para usar el chat.');
     window.location.href = '/login/';
-    return;
+    return; // Detiene la ejecución del script.
   }
 
-  // --- Funciones para agregar mensajes al chat ---
+  // --- Funciones para Manipular la Interfaz del Chat ---
 
+  /**
+   * Agrega un mensaje del usuario al chat-log.
+   * @param {string} mensaje - El texto del mensaje del usuario.
+   */
   function agregarMensajeUsuario(mensaje) {
-    if (!chatLog) return;
+    if (!chatLog) return; // Si no existe el contenedor del chat, no hace nada.
     const messageContainer = document.createElement('div');
-    messageContainer.style.textAlign = 'right';
+    messageContainer.style.textAlign = 'right'; // Alinea los mensajes del usuario a la derecha.
     messageContainer.innerHTML = `<strong>Tú:</strong> ${mensaje}`;
     chatLog.appendChild(messageContainer);
-    chatLog.scrollTop = chatLog.scrollHeight;
+    chatLog.scrollTop = chatLog.scrollHeight; // Hace scroll hacia abajo para ver el último mensaje.
   }
 
+  /**
+   * Agrega un mensaje del bot al chat-log, renderizando el formato Markdown.
+   * @param {string} texto - El texto del mensaje del bot.
+   */
   function agregarMensajeBot(texto) {
-    if (!chatLog) return;
-    const botName = window.categoriaNombre || 'Banky';
+    if (!chatLog) return; // Si no existe el contenedor del chat, no hace nada.
+    const botName = window.categoriaNombre || 'Banky'; // Usa el nombre de la categoría o "Banky" por defecto.
     const messageContainer = document.createElement('div');
-    messageContainer.classList.add('bot-message'); // Clase para estilos
-    // ¡Aquí está la magia! Convierte Markdown a HTML y lo muestra
+    messageContainer.classList.add('bot-message'); // Añade una clase para estilos CSS.
+    // Usa la librería 'marked' para convertir el texto Markdown a HTML.
     messageContainer.innerHTML = `<strong>${botName}:</strong> ${marked.parse(texto)}`;
     chatLog.appendChild(messageContainer);
-    chatLog.scrollTop = chatLog.scrollHeight;
+    chatLog.scrollTop = chatLog.scrollHeight; // Hace scroll hacia abajo.
   }
 
-  // --- Funciones de API ---
+  // --- Funciones de Comunicación con la API (Backend) ---
 
+  /**
+   * Envía un mensaje al backend para obtener una respuesta del chatbot.
+   * @param {string} mensaje - El mensaje a enviar.
+   * @param {function} callback - La función que se ejecutará con la respuesta del bot.
+   */
   function enviarMensajeAlBackend(mensaje, callback) {
     fetch(`/users/dashboard/chat/api/chatbot/${window.chatbotId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
+        'Authorization': 'Bearer ' + token // Incluye el token para la autenticación.
       },
       body: JSON.stringify({ message: mensaje })
     })
       .then(response => response.json())
       .then(data => {
+        // Llama al callback con la respuesta del bot.
         callback(data.response || data.respuesta || "");
       })
       .catch(error => {
@@ -281,32 +301,43 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  /**
+   * Procesa la respuesta JSON del roadmap y la guarda como una nueva estrategia en el backend.
+   * @param {string} respuesta - La respuesta completa del bot que contiene el JSON.
+   * @param {string} categoriaNombre - El nombre de la categoría para la estrategia.
+   */
   function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
     try {
+      // Intenta encontrar un bloque de código JSON en la respuesta del bot.
       const jsonMatch = respuesta.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("No se encontró JSON en la respuesta.");
       
+      // Parsea el JSON encontrado.
       const roadmapData = JSON.parse(jsonMatch[0]);
       const estrategiaData = roadmapData.estrategia || roadmapData.roadmap || roadmapData;
 
+      // Valida que el JSON tenga la estructura esperada.
       if (!estrategiaData || !Array.isArray(estrategiaData.etapas)) {
         throw new Error("El JSON recibido no tiene la estructura esperada (debe contener 'etapas').");
       }
 
+      // Extrae los datos principales de la estrategia.
       const titulo = estrategiaData.titulo || `Roadmap para ${categoriaNombre}`;
       const descripcion = estrategiaData.descripcion || "Roadmap generado automáticamente por el chatbot.";
       const fechaCumplimiento = estrategiaData.fecha_cumplimiento || null;
 
+      // Mapea las etapas y actividades al formato que espera la API del backend.
       const etapasPayload = estrategiaData.etapas.map(etapa => ({
         nombre: etapa.nombre || "Etapa sin nombre",
         descripcion: etapa.descripcion || "",
         actividades: (etapa.actividades || []).map(act => ({
           descripcion: typeof act === "string" ? act : (act.descripcion || act.tarea || ""),
-          fecha_limite: act.fecha_limite || null, // Se toma la fecha del JSON
+          fecha_limite: act.fecha_limite || null,
           completada: act.completada || false
         }))
       }));
 
+      // Envía la nueva estrategia al backend para ser guardada.
       fetch('/empresas/api/estrategias/', {
         method: 'POST',
         headers: {
@@ -317,11 +348,12 @@ document.addEventListener('DOMContentLoaded', () => {
           titulo: titulo,
           descripcion: descripcion,
           categoria: categoriaNombre,
-          fecha_cumplimiento: fechaCumplimiento, // Se añade la fecha de cumplimiento
+          fecha_cumplimiento: fechaCumplimiento,
           etapas: etapasPayload
         })
       })
         .then(response => {
+          // Si la respuesta no es exitosa, lanza un error con los detalles.
           if (!response.ok) {
             return response.json().then(err => { throw new Error(JSON.stringify(err)) });
           }
@@ -336,12 +368,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     } catch (e) {
+      // Captura cualquier error durante el procesamiento del JSON.
       alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato. Error: " + e.message);
       console.error(e);
     }
   }
 
-  // --- Cargar historial de conversaciones ---
+  // --- Carga Inicial del Chat ---
+  // Si se ha seleccionado un chatbot, carga su historial de conversaciones.
   if (window.chatbotId && chatLog) {
     fetch(`/users/dashboard/chat/api/conversaciones/${window.chatbotId}/`, {
       method: 'GET',
@@ -349,56 +383,77 @@ document.addEventListener('DOMContentLoaded', () => {
     })
       .then(response => response.json())
       .then(data => {
-        chatLog.innerHTML = ''; // Limpia el chat
+        chatLog.innerHTML = ''; // Limpia la vista del chat.
+        conversationHistory = []; // Limpia el array de historial en memoria.
+        // Itera sobre las conversaciones guardadas.
         data.forEach(conversacion => {
+          // Agrega los mensajes a la vista y al historial en memoria.
           if (conversacion.mensaje_usuario) {
             agregarMensajeUsuario(conversacion.mensaje_usuario);
+            conversationHistory.push({ role: 'user', content: conversacion.mensaje_usuario });
           }
           if (conversacion.respuesta_chatbot) {
-            // Usa la misma función para asegurar que el Markdown se renderice
             agregarMensajeBot(conversacion.respuesta_chatbot);
+            conversationHistory.push({ role: 'assistant', content: conversacion.respuesta_chatbot });
           }
         });
       });
   }
 
-  // --- Event Listeners ---
+  // --- Event Listeners (Manejadores de Eventos) ---
 
-  // Enviar mensaje con el botón
+  // Manejador para el clic en el botón de enviar.
   if (enviarBtn) {
     enviarBtn.addEventListener('click', () => {
-      const mensaje = userMessageInput.value.trim();
-      if (!mensaje) return;
+      const mensaje = userMessageInput.value.trim(); // Obtiene y limpia el mensaje del input.
+      if (!mensaje) return; // Si no hay mensaje, no hace nada.
 
-      agregarMensajeUsuario(mensaje);
-      userMessageInput.value = '';
+      agregarMensajeUsuario(mensaje); // Muestra el mensaje del usuario en el chat.
+      conversationHistory.push({ role: 'user', content: mensaje }); // Añade el mensaje al historial.
+      userMessageInput.value = ''; // Limpia el campo de texto.
 
+      // Envía el mensaje al backend.
       enviarMensajeAlBackend(mensaje, function (respuesta) {
-        agregarMensajeBot(respuesta);
+        agregarMensajeBot(respuesta); // Muestra la respuesta del bot.
+        conversationHistory.push({ role: 'assistant', content: respuesta }); // Añade la respuesta al historial.
+        
+        // Si se estaba esperando un roadmap, lo guarda.
         if (esRoadmap) {
           guardarRoadmapComoEstrategia(respuesta, window.categoriaNombre);
-          esRoadmap = false;
+          esRoadmap = false; // Resetea el flag.
         }
       });
     });
   }
 
-  // Enviar mensaje con la tecla "Enter"
+  // Manejador para enviar mensaje con la tecla "Enter".
   if (userMessageInput) {
       userMessageInput.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
-              enviarBtn.click();
+              enviarBtn.click(); // Simula un clic en el botón de enviar.
           }
       });
   }
 
-  // Botón para generar roadmap
+  // Manejador para el clic en el botón de generar roadmap.
   if (roadmapBtn) {
     roadmapBtn.addEventListener('click', function () {
-      esRoadmap = true;
+      esRoadmap = true; // Activa el flag para procesar la respuesta como un roadmap.
       const mensajeCorto = `Hazme el roadmap para la categoría "${window.categoriaNombre}"`;
-      const mensajeLargo = `Por favor, genera un roadmap para una pyme peruana en la categoría "${window.categoriaNombre}" siguiendo la estructura JSON de Estrategia, Etapa y Actividad.
-El JSON debe tener este formato:
+
+      // Formatea el historial de la conversación para incluirlo en el prompt.
+      const historialFormateado = conversationHistory.map(msg => {
+        return `${msg.role === 'user' ? 'Usuario' : 'Banky'}: ${msg.content}`;
+      }).join('\n\n');
+
+      // Crea el prompt largo y detallado para el chatbot.
+      const mensajeLargo = `Basándote en la siguiente conversación, genera un roadmap para una pyme peruana en la categoría "${window.categoriaNombre}".
+
+### Historial de la Conversación:
+${historialFormateado}
+
+### Instrucción Final:
+Por favor, genera el roadmap siguiendo la estructura JSON de Estrategia, Etapa y Actividad. El JSON debe tener este formato:
 
 {
   "estrategia": {
@@ -423,9 +478,12 @@ El JSON debe tener este formato:
 
 No limites la cantidad de etapas ni de actividades; incluye todas las que consideres necesarias para un roadmap completo.`;
 
+      // Muestra el mensaje corto en la interfaz para que el usuario vea su acción.
       agregarMensajeUsuario(mensajeCorto);
 
+      // Envía el prompt largo al backend.
       enviarMensajeAlBackend(mensajeLargo, function (respuesta) {
+        // Muestra un mensaje de confirmación y guarda el roadmap.
         agregarMensajeBot("Revisa el apartado estrategias para ver el roadmap generado.");
         guardarRoadmapComoEstrategia(respuesta, window.categoriaNombre);
       });
