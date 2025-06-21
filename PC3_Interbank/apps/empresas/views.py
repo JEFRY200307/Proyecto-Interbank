@@ -354,7 +354,7 @@ class ActividadDetailView(generics.RetrieveUpdateAPIView):
         elif user.rol == 'mentor':
             return Actividad.objects.filter(etapa__estrategia__empresa__mentores=user)
         return Actividad.objects.none()
-
+    
 class ActividadUpdateView(generics.UpdateAPIView):
     """
     Endpoint para actualizar el estado 'completada' de una actividad.
@@ -365,3 +365,35 @@ class ActividadUpdateView(generics.UpdateAPIView):
     def get_queryset(self):
         """Asegura que el usuario solo pueda modificar actividades de sus propias estrategias."""
         return Actividad.objects.filter(etapa__estrategia__usuario=self.request.user)
+    
+class EtapaListByEstrategiaView(generics.ListAPIView):
+    serializer_class = EtapaSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        estrategia_id = self.kwargs['estrategia_id']
+        qs = Etapa.objects.filter(estrategia_id=estrategia_id)
+        if hasattr(user, 'empresa'):
+            qs = qs.filter(estrategia__empresa=user.empresa)
+        elif user.rol == 'mentor':
+            qs = qs.filter(estrategia__empresa__mentores=user)
+        else:
+            return Etapa.objects.none()
+        return qs.order_by('id')
+    
+class ActividadListByEtapaView(generics.ListAPIView):
+    serializer_class = ActividadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        etapa_id = self.kwargs['etapa_id']
+        qs = Actividad.objects.filter(etapa_id=etapa_id)
+        if hasattr(user, 'empresa'):
+            qs = qs.filter(etapa__estrategia__empresa=user.empresa)
+        elif user.rol == 'mentor':
+            qs = qs.filter(etapa__estrategia__empresa__mentores=user)
+        else:
+            return Actividad.objects.none()
+        return qs.order_by('id')
