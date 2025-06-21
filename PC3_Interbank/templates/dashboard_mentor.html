@@ -35,7 +35,7 @@
           <th>Descripción</th>
           <th>Categoría</th>
           <th>Estado</th>
-          <th>Fecha Registro</th>
+          <th>Fecha Cumplimiento</th>
           <th>Etapas</th>
         </tr>
       </thead>
@@ -90,6 +90,7 @@
     overflow-x: auto;
   }
   .estrategias-table {
+    display: table !important;
     width: 100%;
     table-layout: fixed;
     border-collapse: collapse;
@@ -315,7 +316,7 @@ async function cargarEstrategiasEmpresa(empresaId) {
         <td><textarea onchange="editarCampoEstrategia(${e.id}, 'descripcion', this.value)" class="input-estrategia">${e.descripcion || ''}</textarea></td>
         <td><input value="${e.categoria || ''}" onchange="editarCampoEstrategia(${e.id}, 'categoria', this.value)" class="input-estrategia"></td>
         <td><input value="${e.estado || ''}" onchange="editarCampoEstrategia(${e.id}, 'estado', this.value)" class="input-estrategia"></td>
-        <td>${e.fecha_registro ? e.fecha_registro.slice(0, 10) : ''}</td>
+        <td>${e.fecha_cumplimiento ? e.fecha_cumplimiento.slice(0, 10) : ''}</td>
         <td>
           <button onclick="guardarEstrategia(${e.id})" class="btn-guardar" type="button">Guardar</button>
           <button onclick="abrirModalEtapas(${e.id})" class="btn-guardar" type="button">Ver Etapas</button>
