@@ -4,26 +4,34 @@ body {
     margin: 0;
 }
 
+/* --- ESTILOS MEJORADOS PARA EL SIDEBAR --- */
 .sidebar {
-    width: 240px;
-    background: #10dd62;
+    width: 250px;
+    background: #02bb59; /* Un verde corporativo más sobrio */
     color: #fff;
     height: 100vh;
     position: fixed;
     top: 0;
     left: 0;
-    padding-top: 2rem;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    padding: 2rem 0;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; /* Permite alinear el logout al fondo */
 }
 
 .sidebar h2 {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    font-size: 1.8em;
+    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 .sidebar ul {
     list-style: none;
     padding: 0;
+    margin: 0;
+    flex-grow: 1; /* Empuja el contenido siguiente (logout) hacia abajo */
 }
 
 .sidebar ul li {
@@ -31,18 +39,48 @@ body {
 }
 
 .sidebar ul li a {
-    color: #fff;
+    color: #e2f5e8; /* Un color de texto más suave */
     text-decoration: none;
     font-weight: 500;
-    padding: 0.7rem 2rem;
+    padding: 1rem 2.5rem;
     display: block;
+    transition: background 0.2s, color 0.2s, border-left 0.2s;
+    border-left: 4px solid transparent; /* Borde para el estado activo */
+}
+
+.sidebar ul li a:hover {
+    background: #007a2f; /* Un hover sutil */
+    color: #fff;
+}
+
+.sidebar ul li a.active {
+    background: #006b28;
+    color: #fff;
+    font-weight: 600;
+    border-left: 4px solid #7ed957; /* Resaltado verde claro para la página activa */
+}
+
+/* Opcional: Si tienes un botón de logout, puedes usar esto */
+.sidebar-logout {
+    padding: 1rem 2.5rem;
+    margin-top: auto; /* Lo empuja al fondo */
+}
+
+.sidebar-logout button {
+    width: 100%;
+    background: rgba(0,0,0,0.15);
+    color: #fff;
+    border: none;
+    padding: 0.8rem;
     border-radius: 8px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
     transition: background 0.2s;
 }
 
-.sidebar ul li a:hover,
-.sidebar ul li a.active {
-    background: #007a2f;
+.sidebar-logout button:hover {
+    background: rgba(0,0,0,0.3);
 }
 
 .main-content {
@@ -422,43 +460,63 @@ body {
   margin-bottom: 8px;
 }
 
-/* Nuevos estilos para estrategias */
+/* --- ESTILOS MEJORADOS PARA LA TABLA DE ESTRATEGIAS --- */
 .estrategias-container {
-  padding: 20px;
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
 }
 
 .estrategias-title {
-  text-align: center;
-  font-size: 2em;
-  color: #2563eb;
-  margin-bottom: 20px;
-}
-
-.estrategias-list {
-  margin-bottom: 30px;
+    font-size: 2.2em;
+    color: #333;
+    margin-bottom: 1.5rem;
 }
 
 .estrategias-table {
-  width: 100%;
-  border-collapse: collapse;
+    width: 100%;
+    border-collapse: collapse; /* Clave para eliminar espacios entre bordes */
+    font-size: 1em;
 }
 
 .estrategias-table th, .estrategias-table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: center;
+    padding: 1rem;
+    text-align: left;
+    /* Se elimina el borde en todas las celdas */
+    border: none; 
+    /* Se añade un borde solo en la parte inferior de cada fila */
+    border-bottom: 1px solid #e9ecef;
 }
 
 .estrategias-table th {
-  background-color: #f4f4f4;
-  font-weight: bold;
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85em;
 }
 
-.estrategia-detalle {
-  background: #f7fafd;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 24px rgba(79,140,255,0.08);
+/* Efecto hover para resaltar la fila sobre la que está el cursor */
+.estrategias-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+.btn-ver-actividades {
+    background-color: #e2f5e8;
+    color: #007a2f;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9em;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-ver-actividades:hover {
+    background-color: #00953b;
+    color: #fff;
 }
 
 /* dashboard.css */
@@ -565,19 +623,18 @@ body {
   position: relative;
   max-width: 800px;
   margin: 0 auto;
-  padding-left: 20px;
+  padding-left: 25px; /* Espacio para la línea y los puntos */
 }
 
-/* La línea vertical del timeline */
+/* La línea vertical central */
 .timeline::before {
   content: '';
   position: absolute;
-  left: 20px;
+  left: 25px;
   top: 0;
   bottom: 0;
-  width: 4px;
+  width: 3px;
   background: #e9ecef;
-  border-radius: 2px;
 }
 
 .timeline-etapa {
@@ -587,8 +644,9 @@ body {
 }
 
 .timeline-etapa h3 {
-  color: #0056b3; /* Un azul corporativo */
-  margin-bottom: 5px;
+  color: #00843D;
+  margin-bottom: 1rem;
+  font-size: 1.5em;
 }
 
 .timeline-etapa > p {
@@ -604,35 +662,50 @@ body {
 
 .timeline-item {
   position: relative;
-  margin-bottom: 15px;
-  padding: 15px;
-  background-color: #fff;
-  border-radius: 6px;
-  border-left: 4px solid #007bff; /* Azul para pendiente */
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  margin-bottom: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
-/* El círculo en la línea del tiempo */
+/* El punto en la línea de tiempo */
 .timeline-item::before {
   content: '';
   position: absolute;
-  left: -30px; /* (40px de padding - 10px de radio) */
+  left: -21px; /* (25px de padding - 4px de radio) */
   top: 50%;
   transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background-color: #fff;
-  border: 4px solid #007bff; /* Azul para pendiente */
+  background-color: #adb5bd; /* Gris para pendiente */
+  border: 3px solid #fff; /* Borde blanco para separarlo de la línea */
   z-index: 1;
 }
 
-.timeline-item .actividad-descripcion {
-  font-weight: 500;
-  color: #343a40;
+.completada-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #00953b; /* Color del check */
+  flex-shrink: 0; /* Evita que se encoja */
 }
 
-.timeline-item .actividad-estado {
+.actividad-info {
+  flex-grow: 1;
+}
+
+.actividad-descripcion {
+  font-weight: 500;
+  color: #343a40;
+  margin: 0;
+}
+
+.actividad-meta {
   font-size: 0.85em;
   color: #6c757d;
   margin-top: 5px;
@@ -641,23 +714,17 @@ body {
 
 /* Estilo para actividades completadas */
 .timeline-item.completada {
-  border-left-color: #28a745; /* Verde para completado */
-  background-color: #f0fff4;
+  background-color: #e2f5e8; /* Fondo verde claro */
+  border-color: #a3d9b1;
 }
 
 .timeline-item.completada::before {
-  border-color: #28a745; /* Verde para completado */
-  background-color: #28a745;
+  background-color: #00953b; /* Punto verde para completado */
 }
 
 .timeline-item.completada .actividad-descripcion {
   text-decoration: line-through;
   color: #6c757d;
-}
-
-.timeline-item.completada .actividad-estado {
-  color: #28a745;
-  font-weight: bold;
 }
 
 .btn-volver {
