@@ -53,15 +53,14 @@ class ActividadSerializer(serializers.ModelSerializer):
 
 # Serializer para Etapa, que anida Actividades
 class EtapaSerializer(serializers.ModelSerializer):
-    actividades = ActividadSerializer(many=True)
+    actividades = ActividadSerializer(many=True, required=False)
 
     class Meta:
         model = Etapa
         fields = ['id', 'nombre', 'descripcion', 'actividades']
 
-# --- ESTE ES EL SERIALIZER QUE NECESITAS CORREGIR ---
 class EstrategiaSerializer(serializers.ModelSerializer):
-    etapas = EtapaSerializer(many=True) # Acepta una lista de etapas para la creación
+    etapas = EtapaSerializer(many=True, required=False)
 
     class Meta:
         model = Estrategia
