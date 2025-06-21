@@ -238,36 +238,29 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Cargar historial de conversaciones reales desde el backend
-  if (window.chatbotId) {
-    fetch(`/users/dashboard/chat/api/conversaciones/${window.chatbotId}/`, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + token
-      }
-    })
-      .then(response => response.json())
-      .then(data => {
-        chatLog.innerHTML = '';
-        data.forEach(conversacion => {
-          chatLog.innerHTML += `
-          <div><strong>Tú:</strong> ${conversacion.mensaje_usuario}</div>
-          <div><strong>Bot:</strong> ${conversacion.respuesta_chatbot}</div>
-        `;
-        });
-        chatLog.scrollTop = chatLog.scrollHeight;
-      });
-  }
+  // --- Funciones para agregar mensajes al chat ---
 
   function agregarMensajeUsuario(mensaje) {
-    chatLog.innerHTML += `<div style="text-align:right;"><strong>Tú:</strong> ${mensaje}</div>`;
+    if (!chatLog) return;
+    const messageContainer = document.createElement('div');
+    messageContainer.style.textAlign = 'right';
+    messageContainer.innerHTML = `<strong>Tú:</strong> ${mensaje}`;
+    chatLog.appendChild(messageContainer);
     chatLog.scrollTop = chatLog.scrollHeight;
   }
 
-  function agregarMensajeBot(mensaje) {
-    chatLog.innerHTML += `<div style="text-align:left;"><strong>Bot:</strong> ${mensaje}</div>`;
+  function agregarMensajeBot(texto) {
+    if (!chatLog) return;
+    const botName = window.categoriaNombre || 'Banky';
+    const messageContainer = document.createElement('div');
+    messageContainer.classList.add('bot-message'); // Clase para estilos
+    // ¡Aquí está la magia! Convierte Markdown a HTML y lo muestra
+    messageContainer.innerHTML = `<strong>${botName}:</strong> ${marked.parse(texto)}`;
+    chatLog.appendChild(messageContainer);
     chatLog.scrollTop = chatLog.scrollHeight;
   }
+
+  // --- Funciones de API ---
 
   function enviarMensajeAlBackend(mensaje, callback) {
     fetch(`/users/dashboard/chat/api/chatbot/${window.chatbotId}/`, {
@@ -293,11 +286,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let descripcion = "Roadmap generado automáticamente por el chatbot.";
 
     try {
-      // Extrae el bloque JSON del texto
       const jsonMatch = respuesta.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("No se encontró JSON en la respuesta.");
       const roadmapObj = JSON.parse(jsonMatch[0]);
-      // Encuentra la clave que contiene las etapas
+      
       let etapas = [];
       for (const key in roadmapObj) {
         if (roadmapObj[key] && Array.isArray(roadmapObj[key].etapas)) {
@@ -308,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (etapas.length === 0) {
         etapas = roadmapObj.roadmap?.etapas || roadmapObj.etapas || [];
       }
-      // Armar el array de etapas con actividades anidadas
+
       const etapasPayload = etapas.map(etapa => ({
         nombre: etapa.nombre || "Etapa sin nombre",
         descripcion: etapa.descripcion || "",
@@ -347,7 +339,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Enviar mensaje normal
+  // --- Cargar historial de conversaciones ---
+  if (window.chatbotId && chatLog) {
+    fetch(`/users/dashboard/chat/api/conversaciones/${window.chatbotId}/`, {
+      method: 'GET',
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+      .then(response => response.json())
+      .then(data => {
+        chatLog.innerHTML = ''; // Limpia el chat
+        data.forEach(conversacion => {
+          if (conversacion.mensaje_usuario) {
+            agregarMensajeUsuario(conversacion.mensaje_usuario);
+          }
+          if (conversacion.respuesta_chatbot) {
+            // Usa la misma función para asegurar que el Markdown se renderice
+            agregarMensajeBot(conversacion.respuesta_chatbot);
+          }
+        });
+      });
+  }
+
+  // --- Event Listeners ---
+
+  // Enviar mensaje con el botón
   if (enviarBtn) {
     enviarBtn.addEventListener('click', () => {
       const mensaje = userMessageInput.value.trim();
@@ -366,7 +381,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Botón roadmap
+  // Enviar mensaje con la tecla "Enter"
+  if (userMessageInput) {
+      userMessageInput.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+              enviarBtn.click();
+          }
+      });
+  }
+
+  // Botón para generar roadmap
   if (roadmapBtn) {
     roadmapBtn.addEventListener('click', function () {
       esRoadmap = true;
