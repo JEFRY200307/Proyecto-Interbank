@@ -79,7 +79,7 @@ function enviarMensajeRoadmap() {
     "titulo": "Título de la estrategia",
     "descripcion": "Descripción breve",
     "categoria": "${categoriaNombre}",
-    "fecha_cumplimiento": "YYYY-MM-DD",  
+    "fecha_cumplimiento": "DD-MM-YYYY",  
     "estado": "pendiente",
     "etapas": [
       {
@@ -88,7 +88,7 @@ function enviarMensajeRoadmap() {
         "actividades": [
           {
             "descripcion": "Descripción de la actividad",
-            "fecha_limite": "YYYY-MM-DD", 
+            "fecha_limite": "DD-MM-YYYY", 
             "completada": false
           }
         ]
@@ -282,32 +282,28 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function guardarRoadmapComoEstrategia(respuesta, categoriaNombre) {
-    let titulo = `Roadmap para ${categoriaNombre}`;
-    let descripcion = "Roadmap generado automáticamente por el chatbot.";
-
     try {
       const jsonMatch = respuesta.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("No se encontró JSON en la respuesta.");
-      const roadmapObj = JSON.parse(jsonMatch[0]);
       
-      let etapas = [];
-      for (const key in roadmapObj) {
-        if (roadmapObj[key] && Array.isArray(roadmapObj[key].etapas)) {
-          etapas = roadmapObj[key].etapas;
-          break;
-        }
-      }
-      if (etapas.length === 0) {
-        etapas = roadmapObj.roadmap?.etapas || roadmapObj.etapas || [];
+      const roadmapData = JSON.parse(jsonMatch[0]);
+      const estrategiaData = roadmapData.estrategia || roadmapData.roadmap || roadmapData;
+
+      if (!estrategiaData || !Array.isArray(estrategiaData.etapas)) {
+        throw new Error("El JSON recibido no tiene la estructura esperada (debe contener 'etapas').");
       }
 
-      const etapasPayload = etapas.map(etapa => ({
+      const titulo = estrategiaData.titulo || `Roadmap para ${categoriaNombre}`;
+      const descripcion = estrategiaData.descripcion || "Roadmap generado automáticamente por el chatbot.";
+      const fechaCumplimiento = estrategiaData.fecha_cumplimiento || null;
+
+      const etapasPayload = estrategiaData.etapas.map(etapa => ({
         nombre: etapa.nombre || "Etapa sin nombre",
         descripcion: etapa.descripcion || "",
         actividades: (etapa.actividades || []).map(act => ({
           descripcion: typeof act === "string" ? act : (act.descripcion || act.tarea || ""),
-          fecha_limite: null,
-          completada: false
+          fecha_limite: act.fecha_limite || null, // Se toma la fecha del JSON
+          completada: act.completada || false
         }))
       }));
 
@@ -321,10 +317,16 @@ document.addEventListener('DOMContentLoaded', () => {
           titulo: titulo,
           descripcion: descripcion,
           categoria: categoriaNombre,
+          fecha_cumplimiento: fechaCumplimiento, // Se añade la fecha de cumplimiento
           etapas: etapasPayload
         })
       })
-        .then(response => response.json())
+        .then(response => {
+          if (!response.ok) {
+            return response.json().then(err => { throw new Error(JSON.stringify(err)) });
+          }
+          return response.json();
+        })
         .then(data => {
           alert('¡Roadmap guardado en Estrategias!');
         })
@@ -334,7 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     } catch (e) {
-      alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato.");
+      alert("No se pudo procesar el roadmap como JSON. Por favor, revisa el formato. Error: " + e.message);
       console.error(e);
     }
   }
@@ -402,6 +404,7 @@ El JSON debe tener este formato:
   "estrategia": {
     "titulo": "Título de la estrategia",
     "descripcion": "Descripción general",
+    "fecha_cumplimiento": "YYYY-MM-DD",
     "etapas": [
       {
         "nombre": "Nombre de la etapa",
@@ -409,7 +412,7 @@ El JSON debe tener este formato:
         "actividades": [
           {
             "descripcion": "Descripción de la actividad",
-            "fecha_limite": null,
+            "fecha_limite": "YYYY-MM-DD",
             "completada": false
           }
         ]

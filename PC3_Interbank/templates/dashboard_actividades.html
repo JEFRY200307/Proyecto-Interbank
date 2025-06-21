@@ -21,6 +21,9 @@
             <li class="timeline-item {% if actividad.completada %}completada{% endif %}">
               <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
               <small class="actividad-estado">
+                {% if actividad.fecha_limite %}
+                  Fecha Límite: {{ actividad.fecha_limite|date:"d-m-Y" }} |
+                {% endif %}
                 {% if actividad.completada %}
                   ✔ Completada
                 {% else %}

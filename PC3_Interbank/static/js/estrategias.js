@@ -36,12 +36,18 @@ function cargarEstrategias(token) {
     estrategias.forEach(estrategia => {
       const fila = document.createElement('tr');
 
+      // Formatear la fecha si existe, de lo contrario mostrar un texto por defecto.
+      const fechaCumplimiento = estrategia.fecha_cumplimiento 
+        ? new Date(estrategia.fecha_cumplimiento).toLocaleDateString('es-ES') 
+        : 'No definida';
+
       // --- AQUÍ ESTÁ LA CORRECCIÓN ---
       // Cambiamos el botón que abre un modal por un enlace (<a>) que redirige a otra página.
       fila.innerHTML = `
         <td>${estrategia.titulo || 'Sin título'}</td>
         <td>${estrategia.descripcion || 'Sin descripción'}</td>
         <td>${estrategia.categoria || 'N/A'}</td>
+        <td>${fechaCumplimiento}</td>
         <td>
           <a href="/users/dashboard/estrategias/${estrategia.id}/actividades/" class="btn-ver-actividades">
             Ver etapas y actividades
