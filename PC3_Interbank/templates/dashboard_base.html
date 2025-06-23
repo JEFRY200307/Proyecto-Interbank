@@ -6,14 +6,16 @@
     <meta charset="UTF-8">
     <title>{% block title %}Panel{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <div id="logoutModal">
-        <div class="modal-content">
-            <p>¿Estás seguro de que deseas cerrar sesión?</p>
-            <button id="confirmLogoutBtn">Sí, cerrar sesión</button>
-            <button id="cancelLogoutBtn">Cancelar</button>
-        </div>
+    <div class="modal-content">
+        <p>¿Estás seguro de que deseas cerrar sesión?</p>
+        <button id="confirmLogoutBtn">Sí, cerrar sesión</button>
+        <button id="cancelLogoutBtn">Cancelar</button>
     </div>
+</div>
+
 <body>
     <div class="sidebar">
         <h2>Panel</h2>
@@ -22,13 +24,13 @@
     <div class="main-content">
         {% block content %}{% endblock %}
     </div>
-    
+
     {% block extra_js %}
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/logout.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.6/dist/signature_pad.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    
+
     {% endblock %}
 </body>
 

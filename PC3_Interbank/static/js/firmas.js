@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function () {
         })
             .then(r => r.json())
             .then(firma => {
-                const pdfUrl = firma.documento.archivo_firmado || firma.documento.archivo;
+                const pdfUrl = firma.documento.archivo_firmado_visual || firma.documento.archivo;
                 mostrarPDFenCanvas(pdfUrl);
             });
     }

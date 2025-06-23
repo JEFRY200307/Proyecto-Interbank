@@ -1,6 +1,9 @@
 {% extends "dashboard_base.html" %}
 {% load static %}
 {% block title %}Gestión de Documentos{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documentos.css' %}">
+{% endblock %}
 
 {% block content %}
 <h3 id="titulo-documentos"></h3>
@@ -30,14 +33,14 @@
 
 <!-- Mis documentos subidos -->
 <div>
-  <h3>Mis documentos subidos</h3>
-  <div id="misDocumentos"></div>
+    <h3>Mis documentos subidos</h3>
+    <div id="misDocumentos"></div>
 </div>
 
 <!-- Documentos asignados para firmar -->
 <div>
-  <h3>Documentos asignados para firmar</h3>
-  <div id="documentosAsignados"></div>
+    <h3>Documentos asignados para firmar</h3>
+    <div id="documentosAsignados"></div>
 </div>
 
 <!-- Modal para crear/editar documento -->

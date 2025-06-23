@@ -1,0 +1,342 @@
+/* Estilos mejorados para dashboard_documentos.html */
+
+body {
+    background: #f4f6f8;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+h3 {
+    color: #388e3c;
+    font-weight: 700;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.filtros-documentos {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 24px 0 32px 0;
+}
+
+.filtros-documentos input,
+.filtros-documentos select {
+    padding: 8px 12px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    font-size: 1rem;
+    transition: border 0.2s;
+}
+
+.filtros-documentos input:focus,
+.filtros-documentos select:focus {
+    border: 1.5px solid #388e3c;
+    outline: none;
+    background: #e8f5e9;
+}
+
+#botones-doc {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+#botones-doc button {
+    background: #43a047;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#botones-doc button:hover {
+    background: #1b5e20;
+}
+
+#listaDocumentos,
+#misDocumentos,
+#documentosAsignados {
+    margin: 0 auto 32px auto;
+    max-width: 950px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    padding: 24px 32px;
+}
+
+#listaDocumentos table,
+#misDocumentos table,
+#documentosAsignados table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#listaDocumentos th,
+#listaDocumentos td,
+#misDocumentos th,
+#misDocumentos td,
+#documentosAsignados th,
+#documentosAsignados td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: left;
+}
+
+#listaDocumentos th,
+#misDocumentos th,
+#documentosAsignados th {
+    background: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 700;
+}
+
+#listaDocumentos tr:hover,
+#misDocumentos tr:hover,
+#documentosAsignados tr:hover {
+    background: #f1f8e9;
+}
+
+.documentos-actions button,
+.documentos-actions a {
+    background: #43a047;
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 8px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.documentos-actions button:hover,
+.documentos-actions a:hover {
+    background: #1b5e20;
+}
+
+#documentoModal,
+#pdfModal,
+#modalFirmantes {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(44, 62, 80, 0.18);
+    padding: 32px 40px;
+    z-index: 1000;
+    min-width: 320px;
+    max-width: 90vw;
+    display: none;
+}
+
+#documentoModal.active,
+#pdfModal.active,
+#modalFirmantes.active {
+    display: block;
+}
+
+#documentoModal label,
+#modalFirmantes label {
+    font-weight: 600;
+    color: #374151;
+    margin-top: 10px;
+}
+
+#documentoModal input,
+#documentoModal textarea,
+#modalFirmantes input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    transition: border 0.2s;
+}
+
+#documentoModal input:focus,
+#documentoModal textarea:focus,
+#modalFirmantes input:focus {
+    border: 1.5px solid #388e3c;
+    outline: none;
+    background: #e8f5e9;
+}
+
+#documentoModal button,
+#modalFirmantes button,
+#pdfModal button {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    margin: 10px 8px 0 0;
+    transition: background 0.2s;
+}
+
+#documentoModal button:hover,
+#modalFirmantes button:hover,
+#pdfModal button:hover {
+    background: #1b5e20;
+}
+
+#documentoMensaje,
+#docMensaje {
+    margin-top: 10px;
+    font-size: 0.98rem;
+    color: #388e3c;
+    min-height: 20px;
+}
+
+#pdfPreview {
+    border: none;
+    background: #f5f5f5;
+    border-radius: 8px;
+}
+
+@media (max-width: 900px) {
+
+    #listaDocumentos,
+    #misDocumentos,
+    #documentosAsignados {
+        padding: 12px 2vw;
+    }
+
+    #documentoModal,
+    #pdfModal,
+    #modalFirmantes {
+        padding: 16px 4vw;
+    }
+
+    .filtros-documentos {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+
+/* ...existing code... */
+
+/* Quitar puntos de listas de acciones */
+#acciones-documentos {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 18px 0;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+}
+
+#acciones-documentos li {
+    display: inline-block;
+}
+
+/* Botones generales */
+button,
+input[type="submit"],
+input[type="button"] {
+    background: #43a047;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-right: 8px;
+    margin-top: 6px;
+    font-size: 1rem;
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background: #1b5e20;
+}
+
+/* Inputs, selects y textareas en formularios */
+form input[type="text"],
+form input[type="file"],
+form select,
+form textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #bdbdbd;
+    border-radius: 6px;
+    background: #f5f5f5;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    transition: border 0.2s;
+    box-sizing: border-box;
+}
+
+form input[type="file"] {
+    padding: 4px 0;
+    background: none;
+}
+
+form input:focus,
+form select:focus,
+form textarea:focus {
+    border: 1.5px solid #388e3c;
+    outline: none;
+    background: #e8f5e9;
+}
+
+/* Títulos de secciones */
+h2,
+h3 {
+    color: #388e3c;
+    font-weight: 700;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+/* Formulario de subir documento */
+#subirDocForm {
+    max-width: 500px;
+    margin: 32px auto 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+    padding: 24px 32px;
+}
+
+#subirDocForm label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+    display: block;
+}
+
+#subirDocForm textarea {
+    min-height: 60px;
+    resize: vertical;
+}
+
+/* Mensajes */
+#docMensaje,
+#documentoMensaje {
+    margin-top: 10px;
+    font-size: 0.98rem;
+    color: #388e3c;
+    min-height: 20px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    #subirDocForm {
+        padding: 12px 2vw;
+    }
+}

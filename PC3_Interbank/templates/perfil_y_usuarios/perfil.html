@@ -1,5 +1,8 @@
 {% extends "dashboard_base.html" %}
 {% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/perfil.css' %}">
+{% endblock %}
 {% block content %}
 <h3>Gestión de Perfil y Cuenta</h3>
 <div class="perfil-tabs" id="perfil-tabs"></div>
