@@ -1,6 +1,7 @@
 {% extends "dashboard_base.html" %}
 {% load static %}
 {% block title %}Gestión de Documentos{% endblock %}
+
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/documentos.css' %}">
 {% endblock %}
@@ -11,109 +12,105 @@
 
 <!-- Filtros y búsqueda -->
 <div class="filtros-documentos">
-    <input type="text" id="busquedaDocumento" placeholder="Buscar documento...">
+    <input type="text" id="busquedaDocumento" placeholder="Buscar por nombre de documento...">
     <select id="tipoDocumentoFiltro">
         <option value="">Todos los tipos</option>
         <option value="contrato">Contrato</option>
-        <option value="acuerdo">Acuerdo</option>
-        <option value="otro">Otro</option>
+        <option value="poder">Poder</option>
+        <option value="carta">Carta de presentación</option>
+        <option value="declaracion">Declaración jurada</option>
     </select>
 </div>
 
-<!-- Botones de acción para documentos -->
-<div id="botones-doc">
-    <button class="btn-doc firmarDocBtn">Firmar</button>
-    <button class="btn-doc editarDocBtn">Editar</button>
-    <button class="btn-doc asignarFirmantesBtn">Asignar firmantes</button>
-    <button class="btn-doc eliminarDocBtn">Eliminar</button>
+<!-- Contenedor principal para las listas de documentos -->
+<div id="listaDocumentos">
+    <!-- El JS llenará esto si es necesario -->
 </div>
 
-<!-- Lista de documentos -->
-<div id="listaDocumentos"></div>
-
 <!-- Mis documentos subidos -->
-<div>
+<div class="documentos-section">
     <h3>Mis documentos subidos</h3>
-    <div id="misDocumentos"></div>
+    <div id="misDocumentos">
+        <!-- El JS llenará esta sección con los documentos del usuario -->
+    </div>
 </div>
 
 <!-- Documentos asignados para firmar -->
-<div>
+<div class="documentos-section">
     <h3>Documentos asignados para firmar</h3>
-    <div id="documentosAsignados"></div>
-
-    <div class="documentos-section">
-        <h3>Mis documentos subidos</h3>
-        <div id="misDocumentos"></div>
+    <div id="documentosAsignados">
+        <!-- El JS llenará esta sección con los documentos pendientes de firma -->
     </div>
+</div>
 
-    <!-- Documentos asignados para firmar -->
-    <div class="documentos-section">
-        <h3>Documentos asignados para firmar</h3>
-        <div id="documentosAsignados"></div>
-    </div>
+<!-- Botón para mostrar el formulario de subida -->
+<div class="documentos-header">
+    <h2 id="titulo-documentos"></h2> <!-- El JS llenará este título -->
+    <button id="mostrarSubirDocBtn" class="btn btn-primary">Subir Nuevo Documento</button>
+</div>
 
-    <!-- Modal para crear/editar documento -->
-    <div id="documentoModal" style="display:none;">
-        <form id="documentoForm">
-            <input type="hidden" id="documento_id">
-            <label>Título</label>
-            <input type="text" id="titulo" required>
-            <label>Tipo</label>
-            <input type="text" id="tipo_documento" required>
-            <label>Contenido</label>
-            <textarea id="contenido"></textarea>
-            <label>Etiquetas</label>
-            <input type="text" id="etiquetas">
-            <button type="submit" class="btn-doc">Guardar</button>
-            <button type="button" id="cerrarDocumentoModalBtn" class="btn-doc">Cancelar</button>
-            <div id="documentoMensaje"></div>
-        </form>
-    </div>
-
-    <!-- Modal para subir archivo -->
-    <h2>Subir nuevo documento</h2>
-    <form id="subirDocForm" enctype="multipart/form-data">
-        <label>Nombre:</label>
-        <input type="text" id="tituloArchivo" name="nombre" required><br>
-        <label>Tipo de documento:</label>
-        <select id="tipoArchivo" name="tipo_documento" required>
-            <option value="contrato">Contrato</option>
-            <option value="poder">Poder</option>
-            <option value="carta">Carta de presentación</option>
-            <option value="declaracion">Declaración jurada</option>
-        </select><br>
-        <label>Archivo:</label>
-        <input type="file" id="archivo" name="archivo" required><br>
-        <label>Etiquetas:</label>
-        <input type="text" id="etiquetasArchivo" name="etiquetas"><br>
-        <label>Contenido:</label>
-        <textarea id="contenidoArchivo" name="contenido"></textarea><br>
-        <button type="submit" class="btn-doc">Subir</button>
-        <button type="button" id="cancelarSubirDocBtn" class="btn-doc">Cancelar</button>
+<!-- Contenedor del formulario. Su ID debe ser 'subirDocContainer' y debe estar oculto -->
+<div id="subirDocContainer" class="documentos-section" style="display: none;">
+    <h3>Subir Nuevo Documento</h3>
+    <form id="subirDocForm">
+        <div class="form-group">
+            <label for="nombre">Nombre del Documento:</label>
+            <input type="text" id="nombre" name="nombre" required>
+        </div>
+        <div class="form-group">
+            <label for="archivo">Archivo (PDF):</label>
+            <input type="file" id="archivo" name="archivo" accept=".pdf" required>
+        </div>
+        <div class="form-group">
+            <label for="tipo_documento">Tipo:</label>
+            <select id="tipo_documento" name="tipo_documento" required>
+                <option value="contrato">Contrato</option>
+                <option value="poder">Poder</option>
+                <option value="carta">Carta de presentación</option>
+                <option value="declaracion">Declaración jurada</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="etiqueta">Etiqueta:</label>
+            <input type="text" id="etiqueta" name="etiqueta" placeholder="Ej: Confidencial, Urgente...">
+        </div>
+        <div class="form-group">
+            <label for="contenido">Contenido (Resumen):</label>
+            <textarea id="contenido" name="contenido" rows="4"
+                placeholder="Añada un breve resumen o contenido del documento..."></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Subir</button>
+            <button type="button" id="cancelarSubirDocBtn" class="btn btn-secondary">Cancelar</button>
+        </div>
     </form>
-    <div id="docMensaje"></div>
-    <!-- Modal para PDF -->
-    <div id="pdfModal" style="display:none;">
-        <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
-        <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
-        <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
-    </div>
-    <!-- Modal para asignar firmantes -->
-    <div id="popoverFirmantes" class="popover-firmantes" style="display:none; position:absolute; z-index:9999;">
-        <form id="formFirmantes">
-            <div id="listaUsuarios"></div>
-            <button type="submit" class="btn-doc">Asignar</button>
-            <button type="button" id="cancelarFirmantesBtn" class="btn-doc">Cancelar</button>
-        </form>
-    </div>
-    {% endblock %}
+</div>
 
-    {% block extra_css %}
-    <link rel="stylesheet" href="{% static 'css/documentos.css' %}">
-    {% endblock %}
+<!-- Modal para PDF -->
+<div id="pdfModal" style="display:none;">
+    <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
+    <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
+    <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
+</div>
 
-    {% block extra_js %}
-    {{ block.super }}
-    <script src="{% static 'js/documentos.js' %}"></script>
-    {% endblock %}
+<!-- Popover para asignar firmantes -->
+<div id="popoverFirmantes" class="popover-firmantes">
+    <form id="formFirmantes" class="popover-content">
+        <span id="cerrarPopoverBtn" class="close-btn">&times;</span>
+        <h4>Asignar Firmantes</h4>
+        <div id="listaUsuarios" class="lista-usuarios-scroll">
+            <!-- La lista de usuarios se cargará aquí -->
+        </div>
+        <div class="popover-actions">
+            <button type="submit" class="btn-doc">Guardar Cambios</button>
+            <button type="button" id="cancelarFirmantesBtn" class="btn-doc btn-cancelar">Cancelar</button>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/documentos.js' %}"></script>
+{% endblock %}

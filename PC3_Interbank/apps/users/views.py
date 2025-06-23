@@ -111,7 +111,7 @@ def cuenta_usuario(request):
             "nombre": user.nombre,
             "dni": user.dni,
         }
-        # Cambia aquí: incluye datos de empresa si el usuario es representante o administrador
+        # Incluye datos de empresa si el usuario es representante o administrador
         if user.rol_interno in ["representante", "administrador"] and user.empresa:
             data["empresa"] = {
                 "razon_social": user.empresa.razon_social,
@@ -132,11 +132,35 @@ def cuenta_usuario(request):
                 "instagram": user.empresa.instagram,
             }
         return Response(data)
+    
     elif request.method == 'PUT':
-        serializer = UsuarioSerializer(user, data=request.data, partial=True)
+        data = request.data.copy() # Usar una copia mutable de los datos
+
+        # 1. Manejar la actualización del PIN de firma
+        nueva_clave = data.pop('clave_firma_nueva', None)
+        if nueva_clave:
+            # El frontend ya valida que sean 4 dígitos, pero una validación en backend es buena práctica.
+            if len(str(nueva_clave)) == 4 and str(nueva_clave).isdigit():
+                user.set_clave_firma(nueva_clave)
+            else:
+                return Response({"error": "El PIN debe ser de 4 dígitos numéricos."}, status=400)
+        
+        # 2. Manejar la actualización de datos de la empresa (si el rol lo permite)
+        if user.rol_interno in ["representante", "administrador"] and user.empresa:
+            empresa_data = data.pop('empresa', None)
+            if empresa_data and isinstance(empresa_data, dict):
+                for key, value in empresa_data.items():
+                    if hasattr(user.empresa, key):
+                        setattr(user.empresa, key, value)
+                user.empresa.save()
+
+        # 3. Actualizar los datos del usuario con el serializer
+        # El serializer recibe los datos restantes (nombre, dni, password, etc.)
+        serializer = UsuarioSerializer(user, data=data, partial=True)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save() # El serializer debe manejar el hash de la contraseña si se pasa 'password'
             return Response({"mensaje": "Perfil actualizado correctamente."})
+        
         return Response(serializer.errors, status=400)
 
 @login_required

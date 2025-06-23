@@ -21,7 +21,8 @@ class DocumentoSerializer(serializers.ModelSerializer):
         model = Documento
         fields = [
             'id', 'nombre', 'tipo_documento', 'archivo', 'etiquetas', 'contenido',
-            'creador_id', 'firmantes', 'puede_eliminar', 'puede_editar', 'puede_asignar_firmantes'
+            'creador_id', 'firmantes', 'puede_eliminar', 'puede_editar', 'puede_asignar_firmantes',
+            'archivo_firmado_visual', 'archivo_firmado'
         ]
 
     def get_firmantes(self, obj):
@@ -46,9 +47,10 @@ class DocumentoSerializer(serializers.ModelSerializer):
     def get_puede_asignar_firmantes(self, obj):
         user = self.context['request'].user
         return obj.creador_id == user.id or getattr(user, 'rol_interno', None) == 'administrador'
-
+  
 class FirmaSerializer(serializers.ModelSerializer):
     documento = DocumentoSerializer(read_only=True)
+    
     firmante_nombre = serializers.CharField(source='firmante.nombre', read_only=True)
     firmante_correo = serializers.CharField(source='firmante.correo', read_only=True)
     firmante_rol_interno = serializers.CharField(source='firmante.rol_interno', read_only=True)

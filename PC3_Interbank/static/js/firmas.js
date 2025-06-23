@@ -1,5 +1,11 @@
 console.log('firmas.js cargado');
+function getCacheBustedUrl(url) {
+    if (!url || url === '#') return '#';
+    return `${url}?v=${Date.now()}`;
+}
 document.addEventListener('DOMContentLoaded', function () {
+    if (document.body.dataset.firmasInitialized) return;
+    document.body.dataset.firmasInitialized = 'true';
     const token = localStorage.getItem('access_token');
     const rolInterno = localStorage.getItem('rol_interno');
     const titulo = document.getElementById('titulo-firmas');
@@ -10,30 +16,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let lastViewport = null;
     let firmaPosicion = { page: 1, x: 0, y: 0 };
     let signaturePad = null;
+    let lastClickedFirmarBtn = null;
 
-
-    if (!token || !rolInterno) {
-        alert('No hay token o rol en localStorage. Por favor, inicia sesión.');
-        return;
-    }
-
-    if (['representante', 'socio', 'contador', 'administrador'].includes(rolInterno)) {
-        titulo.textContent = 'Firmar documentos asignados';
-        acciones.innerHTML = `<li><button id="verFirmasBtn">Actualizar lista</button></li>`;
-        cargarFirmasPendientes();
-        cargarHistorialFirmas();
-    } else {
-        titulo.textContent = 'Gestión de Firmas';
-        acciones.innerHTML = '';
-        document.getElementById('pendientesFirma').innerHTML = '<p>No tienes permisos para firmar documentos.</p>';
-    }
 
     function cargarFirmasPendientes(pagina = 1) {
         fetch(`/documentos/firmas/pendientes/?page=${pagina}`, {
             headers: { 'Authorization': 'Bearer ' + token }
         })
             .then(r => r.json())
-            .then(data => renderTablaFirmas(data, 'pendientesFirma', cargarFirmasPendientes));
+            .then(data => renderTablaFirmas(data, 'pendientesFirmaBody'));
     }
 
     function cargarHistorialFirmas(pagina = 1) {
@@ -41,87 +32,115 @@ document.addEventListener('DOMContentLoaded', function () {
             headers: { 'Authorization': 'Bearer ' + token }
         })
             .then(r => r.json())
-            .then(data => renderTablaFirmas(data, 'historialFirma', cargarHistorialFirmas));
+            .then(data => renderTablaFirmas(data, 'historialFirmaBody'));
     }
 
-    function renderTablaFirmas(data, contenedorId, cargarPagina) {
+    function renderTablaFirmas(data, tbodyId) {
+        const tbody = document.getElementById(tbodyId);
+        if (!tbody) {
+            console.error(`Error: No se encontró el elemento con ID "${tbodyId}".`);
+            return;
+        }
+
         const firmas = data.results || data || [];
-        let html = '<table><thead><tr><th>Documento</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>';
+        let rowsHtml = '';
         const userNombre = localStorage.getItem('nombre');
-        firmas.forEach(firma => {
-            const puedeFirmar = firma.estado === 'pendiente' && firma.firmante_nombre === userNombre;
-            const pdfUrl = firma.estado === 'firmado'
-                ? (firma.documento.archivo_firmado || firma.documento.archivo)
-                : firma.documento.archivo;
-            html += `<tr>
-            <td>${firma.documento.nombre}</td>
-            <td>${firma.estado}</td>
-            <td>${firma.fecha_firma || '-'}</td>
-            <td>
-                <a href="${pdfUrl}" target="_blank">Ver PDF</a>
-                ${puedeFirmar ? `<button class="abrirFirmarModalBtn" data-id="${firma.id}" data-nombre="${firma.documento.nombre}">Firmar</button>` : ''}
-            </td>
-        </tr>`;
-        });
-        html += '</tbody></table>';
-        document.getElementById(contenedorId).innerHTML = html;
+
+        if (firmas.length === 0) {
+            rowsHtml = '<tr><td colspan="4" style="text-align:center; padding: 20px;">No hay documentos en esta sección.</td></tr>';
+        } else {
+            firmas.forEach(firma => {
+                const puedeFirmar = firma.estado === 'pendiente' && (firma.firmante_nombre || '').trim().toLowerCase() === (userNombre || '').trim().toLowerCase();
+                const baseUrl = firma.documento ? (firma.documento.archivo_firmado || firma.documento.archivo_firmado_visual || firma.documento.archivo) : '#';
+                const pdfUrl = getCacheBustedUrl(baseUrl);
+                rowsHtml += `<tr>
+                    <td>${firma.documento ? firma.documento.nombre : 'N/A'}</td>
+                    <td>${firma.estado}</td>
+                    <td>${firma.fecha_firma ? new Date(firma.fecha_firma).toLocaleString() : '-'}</td>
+                    <td>
+                        <a href="${pdfUrl}" target="_blank" class="btn-link">Ver PDF</a>
+                        ${puedeFirmar ? `<button class="abrirFirmarModalBtn" data-id="${firma.id}" data-nombre="${firma.documento.nombre}">Firmar</button>` : ''}
+                    </td>
+                </tr>`;
+            });
+        }
+        tbody.innerHTML = rowsHtml;
     }
 
     // ===================== MODAL DE FIRMA =====================
     function abrirFirmarModal(firmaId, docNombre) {
-        document.getElementById('firma_doc_id').value = firmaId;
-        document.getElementById('firmaDocInfo').innerText = `Documento: ${docNombre}`;
-        document.getElementById('firmaMensaje').innerText = '';
-        document.getElementById('claveFirma').value = '';
-        document.getElementById('firmarModal').style.display = 'block';
+        try {
+            // --- PASO 1: PREPARAR EL MODAL ---
+            document.getElementById('firma_doc_id').value = firmaId;
+            document.getElementById('firmaDocInfo').innerText = `Documento: ${docNombre}`;
 
-        // Inicializa SignaturePad cada vez que se abre el modal
-        const canvas = document.getElementById('firmaCanvas');
-        signaturePad = new SignaturePad(canvas);
-
-        // ASIGNA onEnd AQUÍ:
-        signaturePad.onEnd = function () {
-            renderPage(currentPage); // Redibuja cuando se termina de dibujar la firma
-        };
-
-        document.getElementById('limpiarFirmaBtn').onclick = () => {
-            signaturePad.clear();
-            renderPage(currentPage);
-        };
-        // Reinicia la posición de la firma
-        firmaPosicion = { page: 1, x: 0, y: 0 };
-
-        // Carga el PDF para previsualización
-        fetch(`/documentos/firmas/${firmaId}/`, {
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
+            // --- PASO 2: VERIFICAR Y PREPARAR EL CANVAS DE FIRMA ---
+            const canvas = document.getElementById('firmaCanvas');
+            if (!canvas) {
+                throw new Error("El elemento 'firmaCanvas' no se encuentra en el HTML.");
             }
-        })
-            .then(r => r.json())
-            .then(firma => {
-                const pdfUrl = firma.documento.archivo_firmado_visual || firma.documento.archivo;
-                mostrarPDFenCanvas(pdfUrl);
-            });
+            if (typeof SignaturePad === 'undefined') {
+                throw new Error("La librería de firma (SignaturePad) no se pudo cargar. Revisa la conexión o un posible bloqueador de scripts.");
+            }
+            signaturePad = new SignaturePad(canvas);
+            signaturePad.onEnd = () => renderPage(currentPage);
+
+            // --- PASO 3: MOSTRAR EL MODAL (SÓLO SI TODO LO ANTERIOR FUNCIONÓ) ---
+            document.getElementById('firmarModal').classList.add('is-visible');
+
+            // --- PASO 4: CARGAR EL DOCUMENTO ---
+            fetch(`/documentos/firmas/${firmaId}/`, { headers: { 'Authorization': 'Bearer ' + token } })
+                .then(r => {
+                    if (!r.ok) throw new Error(`Error de red al obtener el documento: ${r.statusText}`);
+                    return r.json();
+                })
+                .then(firma => {
+                    const baseUrl = firma.documento.archivo_firmado_visual || firma.documento.archivo;
+                    const pdfUrl = getCacheBustedUrl(baseUrl);
+                    return mostrarPDFenCanvas(pdfUrl);
+                })
+                .catch(error => {
+                    console.error("Error al cargar el PDF en el canvas:", error);
+                    const container = document.getElementById('pdfPreviewContainer');
+                    container.innerHTML = `<p style="color: red; padding: 20px;">No se pudo cargar el documento. Error: ${error.message}</p>`;
+                });
+
+        } catch (error) {
+            // --- CAPTURA CUALQUIER ERROR Y MUESTRA UN MENSAJE CLARO ---
+            console.error("Error crítico al abrir el modal de firma:", error);
+            alert(`No se pudo abrir el modal de firma:\n\n${error.message}`);
+
+            // MUY IMPORTANTE: Restaura el botón a su estado original si algo falla.
+            cerrarFirmarModal();
+        }
     }
 
     function cerrarFirmarModal() {
-        document.getElementById('firmarModal').style.display = 'none';
-        document.getElementById('firmaMensaje').innerText = '';
-        document.getElementById('claveFirma').value = '';
+        document.getElementById('firmarModal').classList.remove('is-visible');
         if (signaturePad) signaturePad.clear();
+        if (lastClickedFirmarBtn) {
+            lastClickedFirmarBtn.disabled = false;
+            lastClickedFirmarBtn.textContent = 'Firmar';
+            lastClickedFirmarBtn = null;
+        }
     }
 
     // ===================== PDF.js PREVIEW Y POSICIÓN =====================
     function mostrarPDFenCanvas(pdfUrl) {
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        // --- CORRECCIÓN: La función ahora devuelve una Promesa ---
+        return new Promise((resolve, reject) => {
+            const pdfjsLib = window['pdfjs-dist/build/pdf'];
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
-            pdfDoc = pdf;
-            totalPages = pdf.numPages;
-            currentPage = 1;
-            renderPage(currentPage);
+            pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
+                pdfDoc = pdf;
+                totalPages = pdf.numPages;
+                currentPage = 1;
+                renderPage(currentPage);
+                resolve(pdf); // Resuelve la promesa si todo va bien
+            }).catch(function (error) {
+                reject(error); // Rechaza la promesa si hay un error
+            });
         });
     }
 
@@ -196,9 +215,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // ===================== EVENTOS =====================
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('abrirFirmarModalBtn')) {
-            const firmaId = e.target.getAttribute('data-id');
-            const docNombre = e.target.getAttribute('data-nombre');
-            abrirFirmarModal(firmaId, docNombre);
+            lastClickedFirmarBtn = e.target;
+            lastClickedFirmarBtn.disabled = true;
+            lastClickedFirmarBtn.textContent = 'Cargando...';
+            abrirFirmarModal(e.target.dataset.id, e.target.dataset.nombre);
         }
         if (e.target.id === 'cancelarFirmaBtn') {
             cerrarFirmarModal();
@@ -217,22 +237,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetch(`/documentos/firmas/${firmaId}/firmar/`, {
             method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                clave: clave,
-                firma_imagen: firmaImagen,
-                firma_posicion: firmaPosicion
-            })
-        })
-            .then(r => r.json())
-            .then(data => {
-                document.getElementById('firmaMensaje').innerText = data.mensaje || data.error || 'Documento firmado.';
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clave, firma_imagen: firmaImagen, firma_posicion: firmaPosicion })
+        }).then(r => r.json()).then(data => {
+            alert(data.mensaje || data.error);
+            if (!data.error) {
                 cargarFirmasPendientes();
                 cargarHistorialFirmas();
-                setTimeout(cerrarFirmarModal, 1500);
+                cerrarFirmarModal();
+            }
+        })
+            // --- CORRECCIÓN: Se añade un bloque .finally para reactivar el botón de firma
+            // incluso si la petición falla.
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = 'Firmar Documento';
             });
     };
 

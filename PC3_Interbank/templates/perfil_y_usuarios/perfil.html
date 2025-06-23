@@ -67,6 +67,13 @@
                 <input type="password" id="password" name="password" autocomplete="new-password">
                 <label>Confirmar contraseña</label>
                 <input type="password" id="confirm_password" name="confirm_password" autocomplete="new-password">
+                <label>PIN de Firma (4 dígitos - dejar en blanco para no cambiar)</label>
+                <input type="password" id="clave_firma_nueva" name="clave_firma_nueva" maxlength="4" pattern="\d{4}"
+                    autocomplete="new-password" placeholder="****">
+
+                <label>Confirmar PIN de Firma</label>
+                <input type="password" id="clave_firma_confirm" name="clave_firma_confirm" maxlength="4" pattern="\d{4}"
+                    autocomplete="new-password" placeholder="****">
             </div>
             <button type="submit">Guardar cambios de usuario</button>
             <div id="perfilMensaje"></div>
