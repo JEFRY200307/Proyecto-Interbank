@@ -7,7 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
         header {
             background: #05be50;
@@ -46,21 +45,30 @@
             color: #555;
         }
         .tarjetas-ayuda {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
+            display: flex;
+            flex-wrap: nowrap;      /* No permite salto de línea */
+            justify-content: space-between;
+            align-items: stretch;   /* Para alinear verticalmente */
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
+
         .tarjeta {
+            flex: 1;                /* Hace que cada tarjeta ocupe el espacio disponible */
+            min-height: 220px;      /* Más alto para evitar apariencia aplanada */
             background: white;
             border: 1px solid #e0e0e0;
             border-radius: 0.5rem;
             padding: 1.5rem;
             text-align: center;
+            margin: 0.5rem 0;       /* Ajuste vertical */
             transition: transform 0.3s;
         }
+
         .tarjeta:hover {
             transform: translateY(-5px);
         }
+
         .icono {
             font-size: 2.5rem;
             margin-bottom: 1rem;
@@ -190,7 +198,7 @@
     <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between" style="min-height: 320px;">
       <div class="text-start" style="flex:1;">
         <h1 class="display-5">Crecemos juntos</h1>
-        <p class="lead">Gestión de documentos, firma digital y asesoría financiera para tu empresa</p>
+        <p class="lead">Gestión de documentos, firma digital y asesoría personalizada para tu empresa</p>
         <div class="mt-4">
           <a href="/registro-empresa/" class="btn btn-azul btn-lg me-2">Regístrate gratis</a>
           <a href="/login/" class="btn btn-azul-secundario btn-lg">Inicia sesión</a>
@@ -237,6 +245,11 @@
           <p>Recibe orientación de expertos para potenciar tu negocio y tomar mejores decisiones.</p>
         </div>
         <div class="tarjeta">
+          <div class="icono">📄</div>
+          <h3>Gestión de Documentos</h3>
+          <p>Genera, firma y exporta documentos legales y notariales en PDF de forma segura.</p>
+        </div>
+        <div class="tarjeta">
           <div class="icono">🌐</div>
           <h3>Transformación Digital</h3>
           <p>Te ayudamos a crear tu página web, tienda online o presencia en redes sociales.</p>
@@ -247,24 +260,9 @@
           <p>Accede a estrategias de marketing digital y ventas para llegar a más clientes.</p>
         </div>
         <div class="tarjeta">
-          <div class="icono">📄</div>
-          <h3>Gestión de Documentos</h3>
-          <p>Genera, firma y exporta documentos legales y notariales en PDF de forma segura.</p>
-        </div>
-        <div class="tarjeta">
           <div class="icono">💬</div>
           <h3>Chat y Comunidad</h3>
           <p>Resuelve tus dudas, comparte experiencias y recibe sugerencias de crecimiento.</p>
-        </div>
-        <div class="tarjeta">
-          <div class="icono">🔔</div>
-          <h3>Alertas Inteligentes</h3>
-          <p>Recibe notificaciones sobre vencimientos, oportunidades y alertas financieras.</p>
-        </div>
-        <div class="tarjeta">
-          <div class="icono">📊</div>
-          <h3>Reportes y Analítica</h3>
-          <p>Visualiza KPIs, exporta reportes y toma decisiones basadas en datos.</p>
         </div>
       </div>
 

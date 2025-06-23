@@ -22,10 +22,10 @@
 
 <!-- Botones de acción para documentos -->
 <div id="botones-doc">
-    <button id="btnSubir" style="display:none;">Subir documento</button>
-    <button id="btnEliminar" style="display:none;">Eliminar documento</button>
-    <button id="btnAsignarFirmantes" style="display:none;">Asignar firmantes</button>
-    <button id="btnFirmar" style="display:none;">Firmar documento</button>
+    <button class="btn-doc firmarDocBtn">Firmar</button>
+    <button class="btn-doc editarDocBtn">Editar</button>
+    <button class="btn-doc asignarFirmantesBtn">Asignar firmantes</button>
+    <button class="btn-doc eliminarDocBtn">Eliminar</button>
 </div>
 
 <!-- Lista de documentos -->
@@ -41,66 +41,79 @@
 <div>
     <h3>Documentos asignados para firmar</h3>
     <div id="documentosAsignados"></div>
-</div>
 
-<!-- Modal para crear/editar documento -->
-<div id="documentoModal" style="display:none;">
-    <form id="documentoForm">
-        <input type="hidden" id="documento_id">
-        <label>Título</label>
-        <input type="text" id="titulo" required>
-        <label>Tipo</label>
-        <input type="text" id="tipo_documento" required>
-        <label>Contenido</label>
-        <textarea id="contenido"></textarea>
-        <label>Etiquetas</label>
-        <input type="text" id="etiquetas">
-        <button type="submit">Guardar</button>
-        <button type="button" id="cerrarDocumentoModalBtn">Cancelar</button>
-        <div id="documentoMensaje"></div>
+    <div class="documentos-section">
+        <h3>Mis documentos subidos</h3>
+        <div id="misDocumentos"></div>
+    </div>
+
+    <!-- Documentos asignados para firmar -->
+    <div class="documentos-section">
+        <h3>Documentos asignados para firmar</h3>
+        <div id="documentosAsignados"></div>
+    </div>
+
+    <!-- Modal para crear/editar documento -->
+    <div id="documentoModal" style="display:none;">
+        <form id="documentoForm">
+            <input type="hidden" id="documento_id">
+            <label>Título</label>
+            <input type="text" id="titulo" required>
+            <label>Tipo</label>
+            <input type="text" id="tipo_documento" required>
+            <label>Contenido</label>
+            <textarea id="contenido"></textarea>
+            <label>Etiquetas</label>
+            <input type="text" id="etiquetas">
+            <button type="submit" class="btn-doc">Guardar</button>
+            <button type="button" id="cerrarDocumentoModalBtn" class="btn-doc">Cancelar</button>
+            <div id="documentoMensaje"></div>
+        </form>
+    </div>
+
+    <!-- Modal para subir archivo -->
+    <h2>Subir nuevo documento</h2>
+    <form id="subirDocForm" enctype="multipart/form-data">
+        <label>Nombre:</label>
+        <input type="text" id="tituloArchivo" name="nombre" required><br>
+        <label>Tipo de documento:</label>
+        <select id="tipoArchivo" name="tipo_documento" required>
+            <option value="contrato">Contrato</option>
+            <option value="poder">Poder</option>
+            <option value="carta">Carta de presentación</option>
+            <option value="declaracion">Declaración jurada</option>
+        </select><br>
+        <label>Archivo:</label>
+        <input type="file" id="archivo" name="archivo" required><br>
+        <label>Etiquetas:</label>
+        <input type="text" id="etiquetasArchivo" name="etiquetas"><br>
+        <label>Contenido:</label>
+        <textarea id="contenidoArchivo" name="contenido"></textarea><br>
+        <button type="submit" class="btn-doc">Subir</button>
+        <button type="button" id="cancelarSubirDocBtn" class="btn-doc">Cancelar</button>
     </form>
-</div>
+    <div id="docMensaje"></div>
+    <!-- Modal para PDF -->
+    <div id="pdfModal" style="display:none;">
+        <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
+        <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
+        <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
+    </div>
+    <!-- Modal para asignar firmantes -->
+    <div id="popoverFirmantes" class="popover-firmantes" style="display:none; position:absolute; z-index:9999;">
+        <form id="formFirmantes">
+            <div id="listaUsuarios"></div>
+            <button type="submit" class="btn-doc">Asignar</button>
+            <button type="button" id="cancelarFirmantesBtn" class="btn-doc">Cancelar</button>
+        </form>
+    </div>
+    {% endblock %}
 
-<!-- Modal para subir archivo -->
-<h2>Subir nuevo documento</h2>
-<form id="subirDocForm" enctype="multipart/form-data">
-    <label>Nombre:</label>
-    <input type="text" id="tituloArchivo" name="nombre" required><br>
-    <label>Tipo de documento:</label>
-    <select id="tipoArchivo" name="tipo_documento" required>
-        <option value="contrato">Contrato</option>
-        <option value="poder">Poder</option>
-        <option value="carta">Carta de presentación</option>
-        <option value="declaracion">Declaración jurada</option>
-    </select><br>
-    <label>Archivo:</label>
-    <input type="file" id="archivo" name="archivo" required><br>
-    <label>Etiquetas:</label>
-    <input type="text" id="etiquetasArchivo" name="etiquetas"><br>
-    <label>Contenido:</label>
-    <textarea id="contenidoArchivo" name="contenido"></textarea><br>
-    <button type="submit">Subir</button>
-    <button type="button" id="cancelarSubirDocBtn">Cancelar</button>
-</form>
-<div id="docMensaje"></div>
-<!-- Modal para PDF -->
-<div id="pdfModal" style="display:none;">
-    <iframe id="pdfPreview" style="width:80vw;height:80vh;"></iframe>
-    <a id="descargarPdfBtn" download="documento.pdf">Descargar PDF</a>
-    <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
-</div>
-<!-- Modal para asignar firmantes -->
-<div id="modalFirmantes" style="display:none;">
-    <h3>Seleccionar firmantes</h3>
-    <form id="formFirmantes">
-        <div id="listaUsuarios"></div>
-        <button type="submit">Asignar</button>
-        <button type="button" id="cancelarFirmantesBtn">Cancelar</button>
-    </form>
-</div>
-{% endblock %}
+    {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'css/documentos.css' %}">
+    {% endblock %}
 
-{% block extra_js %}
-{{ block.super }}
-<script src="{% static 'js/documentos.js' %}"></script>
-{% endblock %}
+    {% block extra_js %}
+    {{ block.super }}
+    <script src="{% static 'js/documentos.js' %}"></script>
+    {% endblock %}
