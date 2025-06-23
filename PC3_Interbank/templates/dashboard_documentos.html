@@ -19,23 +19,23 @@
 
 <!-- Botones de acción para documentos -->
 <div id="botones-doc">
-    <button id="btnSubir" style="display:none;">Subir documento</button>
-    <button id="btnEliminar" style="display:none;">Eliminar documento</button>
-    <button id="btnAsignarFirmantes" style="display:none;">Asignar firmantes</button>
-    <button id="btnFirmar" style="display:none;">Firmar documento</button>
+    <button class="btn-doc firmarDocBtn">Firmar</button>
+    <button class="btn-doc editarDocBtn">Editar</button>
+    <button class="btn-doc asignarFirmantesBtn">Asignar firmantes</button>
+    <button class="btn-doc eliminarDocBtn">Eliminar</button>
 </div>
 
 <!-- Lista de documentos -->
 <div id="listaDocumentos"></div>
 
 <!-- Mis documentos subidos -->
-<div>
+<div class="documentos-section">
   <h3>Mis documentos subidos</h3>
   <div id="misDocumentos"></div>
 </div>
 
 <!-- Documentos asignados para firmar -->
-<div>
+<div class="documentos-section">
   <h3>Documentos asignados para firmar</h3>
   <div id="documentosAsignados"></div>
 </div>
@@ -52,8 +52,8 @@
         <textarea id="contenido"></textarea>
         <label>Etiquetas</label>
         <input type="text" id="etiquetas">
-        <button type="submit">Guardar</button>
-        <button type="button" id="cerrarDocumentoModalBtn">Cancelar</button>
+        <button type="submit" class="btn-doc">Guardar</button>
+        <button type="button" id="cerrarDocumentoModalBtn" class="btn-doc">Cancelar</button>
         <div id="documentoMensaje"></div>
     </form>
 </div>
@@ -76,8 +76,8 @@
     <input type="text" id="etiquetasArchivo" name="etiquetas"><br>
     <label>Contenido:</label>
     <textarea id="contenidoArchivo" name="contenido"></textarea><br>
-    <button type="submit">Subir</button>
-    <button type="button" id="cancelarSubirDocBtn">Cancelar</button>
+    <button type="submit" class="btn-doc">Subir</button>
+    <button type="button" id="cancelarSubirDocBtn" class="btn-doc">Cancelar</button>
 </form>
 <div id="docMensaje"></div>
 <!-- Modal para PDF -->
@@ -87,14 +87,17 @@
     <button type="button" id="cerrarPdfModalBtn">Cerrar</button>
 </div>
 <!-- Modal para asignar firmantes -->
-<div id="modalFirmantes" style="display:none;">
-    <h3>Seleccionar firmantes</h3>
+<div id="popoverFirmantes" class="popover-firmantes" style="display:none; position:absolute; z-index:9999;">
     <form id="formFirmantes">
         <div id="listaUsuarios"></div>
-        <button type="submit">Asignar</button>
-        <button type="button" id="cancelarFirmantesBtn">Cancelar</button>
+        <button type="submit" class="btn-doc">Asignar</button>
+        <button type="button" id="cancelarFirmantesBtn" class="btn-doc">Cancelar</button>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documentos.css' %}">
 {% endblock %}
 
 {% block extra_js %}

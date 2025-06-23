@@ -1,0 +1,306 @@
+/* --------------------------------------------------------
+   Section: Layout general de la sección de documentos
+--------------------------------------------------------- */
+.documentos-section {
+    max-width: 1100px;
+    margin: 0 auto 40px auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.07);
+    padding: 32px 28px 24px 28px;
+}
+
+.documentos-section h3 {
+    font-size: 1.5em;
+    color: #2563eb;
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+/* --------------------------------------------------------
+   Section: Tarjetas de documentos
+--------------------------------------------------------- */
+.documento-item {
+    background: #f7fafd;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px rgba(44,62,80,0.08);
+    padding: 20px 24px 16px 24px;
+    margin-bottom: 22px;
+    border-left: 6px solid #00953b;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s;
+    position: relative;
+}
+.documento-item:hover {
+    box-shadow: 0 6px 24px rgba(44,62,80,0.16);
+}
+
+/* Encabezado de cada documento */
+.doc-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+.doc-nombre {
+    font-weight: bold;
+    color: #2563eb;
+    font-size: 1.18em;
+}
+.doc-tipo {
+    color: #00953b;
+    font-size: 1em;
+    background: #eafbe7;
+    border-radius: 4px;
+    padding: 2px 10px;
+}
+.doc-pdf-link {
+    margin-left: auto;
+    color: #2563eb;
+    text-decoration: underline;
+    font-size: 0.98em;
+    transition: color 0.2s;
+}
+.doc-pdf-link:hover {
+    color: #174ea6;
+}
+
+/* Detalles de firmantes/estado */
+.firmantes-lista {
+    font-size: 0.97em;
+    color: #555;
+    margin-bottom: 2px;
+}
+.doc-detalles {
+    font-size: 0.98em;
+    color: #555;
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}
+.doc-estado {
+    font-weight: bold;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 0.97em;
+}
+.doc-estado.firmado {
+    background: #eafbe7;
+    color: #00953b;
+}
+.doc-estado.pendiente {
+    background: #fff3cd;
+    color: #b8860b;
+}
+
+/* Acciones del documento (botones) */
+.doc-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------
+   Section: Barra de botones #botones-doc
+--------------------------------------------------------- */
+#botones-doc {
+    display: flex;
+    gap: 12px;
+    margin: 18px 0 28px 0;
+    flex-wrap: wrap;
+}
+#botones-doc button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 22px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    margin: 0;
+    min-width: 140px;
+    min-height: 40px;
+    outline: none;
+    letter-spacing: 0.5px;
+}
+#botones-doc button:hover {
+    background: #00953b;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+}
+#botones-doc button:active {
+    background: #174ea6;
+    transform: scale(0.98);
+}
+
+/* --------------------------------------------------------
+   Section: Botones con clases .btn-doc y variantes
+--------------------------------------------------------- */
+.btn-doc {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    margin: 0 8px 8px 0;
+    min-width: 90px;
+    min-height: 36px;
+    outline: none;
+    letter-spacing: 0.5px;
+    display: inline-block;
+}
+.btn-doc:hover {
+    background: #00953b;
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
+}
+.btn-doc:active {
+    background: #174ea6;
+    transform: scale(0.98);
+}
+
+/* Variantes */
+.firmarDocBtn {
+    background: #ffb347;
+    color: #333;
+}
+.firmarDocBtn:hover {
+    background: #ff8c68;
+    color: #fff;
+}
+.editarDocBtn {
+    background: #4f8cff;
+}
+.editarDocBtn:hover {
+    background: #2563eb;
+}
+.asignarFirmantesBtn,
+.editarFirmantesBtn {
+    background: #7ed957;
+    color: #256029;
+}
+.asignarFirmantesBtn:hover,
+.editarFirmantesBtn:hover {
+    background: #00953b;
+    color: #fff;
+}
+.eliminarDocBtn {
+    background: #e74c3c;
+}
+.eliminarDocBtn:hover {
+    background: #c0392b;
+}
+
+/* --------------------------------------------------------
+   Section: Popover para firmantes
+--------------------------------------------------------- */
+.popover-firmantes {
+    background: #fff;
+    border: 1.5px solid #2563eb;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(44,62,80,0.13);
+    padding: 18px 22px 14px 22px;
+    min-width: 260px;
+    max-width: 340px;
+    position: absolute;
+    z-index: 9999;
+    display: none;
+}
+.popover-firmantes form {
+    margin: 0;
+}
+
+/* --------------------------------------------------------
+   Section: Filtros y buscador
+--------------------------------------------------------- */
+.filtros-documentos {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+.filtros-documentos input[type="text"] {
+    flex: 1;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+}
+.filtros-documentos select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 0.95em;
+}
+
+/* --------------------------------------------------------
+   Section: Formulario para subir documentos
+--------------------------------------------------------- */
+#subirDocForm {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px 20px;
+    max-width: 500px;
+    margin: 0 auto 20px auto; /* margen superior e inferior */
+}
+#subirDocForm label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+#subirDocForm input[type="text"],
+#subirDocForm input[type="file"],
+#subirDocForm textarea,
+#subirDocForm select {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95em;
+}
+#subirDocForm button {
+    margin-right: 8px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 1em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.15s;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    min-width: 120px;
+    outline: none;
+    letter-spacing: 0.5px;
+}
+#subirDocForm button:hover {
+    background: #00953b;
+    transform: translateY(-2px) scale(1.04);
+}
+#subirDocForm button:active {
+    background: #174ea6;
+    transform: scale(0.98);
+}
+
+/* Mejorar estilo del título principal */
+#titulo-documentos {
+    font-size: 1.8em;
+    color: #2d3748;
+    text-align: center;
+    margin-bottom: 1.2em;
+    font-weight: 600;
+}

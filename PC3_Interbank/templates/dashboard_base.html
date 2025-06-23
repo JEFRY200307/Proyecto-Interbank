@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <title>{% block title %}Panel{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+    {% block extra_css %}{% endblock %}
 </head>
 <div id="logoutModal">
         <div class="modal-content">

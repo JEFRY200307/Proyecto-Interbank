@@ -22,35 +22,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (rolInterno === 'administrador') {
         titulo.textContent = 'Documentos - Administrador';
-        acciones.innerHTML = `
-            <li><button id="nuevoDocumentoBtn">Nuevo documento</button></li>
-            <li><button id="mostrarSubirDocBtn">Subir archivo</button></li>
-            <li><button>Reportes globales</button></li>
-            <li><button>Ver gestión global de firmas</button></li>
-        `;
     } else if (rolInterno === 'representante') {
         titulo.textContent = 'Documentos - Representante Legal';
-        acciones.innerHTML = `
-            <li><button>Ver documentos oficiales</button></li>
-            <li><button>Firmar documentos</button></li>
-        `;
     } else if (rolInterno === 'socio') {
         titulo.textContent = 'Documentos - Socio/Accionista';
-        acciones.innerHTML = `
-            <li><button>Ver acuerdos internos</button></li>
-            <li><button>Firmar acuerdos</button></li>
-        `;
     } else if (rolInterno === 'contador') {
         titulo.textContent = 'Documentos - Contador/Asesor Legal';
-        acciones.innerHTML = `
-            <li><button>Ver informes financieros/legales</button></li>
-            <li><button>Firmar informes</button></li>
-        `;
     } else if (rolInterno === 'empleado') {
         titulo.textContent = 'Documentos - Empleado Operativo';
-        acciones.innerHTML = `
-            <li><button id="mostrarSubirDocBtn">Subir documento básico</button></li>
-        `;
     }
 
     function renderizarDocumentos(documentos) {
@@ -76,26 +55,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Botones según permisos enviados por el backend
-            let docHtml = `<div class="documento-item">
-                <span class="doc-nombre">${doc.nombre}</span>
-                <span class="doc-tipo">(${doc.tipo_documento})</span>
-                <a href="${doc.archivo}" target="_blank">PDF</a>
+            let docHtml = `
+            <div class="documento-item">
+                <div class="doc-header">
+                    <span class="doc-nombre">${doc.nombre}</span>
+                    <span class="doc-tipo">(${doc.tipo_documento})</span>
+                    <a href="${doc.archivo}" target="_blank" class="doc-pdf-link">Ver PDF</a>
+                </div>
                 ${firmantesHtml}
-                ${
-                    firmado
-                        ? `<span class="doc-firmado" style="color:green;font-weight:bold;">Documento firmado por todos</span>`
-                        : `
-                            ${doc.puede_eliminar ? `<button class="eliminarDocBtn" data-id="${doc.id}">Eliminar</button>` : ''}
-                            ${doc.puede_editar ? `<button class="editarDocBtn" data-id="${doc.id}">Editar</button>` : ''}
-                            ${doc.puede_asignar_firmantes ? (
-                                (!doc.firmantes || doc.firmantes.length === 0)
-                                    ? `<button class="asignarFirmantesBtn" data-id="${doc.id}">Asignar firmantes</button>`
-                                    : `<button class="editarFirmantesBtn" data-id="${doc.id}">Editar firmantes</button>`
-                            ) : ''}
-                            ${doc.firmantes && doc.firmantes.some(f => String(f.id) === String(userId) && f.estado === 'pendiente') ? `<button class="firmarDocBtn" data-id="${doc.id}">Firmar</button>` : ''}
-                          `
-                }
-            </div>`;
+                <div class="doc-detalles">
+                    ${firmado
+                        ? `<span class="doc-estado firmado">Firmado por todos</span>`
+                        : `<span class="doc-estado pendiente">Pendiente de firma</span>`
+                    }
+                </div>
+                <div class="doc-actions">
+                    ${doc.puede_eliminar ? `<button class="btn-doc eliminarDocBtn" data-id="${doc.id}">Eliminar</button>` : ''}
+                    ${doc.puede_asignar_firmantes ? (
+                        (!doc.firmantes || doc.firmantes.length === 0)
+                            ? `<button class="btn-doc asignarFirmantesBtn" data-id="${doc.id}">Asignar firmantes</button>`
+                            : `<button class="btn-doc editarFirmantesBtn" data-id="${doc.id}">Editar firmantes</button>`
+                    ) : ''}
+                </div>
+            </div>
+            `;
 
             // Clasifica el documento
             // Clasificación personal (para todos los roles)
@@ -301,11 +284,13 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-    // Mostrar modal para asignar/editar firmantes
+    // Mostrar modal/popover para asignar/editar firmantes
     let documentoSeleccionado = null;
     document.addEventListener('click', function (e) {
         if (e.target.classList.contains('asignarFirmantesBtn') || e.target.classList.contains('editarFirmantesBtn')) {
-            documentoSeleccionado = e.target.getAttribute('data-id');
+            const btn = e.target;
+            const docId = btn.getAttribute('data-id');
+            documentoSeleccionado = docId;
             fetch('/users/empresa/', {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('access_token')
@@ -318,16 +303,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     html += `<label><input type="checkbox" name="firmantes" value="${u.id}"> ${u.nombre}</label><br>`;
                 });
                 document.getElementById('listaUsuarios').innerHTML = html;
-                document.getElementById('modalFirmantes').style.display = 'block';
+                // Muestra el popover cerca del botón
+                const popover = document.getElementById('popoverFirmantes');
+                popover.style.display = 'block';
+                // Posiciona el popover cerca del botón
+                const rect = btn.getBoundingClientRect();
+                popover.style.top = (window.scrollY + rect.bottom + 8) + 'px';
+                popover.style.left = (window.scrollX + rect.left) + 'px';
+                // Marca los firmantes ya asignados
+                marcarFirmantesAsignados(docId);
             });
         }
+        // Ocultar el popover al cancelar
         if (e.target.id === 'cancelarFirmantesBtn') {
-            document.getElementById('modalFirmantes').style.display = 'none';
+            document.getElementById('popoverFirmantes').style.display = 'none';
         }
     });
 
-    // Al abrir el modal de editar firmantes, marca los ya asignados
-    function marcarFirmantesAsignados(docId, usuarios) {
+    // Función para marcar los firmantes ya asignados
+    function marcarFirmantesAsignados(docId) {
         fetch(`/documentos/empresa/${docId}/`, {
             headers: {
                 'Authorization': 'Bearer ' + localStorage.getItem('access_token')
@@ -343,28 +337,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
-
-    // Modifica el evento anterior para marcar los firmantes si es edición
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('editarFirmantesBtn')) {
-            const docId = e.target.getAttribute('data-id');
-            fetch('/users/empresa/', {
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('access_token')
-                }
-            })
-            .then(r => r.json())
-            .then(usuarios => {
-                let html = '';
-                usuarios.forEach(u => {
-                    html += `<label><input type="checkbox" name="firmantes" value="${u.id}"> ${u.nombre}</label><br>`;
-                });
-                document.getElementById('listaUsuarios').innerHTML = html;
-                document.getElementById('modalFirmantes').style.display = 'block';
-                marcarFirmantesAsignados(docId, usuarios);
-            });
-        }
-    });
 
     // Enviar firmantes seleccionados
     document.getElementById('formFirmantes').onsubmit = function (e) {
