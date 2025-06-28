@@ -1,0 +1,359 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block page_title %}
+    Solicitudes de Mentoría por Estrategias
+{% endblock %}
+
+{% block content %}
+<div class="mentor-solicitudes-container">
+    <h2>📋 Solicitudes de Mentoría por Estrategias</h2>
+    <p class="descripcion">Aquí puedes ver todas las estrategias que han solicitado mentoría y aceptar las que desees.</p>
+
+    <!-- Contenedor de tarjetas de solicitudes -->
+    <div id="solicitudes-container" class="solicitudes-grid">
+        <!-- Las tarjetas se cargarán dinámicamente -->
+    </div>
+
+    <!-- Mensaje cuando no hay solicitudes -->
+    <div id="no-solicitudes" class="no-solicitudes" style="display: none;">
+        <div class="no-solicitudes-content">
+            <h3>🎯 No hay solicitudes pendientes</h3>
+            <p>Actualmente no hay estrategias solicitando mentoría.</p>
+        </div>
+    </div>
+
+    <!-- Loading spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Cargando solicitudes...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos específicos para solicitudes de mentoría */
+.mentor-solicitudes-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.mentor-solicitudes-container h2 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.descripcion {
+    color: #666;
+    font-size: 1.1em;
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.solicitudes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+/* Tarjeta de solicitud */
+.solicitud-card {
+    background: #fff;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+    position: relative;
+}
+
+.solicitud-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    border-color: #02bb59;
+}
+
+.solicitud-header {
+    border-bottom: 2px solid #f8f9fa;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+.estrategia-titulo {
+    font-size: 1.3em;
+    font-weight: 600;
+    color: #02bb59;
+    margin-bottom: 8px;
+}
+
+.estrategia-categoria {
+    display: inline-block;
+    background: #e7f3ff;
+    color: #0066cc;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.empresa-info {
+    margin: 20px 0;
+}
+
+.empresa-info h4 {
+    color: #333;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #555;
+}
+
+.info-value {
+    color: #333;
+    text-align: right;
+}
+
+.estrategia-descripcion {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+.especialidad-badge {
+    background: #fff3cd;
+    color: #856404;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-weight: 600;
+    border: 2px solid #ffeaa7;
+    margin: 15px 0;
+    display: inline-block;
+}
+
+.fecha-solicitud {
+    color: #888;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+}
+
+.btn-aceptar-mentoria {
+    width: 100%;
+    background: #02bb59;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.btn-aceptar-mentoria:hover {
+    background: #028a4a;
+    transform: translateY(-2px);
+}
+
+.btn-aceptar-mentoria:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* No solicitudes */
+.no-solicitudes {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 30px;
+}
+
+.no-solicitudes-content h3 {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.no-solicitudes-content p {
+    color: #888;
+    font-size: 1.1em;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #02bb59;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .solicitudes-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .solicitud-card {
+        padding: 20px;
+    }
+    
+    .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .info-value {
+        text-align: left;
+        margin-top: 5px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    cargarSolicitudesMentoria();
+});
+
+async function cargarSolicitudesMentoria() {
+    const token = localStorage.getItem('access_token');
+    const container = document.getElementById('solicitudes-container');
+    const noSolicitudes = document.getElementById('no-solicitudes');
+    const loading = document.getElementById('loading-spinner');
+    
+    try {
+        const response = await fetch('/mentor/api/estrategias-solicitan/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error al cargar las solicitudes');
+        }
+        
+        const solicitudes = await response.json();
+        loading.style.display = 'none';
+        
+        if (solicitudes.length === 0) {
+            noSolicitudes.style.display = 'block';
+            return;
+        }
+        
+        container.innerHTML = solicitudes.map(estrategia => `
+            <div class="solicitud-card">
+                <div class="solicitud-header">
+                    <h3 class="estrategia-titulo">${estrategia.titulo}</h3>
+                    <span class="estrategia-categoria">📊 ${estrategia.categoria || 'General'}</span>
+                </div>
+                
+                <div class="empresa-info">
+                    <h4>🏢 Información de la Empresa</h4>
+                    <div class="info-row">
+                        <span class="info-label">Empresa:</span>
+                        <span class="info-value">${estrategia.empresa_nombre}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">RUC:</span>
+                        <span class="info-value">${estrategia.empresa_ruc || 'No especificado'}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Teléfono:</span>
+                        <span class="info-value">${estrategia.empresa_telefono || 'No especificado'}</span>
+                    </div>
+                </div>
+                
+                <div class="estrategia-descripcion">
+                    <strong>Descripción:</strong> ${estrategia.descripcion}
+                </div>
+                
+                <div class="fecha-solicitud">
+                    📅 Solicitado el: ${new Date(estrategia.fecha_solicitud_mentoria).toLocaleDateString('es-ES')}
+                </div>
+                
+                <button class="btn-aceptar-mentoria" onclick="aceptarMentoria(${estrategia.id})">
+                    ✅ Aceptar Mentoría
+                </button>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        loading.style.display = 'none';
+        container.innerHTML = `
+            <div class="error-message">
+                <p style="color: red;">❌ Error al cargar las solicitudes: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+async function aceptarMentoria(estrategiaId) {
+    const token = localStorage.getItem('access_token');
+    const btn = event.target;
+    
+    if (!confirm('¿Estás seguro de que quieres aceptar la mentoría para esta estrategia?')) {
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.textContent = 'Aceptando...';
+    
+    try {
+        const response = await fetch(`/mentor/api/estrategias/${estrategiaId}/aceptar/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('✅ ' + result.mensaje);
+            cargarSolicitudesMentoria(); // Recargar la lista
+        } else {
+            throw new Error(result.error || 'Error al aceptar la mentoría');
+        }
+        
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = '✅ Aceptar Mentoría';
+    }
+}
+</script>
+{% endblock %}

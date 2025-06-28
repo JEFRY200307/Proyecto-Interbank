@@ -25,7 +25,7 @@ class Empresa(models.Model):
     web = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
-    mentores = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='empresas_asesoradas', blank=True, limit_choices_to={'rol': 'mentor'} ) # Opcional: solo usuarios con rol mentor
+    # Campo 'mentores' eliminado - ahora los mentores se asignan por estrategia
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"

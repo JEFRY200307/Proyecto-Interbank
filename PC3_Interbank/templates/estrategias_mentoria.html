@@ -18,6 +18,11 @@
         <p>Gestiona tus estrategias y solicita mentoría especializada para cada una</p>
     </div>
     
+    <!-- Estadísticas de mentoría -->
+    <div id="estadisticasMentoria">
+        <!-- Las estadísticas se cargarán dinámicamente aquí -->
+    </div>
+    
     <div id="estrategiasEmpresaContainer">
         <!-- Las estrategias se cargarán dinámicamente aquí -->
         <div class="loading-container">
@@ -183,7 +188,7 @@
     <script>
         // Variables globales
         const USER_ROL = '{{ user.rol }}';
-        const USER_ID = {{ user.id }};
+        const USER_ID = {{ user.id|default:0 }};
         
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar según el rol del usuario

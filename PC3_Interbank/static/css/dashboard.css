@@ -1,7 +1,8 @@
 body {
-    font-family: 'Segoe UI', Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: rgb(255, 255, 255) !important;
     margin: 0;
+    line-height: 1.6;
 }
 
 /* --- ESTILOS MEJORADOS PARA EL SIDEBAR --- */
@@ -640,13 +641,15 @@ body {
   }
 }
 
-/* --- ESTILOS PARA EL ROADMAP DE ACTIVIDADES --- */
+/* --- ESTILOS PARA EL ROADMAP DE ACTIVIDADES MEJORADOS --- */
 
 .roadmap-container {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  padding: 30px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 20px;
+  min-height: 100vh;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
 }
 
 .roadmap-container h2 {
@@ -659,6 +662,30 @@ body {
   text-align: center;
   color: #666;
   margin-bottom: 40px;
+}
+
+/* Botón volver mejorado */
+.btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  text-decoration: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 10px rgba(108, 117, 125, 0.3);
+}
+
+.btn-volver:hover {
+  background: linear-gradient(135deg, #495057 0%, #6c757d 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+  color: white;
+  text-decoration: none;
 }
 
 .timeline {
@@ -917,4 +944,672 @@ body {
 
 #cancelLogoutBtn:hover {
     background: #ddd;
+}
+
+/* =================================================================== */
+/* ESTILOS PROFESIONALES PARA PÁGINA DE ACTIVIDADES Y ROADMAP */
+/* =================================================================== */
+
+/* --- PÁGINA DE ACTIVIDADES --- */
+.actividades-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 0;
+}
+
+.actividades-page .main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    max-width: 1200px;
+}
+
+/* Header de navegación */
+.page-header {
+    margin-bottom: 2rem;
+    padding: 1rem 0;
+}
+
+.btn-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    color: #4a5568;
+    text-decoration: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.btn-volver:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    color: #2d3748;
+    text-decoration: none;
+}
+
+.icon-arrow-left {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+/* Card principal de la estrategia */
+.estrategia-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    position: relative;
+    backdrop-filter: blur(10px);
+}
+
+.estrategia-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px 20px 0 0;
+}
+
+.estrategia-info {
+    margin-bottom: 2rem;
+}
+
+.estrategia-titulo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.estrategia-descripcion {
+    font-size: 1.1rem;
+    color: #718096;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.categoria-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.badge-icon {
+    font-size: 1.2rem;
+}
+
+/* Widget de mentoría */
+.mentoria-widget {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.mentoria-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.mentoria-status.success {
+    background: #e6fffa;
+    border: 2px solid #38d9a9;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.mentoria-status.pending {
+    background: #fffaf0;
+    border: 2px solid #ffa94d;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+.status-icon {
+    font-size: 2rem;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.status-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.status-content p {
+    margin: 0;
+    color: #4a5568;
+}
+
+.status-content small {
+    color: #718096;
+    font-size: 0.9rem;
+}
+
+.mentoria-cta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.cta-icon {
+    font-size: 2.5rem;
+    min-width: 3rem;
+    text-align: center;
+}
+
+.cta-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.cta-content p {
+    margin: 0 0 1rem 0;
+    opacity: 0.9;
+}
+
+.btn-primary {
+    background: #fff;
+    color: #667eea;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-1px);
+}
+
+/* Sección de actividades */
+.actividades-section {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.section-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.progress-indicator {
+    color: #718096;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Timeline moderno y profesional - ROADMAP */
+.timeline-modern {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.timeline-modern::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    transform: translateX(-50%);
+    z-index: 1;
+    border-radius: 2px;
+}
+
+.etapa-container {
+    position: relative;
+    margin-bottom: 4rem;
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.etapa-container:nth-child(1) { animation-delay: 0.1s; }
+.etapa-container:nth-child(2) { animation-delay: 0.2s; }
+.etapa-container:nth-child(3) { animation-delay: 0.3s; }
+.etapa-container:nth-child(4) { animation-delay: 0.4s; }
+.etapa-container:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.etapa-container:nth-child(odd) .etapa-header {
+    margin-right: 55%;
+    text-align: right;
+}
+
+.etapa-container:nth-child(even) .etapa-header {
+    margin-left: 55%;
+    text-align: left;
+}
+
+.etapa-header {
+    position: relative;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 2px solid #e2e8f0;
+    z-index: 2;
+    transition: all 0.3s ease;
+}
+
+.etapa-header:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    border-color: #667eea;
+}
+
+.etapa-header::before {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    border-radius: 2px;
+}
+
+.etapa-container:nth-child(odd) .etapa-header::before {
+    right: -30px;
+}
+
+.etapa-container:nth-child(even) .etapa-header::before {
+    left: -30px;
+}
+
+.etapa-number {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    z-index: 4;
+    border: 4px solid #fff;
+}
+
+.etapa-container:nth-child(odd) .etapa-number {
+    right: -85px;
+}
+
+.etapa-container:nth-child(even) .etapa-number {
+    left: -85px;
+}
+
+.etapa-titulo {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.etapa-descripcion {
+    color: #718096;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+/* Grid de actividades mejorado */
+.actividades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.actividad-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.actividad-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.actividad-card:hover::before {
+    opacity: 1;
+}
+
+.actividad-card:hover {
+    border-color: #667eea;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    transform: translateY(-3px);
+    background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+}
+
+.actividad-card.completed {
+    background: linear-gradient(135deg, #e6fffa 0%, #d4eeea 100%);
+    border-color: #38d9a9;
+}
+
+.actividad-card.completed::before {
+    background: #38d9a9;
+    opacity: 1;
+}
+
+.actividad-checkbox {
+    position: relative;
+    min-width: 28px;
+    height: 28px;
+    margin-top: 2px;
+}
+
+.completada-checkbox {
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border: 3px solid #cbd5e0;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.completada-checkbox:hover {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.completada-checkbox:checked {
+    background: #38d9a9;
+    border-color: #38d9a9;
+    box-shadow: 0 0 0 3px rgba(56, 217, 169, 0.2);
+}
+
+.checkmark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.completada-checkbox:checked + .checkmark {
+    opacity: 1;
+}
+
+.checkmark::before {
+    content: '✓';
+    font-size: 16px;
+}
+
+.actividad-content {
+    flex: 1;
+}
+
+.actividad-texto {
+    margin: 0 0 0.75rem 0;
+    color: #4a5568;
+    font-weight: 500;
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.actividad-fecha {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #718096;
+    font-size: 0.9rem;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.fecha-icon {
+    font-size: 1rem;
+}
+
+/* Estados vacíos mejorados */
+.empty-state, .empty-state-main {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #718096;
+    background: #f8fafc;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+}
+
+.empty-state-main {
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+}
+
+.empty-state-main h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p, .empty-state-main p {
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Animaciones adicionales */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.etapa-number {
+    animation: pulse 2s infinite;
+}
+
+/* Responsive design mejorado */
+@media (max-width: 1024px) {
+    .actividades-page .main-content {
+        padding: 1.5rem;
+    }
+    
+    .timeline-modern::before {
+        left: 30px;
+    }
+    
+    .etapa-container:nth-child(odd) .etapa-header,
+    .etapa-container:nth-child(even) .etapa-header {
+        margin: 0 0 0 80px;
+        text-align: left;
+    }
+    
+    .etapa-container:nth-child(odd) .etapa-number,
+    .etapa-container:nth-child(even) .etapa-number {
+        left: 0;
+        transform: translate(0, -50%);
+    }
+    
+    .etapa-container:nth-child(odd) .etapa-header::before,
+    .etapa-container:nth-child(even) .etapa-header::before {
+        left: -30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .actividades-page .main-content {
+        margin-left: 0;
+        padding: 1rem;
+    }
+    
+    .estrategia-card {
+        padding: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .estrategia-titulo {
+        font-size: 1.8rem;
+    }
+    
+    .actividades-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mentoria-cta, .mentoria-status {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .etapa-header {
+        padding: 1.5rem;
+        margin: 0 0 0 60px;
+    }
+    
+    .etapa-number {
+        width: 50px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .etapa-titulo {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 1rem 0;
+    }
+    
+    .estrategia-card {
+        padding: 1.25rem;
+    }
+    
+    .actividades-section {
+        padding: 1.5rem;
+    }
+    
+    .btn-volver {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .etapa-header {
+        margin: 0 0 0 50px;
+        padding: 1.25rem;
+    }
+    
+    .timeline-modern::before {
+        left: 25px;
+    }
+    
+    .etapa-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .actividad-card {
+        padding: 1.25rem;
+    }
 }

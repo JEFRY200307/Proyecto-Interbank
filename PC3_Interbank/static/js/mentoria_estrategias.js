@@ -41,6 +41,139 @@ const ESPECIALIDADES = {
     'internacional': 'Comercio Internacional'
 };
 
+// Funciones específicas para empresas
+async function cargarEstrategiasEmpresa() {
+    try {
+        // Usar la nueva API que incluye información de mentoría
+        const response = await fetch('/empresas/api/estrategias-con-mentoria/');
+        const data = await response.json();
+        
+        if (response.ok) {
+            renderizarEstrategiasEmpresa(data.estrategias);
+            mostrarEstadisticasMentoria(data.estadisticas);
+        } else {
+            mostrarMensaje('Error al cargar estrategias', 'error');
+        }
+    } catch (error) {
+        mostrarMensaje('Error de conexión', 'error');
+        console.error('Error:', error);
+    }
+}
+
+function mostrarEstadisticasMentoria(estadisticas) {
+    const statsContainer = document.getElementById('estadisticasMentoria');
+    if (statsContainer) {
+        statsContainer.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>${estadisticas.total}</h4>
+                    <p>Total Estrategias</p>
+                </div>
+                <div class="stat-card success">
+                    <h4>${estadisticas.con_mentor}</h4>
+                    <p>Con Mentor</p>
+                </div>
+                <div class="stat-card warning">
+                    <h4>${estadisticas.solicitando_mentoria}</h4>
+                    <p>Buscando Mentor</p>
+                </div>
+                <div class="stat-card neutral">
+                    <h4>${estadisticas.sin_mentoria}</h4>
+                    <p>Sin Mentoría</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function renderizarEstrategiasEmpresa(estrategias) {
+    const container = document.getElementById('estrategiasEmpresaContainer');
+    
+    if (estrategias.length === 0) {
+        container.innerHTML = `
+            <div class="no-data">
+                <h4>📝 ¡Comienza creando tu primera estrategia!</h4>
+                <p>Las estrategias te ayudan a organizar tus objetivos empresariales y conseguir mentoría especializada</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = estrategias.map(estrategia => {
+        return crearCardEstrategia(estrategia);
+    }).join('');
+}
+
+function crearCardEstrategia(estrategia) {
+    const estadoMentoria = estrategia.estado_mentoria;
+    const puedesSolicitar = estrategia.puede_solicitar_mentoria;
+    const puedesCancelar = estrategia.puede_cancelar_solicitud;
+    
+    let botonesAccion = '';
+    let infoMentor = '';
+    
+    // Configurar botones según el estado
+    if (estadoMentoria.codigo === 'CON_MENTOR') {
+        botonesAccion = `
+            <button class="btn btn-info" onclick="chatConMentor(${estrategia.id})">
+                💬 Chat con Mentor
+            </button>
+            <button class="btn btn-secondary" onclick="verPerfilMentor(${estrategia.mentor_asignado})">
+                👨‍💼 Ver Mentor
+            </button>
+        `;
+        infoMentor = `
+            <div class="mentor-info-section">
+                <p><strong>Mentor:</strong> ${estrategia.mentor_asignado_nombre}</p>
+                <p><strong>Especialidad:</strong> ${estrategia.mentor_especialidad || 'No especificada'}</p>
+                <p><strong>Asignado:</strong> ${new Date(estrategia.fecha_asignacion_mentor).toLocaleDateString()}</p>
+            </div>
+        `;
+    } else if (estadoMentoria.codigo === 'SOLICITANDO') {
+        botonesAccion = `
+            <button class="btn btn-danger btn-cancelar-mentoria" data-estrategia-id="${estrategia.id}">
+                ❌ Cancelar Solicitud
+            </button>
+        `;
+    } else if (puedesSolicitar) {
+        botonesAccion = `
+            <button class="btn btn-primary btn-solicitar-mentoria" data-estrategia-id="${estrategia.id}">
+                👨‍💼 Solicitar Mentoría
+            </button>
+        `;
+    }
+    
+    return `
+        <div class="estrategia-card" data-estrategia-id="${estrategia.id}">
+            <div class="estrategia-header">
+                <h4>${estrategia.titulo}</h4>
+                <div class="estrategia-badges">
+                    <span class="categoria-badge">${estrategia.categoria || 'Sin categoría'}</span>
+                    <span class="estado-mentoria ${estadoMentoria.codigo.toLowerCase()}">${estadoMentoria.descripcion}</span>
+                </div>
+            </div>
+            <div class="estrategia-info">
+                <p><strong>Estado:</strong> ${estrategia.estado}</p>
+                <p><strong>Fecha límite:</strong> ${estrategia.fecha_cumplimiento || 'Sin fecha'}</p>
+                <p><strong>Descripción:</strong> ${estrategia.descripcion}</p>
+                ${infoMentor}
+                ${estadoMentoria.codigo === 'SOLICITANDO' ? `
+                    <div class="solicitud-info">
+                        <p><strong>Especialidad buscada:</strong> ${ESPECIALIDADES[estadoMentoria.especialidad] || estadoMentoria.especialidad}</p>
+                        <p><strong>Solicitado:</strong> ${new Date(estadoMentoria.fecha_solicitud).toLocaleDateString()}</p>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="estrategia-actions">
+                <button class="btn btn-secondary" onclick="verDetalleEstrategia(${estrategia.id})">
+                    📊 Ver Detalle
+                </button>
+                ${botonesAccion}
+            </div>
+        </div>
+    `;
+}
+
 function cargarEspecialidades() {
     const selectores = document.querySelectorAll('.especialidad-select');
     selectores.forEach(select => {

@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, DetailView
-from apps.empresas.models import Empresa
+from apps.empresas.models import Empresa, Estrategia
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -16,7 +16,10 @@ class EmpresasMentorAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        empresas = Empresa.objects.filter(mentores=request.user)
+        # En el nuevo sistema, obtener empresas a través de las estrategias que el mentor tiene asignadas
+        estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user)
+        empresas_ids = estrategias_mentor.values_list('empresa_id', flat=True).distinct()
+        empresas = Empresa.objects.filter(id__in=empresas_ids)
         serializer = EmpresaSerializer(empresas, many=True)
         return Response(serializer.data)
 
@@ -26,19 +29,28 @@ class EmpresaDetalleMentorAPIView(APIView):
 
     def get(self, request, pk):
         try:
-            # Nos aseguramos que el mentor solo pueda ver empresas que le pertenecen
-            empresa = Empresa.objects.get(pk=pk, mentores=request.user)
+            # Verificar que el mentor tenga al menos una estrategia asignada en esta empresa
+            estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user, empresa_id=pk)
+            if not estrategias_mentor.exists():
+                return Response({"error": "No tienes estrategias asignadas en esta empresa."}, status=status.HTTP_404_NOT_FOUND)
+            
+            empresa = Empresa.objects.get(pk=pk)
         except Empresa.DoesNotExist:
-            return Response({"error": "Empresa no encontrada o no tienes permiso."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Empresa no encontrada."}, status=status.HTTP_404_NOT_FOUND)
         # Usamos el serializador completo para la respuesta GET
         serializer = EmpresaParaMentorSerializer(empresa)
         return Response(serializer.data)
 
     def put(self, request, pk):
         try:
-            empresa = Empresa.objects.get(pk=pk, mentores=request.user)
+            # Verificar que el mentor tenga al menos una estrategia asignada en esta empresa
+            estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user, empresa_id=pk)
+            if not estrategias_mentor.exists():
+                return Response({"error": "No tienes estrategias asignadas en esta empresa."}, status=status.HTTP_404_NOT_FOUND)
+            
+            empresa = Empresa.objects.get(pk=pk)
         except Empresa.DoesNotExist:
-            return Response({"error": "Empresa no encontrada o no tienes permiso."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Empresa no encontrada."}, status=status.HTTP_404_NOT_FOUND)
         
         # CORRECCIÓN: Usamos el serializador correcto para actualizar (PUT/PATCH)
         serializer = EmpresaParaMentorSerializer(empresa, data=request.data, partial=True)
@@ -62,21 +74,11 @@ class EstrategiasSolicitanMentoriaAPIView(APIView):
         # Importar el modelo desde la app correcta
         from apps.empresas.models import Estrategia
         
-        # Filtrar por especialidad del mentor si tiene una
-        especialidad_mentor = request.user.especialidades
-        
-        if especialidad_mentor:
-            estrategias = Estrategia.objects.filter(
-                solicita_mentoria=True,
-                mentor_asignado__isnull=True,
-                especialidad_requerida=especialidad_mentor
-            ).select_related('empresa', 'usuario')
-        else:
-            # Si el mentor no tiene especialidad definida, mostrar todas
-            estrategias = Estrategia.objects.filter(
-                solicita_mentoria=True,
-                mentor_asignado__isnull=True
-            ).select_related('empresa', 'usuario')
+        # Los mentores ven TODAS las solicitudes de mentoría
+        estrategias = Estrategia.objects.filter(
+            solicita_mentoria=True,
+            mentor_asignado__isnull=True
+        ).select_related('empresa')
         
         data = []
         for estrategia in estrategias:
@@ -85,25 +87,13 @@ class EstrategiasSolicitanMentoriaAPIView(APIView):
                 'titulo': estrategia.titulo,
                 'descripcion': estrategia.descripcion,
                 'categoria': estrategia.categoria,
-                'especialidad_requerida': estrategia.especialidad_requerida,
-                'fecha_solicitud': estrategia.fecha_solicitud_mentoria,
-                'empresa': {
-                    'id': estrategia.empresa.id,
-                    'razon_social': estrategia.empresa.razon_social,
-                    'ruc': estrategia.empresa.ruc
-                },
-                'usuario_solicitante': {
-                    'id': estrategia.usuario.id,
-                    'nombre': estrategia.usuario.nombre,
-                    'correo': estrategia.usuario.correo
-                } if estrategia.usuario else None
+                'fecha_solicitud_mentoria': estrategia.fecha_solicitud_mentoria,
+                'empresa_nombre': estrategia.empresa.razon_social,
+                'empresa_ruc': estrategia.empresa.ruc,
+                'empresa_telefono': estrategia.empresa.telefono,
             })
         
-        return Response({
-            'estrategias': data,
-            'total': len(data),
-            'especialidad_mentor': especialidad_mentor
-        }, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
     
 # Vista base para dashboard mentor (solo renderiza el HTML)
 class DashboardMentorView(TemplateView):
@@ -117,6 +107,12 @@ class DashboardMentorBotsView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['categories'] = ChatCategory.objects.all()  # Pasamos las categorías al template
         return context
+
+class SolicitudesMentoriaView(TemplateView):
+    """
+    Vista para mostrar las solicitudes de mentoría por estrategias a los mentores
+    """
+    template_name = "mentor_solicitudes_estrategias.html"
 
 class AceptarMentoriaEstrategiaAPIView(APIView):
     """
@@ -148,8 +144,7 @@ class AceptarMentoriaEstrategiaAPIView(APIView):
         estrategia.fecha_asignacion_mentor = timezone.now()
         estrategia.save()
         
-        # También agregar la empresa a la lista de empresas asesoradas del mentor
-        estrategia.empresa.mentores.add(request.user)
+        # En el nuevo sistema, la relación mentor-empresa se establece a través de las estrategias
         
         return Response({
             'mensaje': 'Mentoría aceptada correctamente.',
@@ -157,32 +152,17 @@ class AceptarMentoriaEstrategiaAPIView(APIView):
             'empresa': estrategia.empresa.razon_social
         }, status=status.HTTP_200_OK)
 
-# Vista antigua mantenida para compatibilidad
+# Vista antigua mantenida para compatibilidad (DESHABILITADA - usar AceptarMentoriaEstrategiaAPIView)
 class AceptarMentoriaAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        # 1. Verificación de rol: Asegurarse de que solo un mentor puede aceptar.
-        if not hasattr(request.user, 'rol') or request.user.rol != 'mentor':
-            return Response(
-                {'error': 'Acción no permitida. Solo los mentores pueden aceptar empresas.'}, 
-                status=status.HTTP_403_FORBIDDEN
-            )
-
-        # 2. Búsqueda más segura: La empresa debe solicitar Y NO tener ya un mentor.
-        try:
-            empresa = Empresa.objects.get(pk=pk, solicita_mentoria=True, mentores__isnull=True)
-        except Empresa.DoesNotExist:
-            return Response(
-                {'error': 'Empresa no encontrada, ya no solicita mentoría o ya fue asignada a otro mentor.'}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        # 3. Asignación y guardado (esto ya estaba bien)
-        empresa.mentores.add(request.user)
-        empresa.solicita_mentoria = False
-        empresa.save()
-        return Response({'mensaje': 'Ahora eres mentor de esta empresa.'})
+        # ESTA VISTA YA NO FUNCIONA - EL CAMPO solicita_mentoria DE EMPRESA YA NO EXISTE
+        # USAR AceptarMentoriaEstrategiaAPIView EN SU LUGAR
+        return Response(
+            {'error': 'Esta funcionalidad ha sido reemplazada. Usa el sistema de mentoría por estrategias.'}, 
+            status=status.HTTP_410_GONE
+        )
 class DashboardMentorBotsDetailView(DetailView):
     model = ChatCategory
     template_name = "dashboard_mentor_bots_detail.html"

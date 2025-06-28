@@ -166,18 +166,95 @@ class EmpresaParaMentorSerializer(serializers.ModelSerializer):
 
 class EmpresaPerfilSerializer(serializers.ModelSerializer):
     """
-    Serializer para el perfil de la empresa, usado para saber si ya solicitó mentoría.
+    Serializer para el perfil de la empresa, adaptado al nuevo sistema de mentoría por estrategias.
     """
     tiene_mentor = serializers.SerializerMethodField()
+    estrategias_con_mentoria = serializers.SerializerMethodField()
+    total_estrategias = serializers.SerializerMethodField()
+    estrategias_solicitando_mentoria = serializers.SerializerMethodField()
 
     class Meta:
         model = Empresa
         fields = [
             'razon_social', 'ruc', 'representante', 'correo', 'direccion', 
             'telefono', 'objetivo', 'mision', 'vision', 'historia', 'web', 
-            'facebook', 'instagram', 'tiene_mentor'
+            'facebook', 'instagram', 'tiene_mentor', 'estrategias_con_mentoria',
+            'total_estrategias', 'estrategias_solicitando_mentoria'
         ]
-        read_only_fields = ('ruc', 'razon_social', 'tiene_mentor')
+        read_only_fields = ('ruc', 'razon_social', 'tiene_mentor', 'estrategias_con_mentoria', 
+                          'total_estrategias', 'estrategias_solicitando_mentoria')
 
     def get_tiene_mentor(self, obj):
-        return obj.mentores.exists()
+        """Verifica si la empresa tiene al menos una estrategia con mentor asignado"""
+        return obj.estrategia_set.filter(mentor_asignado__isnull=False).exists()
+    
+    def get_estrategias_con_mentoria(self, obj):
+        """Cuenta estrategias que ya tienen mentor asignado"""
+        return obj.estrategia_set.filter(mentor_asignado__isnull=False).count()
+    
+    def get_total_estrategias(self, obj):
+        """Cuenta total de estrategias de la empresa"""
+        return obj.estrategia_set.count()
+    
+    def get_estrategias_solicitando_mentoria(self, obj):
+        """Cuenta estrategias que están solicitando mentoría pero aún no tienen mentor"""
+        return obj.estrategia_set.filter(solicita_mentoria=True, mentor_asignado__isnull=True).count()
+
+class EstrategiaConMentoriaSerializer(serializers.ModelSerializer):
+    """
+    Serializer especializado para mostrar estrategias con información de mentoría
+    """
+    mentor_asignado_nombre = serializers.CharField(source='mentor_asignado.nombre', read_only=True)
+    mentor_especialidad = serializers.CharField(source='mentor_asignado.especialidades', read_only=True)
+    empresa_nombre = serializers.CharField(source='empresa.razon_social', read_only=True)
+    estado_mentoria = serializers.SerializerMethodField()
+    puede_solicitar_mentoria = serializers.SerializerMethodField()
+    puede_cancelar_solicitud = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Estrategia
+        fields = [
+            'id', 'titulo', 'descripcion', 'categoria', 'estado',
+            'fecha_cumplimiento', 'fecha_registro',
+            'solicita_mentoria', 'especialidad_requerida', 
+            'mentor_asignado', 'mentor_asignado_nombre', 'mentor_especialidad',
+            'fecha_solicitud_mentoria', 'fecha_asignacion_mentor',
+            'empresa_nombre', 'estado_mentoria', 
+            'puede_solicitar_mentoria', 'puede_cancelar_solicitud'
+        ]
+        read_only_fields = [
+            'id', 'fecha_registro', 'mentor_asignado_nombre', 'mentor_especialidad',
+            'empresa_nombre', 'fecha_asignacion_mentor', 'estado_mentoria',
+            'puede_solicitar_mentoria', 'puede_cancelar_solicitud'
+        ]
+
+    def get_estado_mentoria(self, obj):
+        """Devuelve el estado actual de mentoría de la estrategia"""
+        if obj.mentor_asignado:
+            return {
+                'codigo': 'CON_MENTOR',
+                'descripcion': 'Tiene mentor asignado',
+                'mentor': obj.mentor_asignado.nombre,
+                'fecha_asignacion': obj.fecha_asignacion_mentor
+            }
+        elif obj.solicita_mentoria:
+            return {
+                'codigo': 'SOLICITANDO',
+                'descripcion': f'Buscando mentor en {obj.especialidad_requerida}',
+                'especialidad': obj.especialidad_requerida,
+                'fecha_solicitud': obj.fecha_solicitud_mentoria
+            }
+        else:
+            return {
+                'codigo': 'SIN_MENTORIA',
+                'descripcion': 'Sin mentoría',
+                'disponible': True
+            }
+
+    def get_puede_solicitar_mentoria(self, obj):
+        """Verifica si se puede solicitar mentoría para esta estrategia"""
+        return not obj.solicita_mentoria and not obj.mentor_asignado
+
+    def get_puede_cancelar_solicitud(self, obj):
+        """Verifica si se puede cancelar la solicitud de mentoría"""
+        return obj.solicita_mentoria and not obj.mentor_asignado

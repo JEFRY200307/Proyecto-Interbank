@@ -102,7 +102,7 @@ function enviarMensajeRoadmap() {
 
 ${estructuraBase}
 
-Usa nombres de etapas relevantes según el contexto y mensajes previos. No agregues texto adicional, solo devuelve el JSON.`;
+Usa nombres de etapas relevantes según el contexto y mensajes previos. No agregues texto adicional, solo devuelve el JSON y para las fechas limite de cada actividad considera partir desde hoy.`;
 
   // Enviar el mensaje al chatbot
   document.getElementById('user-message').value = mensaje;
@@ -476,7 +476,7 @@ Por favor, genera el roadmap siguiendo la estructura JSON de Estrategia, Etapa y
   }
 }
 
-No limites la cantidad de etapas ni de actividades; incluye todas las que consideres necesarias para un roadmap completo.`;
+No limites la cantidad de etapas ni de actividades; incluye todas las que consideres necesarias para un roadmap completo. y en la parte de fecha de cumplimiento considera la fecha de hoy como base para calcular las fechas límite de las actividades.`;
 
       // Muestra el mensaje corto en la interfaz para que el usuario vea su acción.
       agregarMensajeUsuario(mensajeCorto);

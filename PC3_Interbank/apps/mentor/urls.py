@@ -8,6 +8,7 @@ from .views import (
     EmpresasMentorAPIView,
     EmpresaDetalleMentorAPIView,
     EstrategiasSolicitanMentoriaAPIView,
+    SolicitudesMentoriaView,
     AceptarMentoriaAPIView,
     AceptarMentoriaEstrategiaAPIView,
     DashboardMentorBotsDetailView,
@@ -24,10 +25,10 @@ urlpatterns = [
     path('dashboard/bots/<int:bot_id>/', DashboardMentorBotsDetailView.as_view(), name='dashboard_mentor_bots_detail'),  # Esta debe existir
     path('api/empresas/', EmpresasMentorAPIView.as_view(), name='mentor_empresas_api'),
     path('api/empresas/<int:pk>/', EmpresaDetalleMentorAPIView.as_view(), name='mentor_empresa_detalle_api'),
-    path('dashboard/solicitudes/', TemplateView.as_view(template_name="mentor_solicitudes.html"), name='mentor_solicitudes'),
+    path('dashboard/solicitudes/', SolicitudesMentoriaView.as_view(), name='mentor_solicitudes'),
     path('api/estrategias-solicitan/', EstrategiasSolicitanMentoriaAPIView.as_view(), name='mentor_estrategias_solicitan_api'),
     path('api/empresas/<int:pk>/aceptar_mentoria/', AceptarMentoriaAPIView.as_view(), name='mentor_aceptar_mentoria_api'),
-    path('api/estrategias/<int:pk>/aceptar_mentoria/', AceptarMentoriaEstrategiaAPIView.as_view(), name='mentor_aceptar_mentoria_estrategia_api'),
+    path('api/estrategias/<int:pk>/aceptar/', AceptarMentoriaEstrategiaAPIView.as_view(), name='mentor_aceptar_mentoria_estrategia_api'),
     # Estrategias de un bot
     path('api/bots/<int:bot_id>/estrategias/', BotEstrategiasListCreateView.as_view(), name='bot_estrategias_api'),
     path('api/estrategias/<int:pk>/', EstrategiaDetailView.as_view(), name='estrategia_detail_api'),

@@ -317,7 +317,7 @@ class ActividadListByEstrategiaView(generics.ListAPIView):
         if hasattr(user, 'empresa'):
             estrategia_accesible = estrategia_accesible.filter(empresa=user.empresa)
         elif user.rol == 'mentor':
-            estrategia_accesible = estrategia_accesible.filter(empresa__mentores=user)
+            estrategia_accesible = estrategia_accesible.filter(mentor_asignado=user)
         else:
             return Actividad.objects.none() # No es empresa ni mentor
 
@@ -339,7 +339,7 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
         # Si un mentor pide las estrategias de una empresa específica...
         if empresa_id and user.rol == 'mentor':
             # ...devuélvelas SÓLO SI el mentor está asignado a esa empresa.
-            return Estrategia.objects.filter(empresa_id=empresa_id, empresa__mentores=user).order_by('-fecha_registro')
+            return Estrategia.objects.filter(empresa_id=empresa_id, mentor_asignado=user).order_by('-fecha_registro')
         
         # Si un usuario de empresa pide sus propias estrategias...
         elif hasattr(user, 'empresa'):
@@ -368,7 +368,7 @@ class EstrategiaDetailView(generics.RetrieveUpdateAPIView):
             return Estrategia.objects.filter(empresa=user.empresa)
         # Si el usuario es un mentor, puede ver/editar las estrategias de las empresas que asesora.
         elif user.rol == 'mentor':
-            return Estrategia.objects.filter(empresa__mentores=user)
+            return Estrategia.objects.filter(mentor_asignado=user)
         # Si es otro tipo de usuario (ej. admin), podría ver todas.
         # Por seguridad, si no es empresa ni mentor, no devolvemos nada.
         return Estrategia.objects.none()
@@ -383,7 +383,7 @@ class EtapaDetailView(generics.RetrieveUpdateAPIView):
         if hasattr(user, 'empresa'):
             return Etapa.objects.filter(estrategia__empresa=user.empresa)
         elif user.rol == 'mentor':
-            return Etapa.objects.filter(estrategia__empresa__mentores=user)
+            return Etapa.objects.filter(estrategia__mentor_asignado=user)
         return Etapa.objects.none()
 
 class ActividadDetailView(generics.RetrieveUpdateAPIView):
@@ -396,7 +396,7 @@ class ActividadDetailView(generics.RetrieveUpdateAPIView):
         if hasattr(user, 'empresa'):
             return Actividad.objects.filter(etapa__estrategia__empresa=user.empresa)
         elif user.rol == 'mentor':
-            return Actividad.objects.filter(etapa__estrategia__empresa__mentores=user)
+            return Actividad.objects.filter(etapa__estrategia__mentor_asignado=user)
         return Actividad.objects.none()
     
 class ActividadUpdateView(generics.UpdateAPIView):
@@ -421,7 +421,7 @@ class EtapaListByEstrategiaView(generics.ListAPIView):
         if hasattr(user, 'empresa'):
             qs = qs.filter(estrategia__empresa=user.empresa)
         elif user.rol == 'mentor':
-            qs = qs.filter(estrategia__empresa__mentores=user)
+            qs = qs.filter(estrategia__mentor_asignado=user)
         else:
             return Etapa.objects.none()
         return qs.order_by('id')
@@ -437,7 +437,7 @@ class ActividadListByEtapaView(generics.ListAPIView):
         if hasattr(user, 'empresa'):
             qs = qs.filter(etapa__estrategia__empresa=user.empresa)
         elif user.rol == 'mentor':
-            qs = qs.filter(etapa__estrategia__empresa__mentores=user)
+            qs = qs.filter(etapa__estrategia__mentor_asignado=user)
         else:
             return Actividad.objects.none()
         return qs.order_by('id')
@@ -521,11 +521,44 @@ class AceptarMentoriaEstrategiaAPIView(APIView):
         estrategia.fecha_asignacion_mentor = timezone.now()
         estrategia.save()
         
-        # También agregar la empresa a la lista de empresas asesoradas del mentor
-        estrategia.empresa.mentores.add(request.user)
+        # En el nuevo sistema, la relación mentor-empresa se establece a través de las estrategias
         
         return Response({
             'mensaje': 'Mentoría aceptada correctamente.',
             'estrategia': estrategia.titulo,
             'empresa': estrategia.empresa.razon_social
+        }, status=status.HTTP_200_OK)
+
+class EstrategiasEmpresaConMentoriaAPIView(APIView):
+    """
+    API para que las empresas vean todas sus estrategias con información de mentoría
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.rol != 'empresa' or not request.user.empresa:
+            return Response({'error': 'Solo empresas pueden acceder a esta información.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        from .serializers import EstrategiaConMentoriaSerializer
+        
+        estrategias = Estrategia.objects.filter(empresa=request.user.empresa).select_related(
+            'mentor_asignado', 'empresa'
+        ).order_by('-fecha_registro')
+        
+        serializer = EstrategiaConMentoriaSerializer(estrategias, many=True)
+        
+        # Estadísticas adicionales
+        total_estrategias = estrategias.count()
+        con_mentor = estrategias.filter(mentor_asignado__isnull=False).count()
+        solicitando = estrategias.filter(solicita_mentoria=True, mentor_asignado__isnull=True).count()
+        sin_mentoria = estrategias.filter(solicita_mentoria=False, mentor_asignado__isnull=True).count()
+        
+        return Response({
+            'estrategias': serializer.data,
+            'estadisticas': {
+                'total': total_estrategias,
+                'con_mentor': con_mentor,
+                'solicitando_mentoria': solicitando,
+                'sin_mentoria': sin_mentoria
+            }
         }, status=status.HTTP_200_OK)

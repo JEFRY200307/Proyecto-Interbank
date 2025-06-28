@@ -2,36 +2,126 @@
 {% load static %}
 
 {% block content %}
-<div class="roadmap-container">
-  <!-- Botón para regresar a la lista de estrategias -->
-  <a href="{% url 'dashboard_estrategias' %}" class="btn-volver">← Volver a Estrategias</a>
+<div class="actividades-page">
+  <!-- Header con navegación -->
+  <div class="page-header">
+    <a href="{% url 'dashboard_estrategias' %}" class="btn-volver">
+      <i class="icon-arrow-left">←</i>
+      <span>Volver a Estrategias</span>
+    </a>
+  </div>
 
-  <h2>{{ estrategia.titulo }}</h2>
-  <p class="estrategia-descripcion">{{ estrategia.descripcion }}</p>
-
-  <div class="timeline">
-    {% for etapa in estrategia.etapas.all %}
-      <div class="timeline-etapa">
-        <h3>{{ etapa.nombre }}</h3>
+  <!-- Contenido principal -->
+  <div class="main-content">
+    <!-- Card de información de la estrategia -->
+    <div class="estrategia-card">
+      <div class="estrategia-info">
+        <h1 class="estrategia-titulo">{{ estrategia.titulo }}</h1>
+        <p class="estrategia-descripcion">{{ estrategia.descripcion }}</p>
+        
+        <!-- Badge de categoría -->
+        {% if estrategia.categoria %}
+        <div class="categoria-badge">
+          <span class="badge-icon">📊</span>
+          <span class="badge-text">{{ estrategia.categoria }}</span>
+        </div>
+        {% endif %}
       </div>
-      {% for actividad in etapa.actividades.all %}
-        <li class="timeline-item {% if actividad.completada %}completada{% endif %}" data-actividad-id="{{ actividad.id }}">
-          <div class="actividad-info">
-            <input type="checkbox" class="completada-checkbox" {% if actividad.completada %}checked{% endif %}>
-            <p class="actividad-descripcion">{{ actividad.descripcion }}</p>
+
+      <!-- Sección de mentoría integrada -->
+      <div class="mentoria-widget">
+        {% if estrategia.mentor_asignado %}
+          <div class="mentoria-status success">
+            <div class="status-icon">✅</div>
+            <div class="status-content">
+              <h4>Mentoría Activa</h4>
+              <p><strong>{{ estrategia.mentor_asignado.nombre }}</strong></p>
+              <small>Asignado el {{ estrategia.fecha_asignacion_mentor|date:"d/m/Y" }}</small>
+            </div>
           </div>
-          <small class="actividad-meta">
-            {% if actividad.fecha_limite %}
-              Fecha Límite: {{ actividad.fecha_limite|date:"d-m-Y" }}
-            {% else %}
-              Sin fecha límite
-            {% endif %}
-          </small>
-        </li>
-      {% empty %}
-        <li class="timeline-item">No hay actividades en esta etapa.</li>
-      {% endfor %}
-    {% endfor %}
+        {% elif estrategia.solicita_mentoria %}
+          <div class="mentoria-status pending">
+            <div class="status-icon">⏳</div>
+            <div class="status-content">
+              <h4>Mentoría Solicitada</h4>
+              <small>Solicitado el {{ estrategia.fecha_solicitud_mentoria|date:"d/m/Y" }}</small>
+              <button class="btn-secondary" onclick="cancelarMentoriaEstrategia({{ estrategia.id }})">
+                Cancelar Solicitud
+              </button>
+            </div>
+          </div>
+        {% else %}
+          <div class="mentoria-cta">
+            <div class="cta-icon">🎓</div>
+            <div class="cta-content">
+              <h4>¿Necesitas ayuda?</h4>
+              <p>Solicita la ayuda de un mentor experto</p>
+              <button class="btn-primary" onclick="solicitarMentoriaEstrategia({{ estrategia.id }})">
+                Solicitar Mentoría
+              </button>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Timeline de actividades modernizado -->
+    <div class="actividades-section">
+      <div class="section-header">
+        <h2>Plan de Acción</h2>
+        <div class="progress-indicator">
+          {% with total_actividades=estrategia.etapas.all|length completadas=0 %}
+            <span class="progress-text">Progreso de la estrategia</span>
+          {% endwith %}
+        </div>
+      </div>
+
+      <div class="timeline-modern">
+        {% for etapa in estrategia.etapas.all %}
+          <div class="etapa-container">
+            <div class="etapa-header">
+              <div class="etapa-number">{{ forloop.counter }}</div>
+              <h3 class="etapa-titulo">{{ etapa.nombre }}</h3>
+              {% if etapa.descripcion %}
+                <p class="etapa-descripcion">{{ etapa.descripcion }}</p>
+              {% endif %}
+            </div>
+
+            <div class="actividades-grid">
+              {% for actividad in etapa.actividades.all %}
+                <div class="actividad-card {% if actividad.completada %}completed{% endif %}" data-actividad-id="{{ actividad.id }}">
+                  <div class="actividad-checkbox">
+                    <input type="checkbox" class="completada-checkbox" {% if actividad.completada %}checked{% endif %}>
+                    <span class="checkmark"></span>
+                  </div>
+                  
+                  <div class="actividad-content">
+                    <p class="actividad-texto">{{ actividad.descripcion }}</p>
+                    {% if actividad.fecha_limite %}
+                      <div class="actividad-fecha">
+                        <span class="fecha-icon">📅</span>
+                        <span class="fecha-texto">{{ actividad.fecha_limite|date:"d/m/Y" }}</span>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% empty %}
+                <div class="empty-state">
+                  <div class="empty-icon">📝</div>
+                  <p>No hay actividades definidas para esta etapa</p>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% empty %}
+          <div class="empty-state-main">
+            <div class="empty-icon">🚀</div>
+            <h3>¡Comienza tu estrategia!</h3>
+            <p>Aún no hay etapas definidas para esta estrategia</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
