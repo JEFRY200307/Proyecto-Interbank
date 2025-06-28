@@ -22,14 +22,32 @@
         <ul id="sidebar-menu"></ul>
     </div>
     <div class="main-content">
-        {% block content %}{% endblock %}
+        <header class="page-header">
+            <h2 class="page-title">
+                {% block page_title %}
+                    Dashboard
+                {% endblock %}
+            </h2>
+            <div class="header-actions">
+                {% block header_actions %}
+                {% endblock %}
+            </div>
+        </header>
+
+        {% block content %}
+        {% endblock %}
     </div>
 
+    <!-- 
+      CORRECCIÓN: Movemos los scripts comunes DENTRO del bloque extra_js.
+      De esta forma, las plantillas hijas pueden añadir sus propios scripts
+      y luego se cargarán los scripts base.
+    -->
     {% block extra_js %}
+    {% endblock %}
     <script src="{% static 'js/sidebar.js' %}"></script>
     <script src="{% static 'js/logout.js' %}"></script>
 
-    {% endblock %}
 </body>
 
 </html>

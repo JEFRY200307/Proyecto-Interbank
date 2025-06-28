@@ -11,9 +11,11 @@ from .models import Usuario
 User = get_user_model()
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    razon_social = serializers.CharField(source='empresa.razon_social', read_only=True)
+
     class Meta:
         model = Usuario
-        fields = ['id', 'nombre', 'correo', 'rol', 'rol_interno', 'password']
+        fields = ['id', 'nombre', 'correo', 'rol', 'rol_interno', 'password', 'razon_social']
         extra_kwargs = {'password': {'write_only': True, 'required': False}}
 
     def create(self, validated_data):

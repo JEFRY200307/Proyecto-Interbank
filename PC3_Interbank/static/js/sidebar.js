@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
+    const rol = localStorage.getItem('rol');
+    const nombre = localStorage.getItem('nombre');
+    const razonSocial = localStorage.getItem('razon_social'); // Obtener razón social
     const sidebar = document.getElementById('sidebar-menu');
     console.log('sidebar.js cargado');
     if (!sidebar) return;
@@ -32,36 +35,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     // --- Fin modal de logout ---
 
-    function renderMenu(rol, nombre) {
+    function renderMenu(rol, nombre, razonSocial) {
         let menu = '';
         if (rol === 'empresa') {
-            menu += `<li style="list-style:none;"><h3>Mi empresa</h3></li>
+            menu += `<li style="list-style:none;"><h3>${razonSocial || 'Mi empresa'}</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/users/dashboard/usuarios/">Usuarios</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
                 <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
-                <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
-                <li><a href="/users/dashboard/estrategias/">Estrategias</a></li>
-                <li><a href="/users/dashboard/reportes/">Reportes y Analíticas</a></li>
-                <li><a href="/users/dashboard/recursos/">Recursos y Capacitación</a></li>`;
+                <li><a href="/users/dashboard/chat/">Banki</a></li>
+                <li><a href="/users/dashboard/estrategias/">Estrategias</a></li>`;
         } else if (rol === 'editor') {
             menu += `<li style="list-style:none;"><h3>Bienvenido ${nombre}</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
                 <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
                 <li><a href="/users/dashboard/estrategias/">Estrategias</a></li>
-                <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
-                <li><a href="/users/dashboard/recursos/">Recursos y Capacitación</a></li>`;
+                <li><a href="/users/dashboard/chat/">Banki</a></li>`;
         } else if (rol === 'lector') {
             menu += `<li style="list-style:none;"><h3>Bienvenido ${nombre}</h3></li>
                 <li><a href="/users/dashboard/perfil/">Perfil</a></li>
                 <li><a href="/documentos/dashboard/documentos/">Documentos</a></li>
                 <li><a href="/documentos/dashboard/firmas/">Firma Electrónica</a></li>
-                <li><a href="/users/dashboard/chat/">Chat y Soporte</a></li>
-                <li><a href="/users/dashboard/recursos/">Recursos y Capacitación</a></li>`;
+                <li><a href="/users/dashboard/chat/">Banki</a></li>`;
         } else if (rol === 'mentor') {
         menu += `<li style="list-style:none;"><h3>Mentor</h3></li>
             <li><a href="/mentor/dashboard/">Gestión de empresas</a></li>
+            <li><a href="/mentor/solicitudes/">Solicitudes</a></li>
             <li><a href="/mentor/dashboard/bots/">Alimentar al bot</a></li>`;
         }
         menu += `<li><a href="#" id="logout-link">Cerrar sesión</a></li>`;
@@ -75,6 +75,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 showLogoutModal();
             });
         }
+
+        // Resaltar el enlace activo
+        const currentPath = window.location.pathname;
+        const menuLinks = sidebar.querySelectorAll('a');
+        menuLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && currentPath.includes(href)) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
     }
 
     async function getAndRenderMenu() {

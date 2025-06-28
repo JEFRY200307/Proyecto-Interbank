@@ -1,68 +1,51 @@
 {% extends 'dashboard_base.html' %}
 {% load static %}
 
+{% block page_title %}
+    Gestión de Empresas
+{% endblock %}
+
+{% block header_actions %}
+    <button id="verSolicitudesBtn" class="btn btn-primary">Ver Solicitudes</button>
+{% endblock %}
+
 {% block content %}
-<h2>Empresas a tu cargo</h2>
-<div class="empresas-tarjetas-container">
-  <!-- Las tarjetas de empresas se cargarán por JS -->
-</div>
+    <!-- Contenedor para las tarjetas de las empresas asignadas -->
+    <div id="empresas-tarjetas-container" class="empresas-tarjetas-container">
+        <!-- Las tarjetas se cargarán aquí con JS -->
+    </div>
 
-<div id="detalle-empresa-panel" style="display:none; margin-top:2rem;">
-  <h2>Detalle de la empresa</h2>
-  <form id="form-editar-empresa" class="form-detalle-empresa"></form>
-  <div class="detalle-empresa-botones">
-    <button type="button" onclick="cerrarDetalleEmpresa()">Volver a empresas</button>
-    <button type="button" onclick="mostrarEstrategiasEmpresa()">Ver/Editar estrategias</button>
-  </div>
-</div>
+    <!-- Panel oculto para el detalle de la empresa (se mostrará al hacer clic) -->
+    <div id="detalle-empresa-panel" style="display: none;">
+        <button onclick="cerrarDetalleEmpresa()" class="btn-volver">← Volver a Empresas</button>
+        <h3 id="detalle-empresa-nombre"></h3>
+        <p id="detalle-empresa-ruc"></p>
+        <button onclick="mostrarEstrategiasEmpresa()" class="btn btn-primary">Ver/Editar Estrategias</button>
+    </div>
 
-<div id="panel-estrategias-empresa" style="display:none; margin-top:2rem;">
-  <h3>Estrategias de la empresa</h3>
-  <button onclick="cerrarPanelEstrategiasEmpresa()" style="margin-bottom:1rem;">Volver a detalles</button>
-  <div class="tabla-scroll">
-    <table class="estrategias-table" id="tabla-estrategias-mentor">
-      <colgroup>
-        <col style="width: 20%;">
-        <col style="width: 40%;">
-        <col style="width: 10%;">
-        <col style="width: 10%;">
-        <col style="width: 10%;">
-        <col style="width: 10%;">
-      </colgroup>
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Descripción</th>
-          <th>Categoría</th>
-          <th>Estado</th>
-          <th>Fecha Cumplimiento</th>
-          <th>Etapas</th>
-        </tr>
-      </thead>
-      <tbody id="estrategias-empresa-lista">
-        <!-- JS insertará aquí las filas -->
-      </tbody>
-    </table>
-  </div>
-</div>
+    <!-- Panel oculto para las estrategias de la empresa -->
+    <div id="panel-estrategias-empresa" style="display: none;">
+        <button onclick="cerrarPanelEstrategiasEmpresa()" class="btn-volver">← Volver al Detalle</button>
+        <h3>Estrategias de <span id="nombre-empresa-estrategias"></span></h3>
+        <div id="tabla-estrategias-container"></div>
+    </div>
 
-<!-- Modal de etapas y actividades -->
-<div id="modal-etapas" class="modal-actividades" style="display:none;">
-  <div class="modal-actividades-content">
-    <span class="close-modal" onclick="cerrarModalEtapas()">&times;</span>
-    <h3>Etapas y Actividades de la Estrategia</h3>
-    <div id="etapas-lista"></div>
-  </div>
-</div>
+    <!-- Modal para mostrar las solicitudes de mentoría -->
+    <div id="solicitudesModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>Empresas que solicitan mentoría</h2>
+            <div id="solicitudes-container">
+                <!-- El contenido de las solicitudes se cargará aquí desde tu API -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
 
-<!-- Modal de actividades por etapa -->
-<div id="modal-actividades" class="modal-actividades" style="display:none;">
-  <div class="modal-actividades-content">
-    <span class="close-modal" onclick="cerrarModalActividades()">&times;</span>
-    <h3>Actividades de la etapa</h3>
-    <div id="actividades-lista"></div>
-  </div>
-</div>
+{% block extra_js %}
+    <!-- Vinculamos el script que contiene toda la lógica que ya tenías -->
+    <script src="{% static 'js/mentor_dashboard.js' %}"></script>
+{% endblock %}
 
 <style>
   .empresas-tarjetas-container {
@@ -533,4 +516,3 @@ function cerrarModalActividades() {
   document.getElementById('actividades-lista').innerHTML = '';
 }
 </script>
-{% endblock %}

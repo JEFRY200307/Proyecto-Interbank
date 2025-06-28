@@ -1,34 +1,45 @@
 {% extends 'dashboard_base.html' %}
 {% load static %}
 
+{% block page_title %}
+    Estrategias
+{% endblock %}
+
+{% block header_actions %}
+    <!-- Este contenedor se llenará dinámicamente con el estado de la mentoría -->
+    <div id="mentoria-seccion"></div>
+{% endblock %}
+
 {% block content %}
 <div class="estrategias-container">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-    <h2 class="estrategias-title">Estrategias</h2>
-    <!-- Este contenedor se llenará dinámicamente con JavaScript -->
-    <div id="mentoria-seccion"></div>
-  </div>
+    <!-- 
+      Se eliminan los títulos <h2> y <h3> que estaban aquí.
+      El contenido principal (las tarjetas de estrategias) se muestra directamente.
+    -->
+    <div class="estrategias-list">
+        <!-- Contenedor para las tarjetas de estrategias que se generan con JS -->
+        <div id="estrategias-cards-container" class="estrategias-cards-container"></div>
 
-  <!-- Lista de estrategias (se llenará con JS) -->
-  <div class="estrategias-list">
-    <h3>Mis Estrategias</h3>
-    <table class="estrategias-table" id="tabla-estrategias" border="1">
-      <thead>
-        <tr>
-          <th>Título</th>
-          <th>Descripción</th>
-          <th>Categoría</th>
-          <th>Fecha Cumplimiento</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="estrategias-tbody">
-        <!-- Las filas se insertan aquí dinámicamente -->
-      </tbody>
-    </table>
-  </div>
+        <!-- La tabla original se puede mantener oculta por si se necesita en el futuro -->
+        <table class="estrategias-table" id="tabla-estrategias" border="1" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Categoría</th>
+                    <th>Fecha Cumplimiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="estrategias-tbody">
+                <!-- Las filas se insertan aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endblock %}
 
-<!-- Vinculamos el archivo JavaScript externo -->
-<script src="{% static 'js/estrategias.js' %}"></script>
+{% block extra_js %}
+    <!-- Vinculamos el archivo JavaScript externo -->
+    <script src="{% static 'js/estrategias.js' %}"></script>
 {% endblock %}

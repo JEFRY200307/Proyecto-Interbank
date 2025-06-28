@@ -5,7 +5,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from apps.empresas.serializers import EmpresaParaMentorSerializer, EmpresaSerializer, EmpresaDetalleSerializer
+# CORRECCIÓN: Importamos el serializador correcto
+from apps.empresas.serializers import EmpresaParaMentorSerializer, EmpresaSerializer
+
 from apps.chat.models import ChatCategory, Estrategia, Etapa, Actividad  # Importa las categorías de bots
 from apps.chat.serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer
 
@@ -24,23 +26,26 @@ class EmpresaDetalleMentorAPIView(APIView):
 
     def get(self, request, pk):
         try:
+            # Nos aseguramos que el mentor solo pueda ver empresas que le pertenecen
             empresa = Empresa.objects.get(pk=pk, mentores=request.user)
         except Empresa.DoesNotExist:
-            return Response({'error': 'Empresa no encontrada o no asignada.'}, status=404)
-        serializer = EmpresaDetalleSerializer(empresa)
+            return Response({"error": "Empresa no encontrada o no tienes permiso."}, status=status.HTTP_404_NOT_FOUND)
+        # Usamos el serializador completo para la respuesta GET
+        serializer = EmpresaParaMentorSerializer(empresa)
         return Response(serializer.data)
 
     def put(self, request, pk):
         try:
             empresa = Empresa.objects.get(pk=pk, mentores=request.user)
         except Empresa.DoesNotExist:
-            return Response({'error': 'Empresa no encontrada o no asignada.'}, status=404)
-        serializer = EmpresaDetalleSerializer(empresa, data=request.data, partial=True)
+            return Response({"error": "Empresa no encontrada o no tienes permiso."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # CORRECCIÓN: Usamos el serializador correcto para actualizar (PUT/PATCH)
+        serializer = EmpresaParaMentorSerializer(empresa, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
- 
-        return Response(serializer.errors, status=400)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EmpresasSolicitanMentoriaAPIView(APIView):
@@ -55,6 +60,7 @@ class EmpresasSolicitanMentoriaAPIView(APIView):
 # Vista base para dashboard mentor (solo renderiza el HTML)
 class DashboardMentorView(TemplateView):
     template_name = "dashboard_mentor.html"
+
 
 class DashboardMentorBotsView(TemplateView):
     template_name = "dashboard_mentor_bots.html"

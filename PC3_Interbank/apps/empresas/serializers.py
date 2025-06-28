@@ -127,9 +127,9 @@ class EmpresaDetalleSerializer(serializers.ModelSerializer):
 
 class EmpresaParaMentorSerializer(serializers.ModelSerializer):
     """
-    Serializer para que el mentor vea la empresa y sus estrategias.
+    Serializer para que el mentor vea y EDITE la empresa y sus estrategias.
     """
-    estrategias = EstrategiaSerializer(many=True, read_only=True, source='estrategias')
+    estrategias = EstrategiaSerializer(many=True, required=False)
 
     class Meta:
         model = Empresa
@@ -137,6 +137,26 @@ class EmpresaParaMentorSerializer(serializers.ModelSerializer):
             'id', 'razon_social', 'ruc', 'correo', 'objetivo', 
             'mision', 'vision', 'historia', 'estrategias', 'estado'
         ]
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        estrategias_data = validated_data.pop('estrategias', [])
+        
+        # Actualiza los campos de la empresa (si los hubiera)
+        instance = super().update(instance, validated_data)
+
+        # Lógica para actualizar las estrategias anidadas
+        for estrategia_data in estrategias_data:
+            estrategia_id = estrategia_data.get('id')
+            if estrategia_id:
+                estrategia = Estrategia.objects.get(id=estrategia_id, empresa=instance)
+                # Actualiza cada campo de la estrategia que venga en la petición
+                for key, value in estrategia_data.items():
+                    setattr(estrategia, key, value)
+                estrategia.save()
+            # Aquí se podría añadir lógica para crear nuevas estrategias si no vienen con ID
+        
+        return instance
 
 class EmpresaPerfilSerializer(serializers.ModelSerializer):
     """

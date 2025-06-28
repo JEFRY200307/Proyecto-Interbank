@@ -40,15 +40,12 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                     alert('Rol interno recibido: ' + data.rol_interno);
                     if (data.rol) {
                         localStorage.setItem('rol', data.rol);
-                    }
-                    if (data.rol_interno) {
                         localStorage.setItem('rol_interno', data.rol_interno);
-                    }
-                    if (data.nombre) {
                         localStorage.setItem('nombre', data.nombre);
-                    }
-                     if (data.id) {
                         localStorage.setItem('user_id', data.id);
+                        if (data.razon_social) {
+                            localStorage.setItem('razon_social', data.razon_social);
+                        }
                     }
                     // Redirige siempre al dashboard único
                     if (data.rol === 'mentor') {
