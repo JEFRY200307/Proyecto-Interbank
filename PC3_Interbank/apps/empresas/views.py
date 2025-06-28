@@ -151,20 +151,64 @@ class PerfilEmpresaAPIView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
 
-class SolicitarMentoriaAPIView(APIView):
+class SolicitarMentoriaEstrategiaAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        empresa = request.user.empresa
-        if not empresa:
-            return Response({'error': 'El usuario no está asociado a ninguna empresa.'}, status=status.HTTP_400_BAD_REQUEST)
+        estrategia_id = request.data.get('estrategia_id')
+        especialidad_requerida = request.data.get('especialidad_requerida')
         
-        if empresa.solicita_mentoria or empresa.mentores.exists():
-            return Response({'mensaje': 'Ya existe una solicitud de mentoría activa o ya tienes un mentor.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        empresa.solicita_mentoria = True
-        empresa.save()
-        return Response({'mensaje': 'Solicitud de mentoría enviada correctamente.'}, status=status.HTTP_200_OK)
+        if not estrategia_id:
+            return Response({'error': 'El ID de la estrategia es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not especialidad_requerida:
+            return Response({'error': 'La especialidad requerida es obligatoria.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            estrategia = Estrategia.objects.get(id=estrategia_id, empresa=request.user.empresa)
+        except Estrategia.DoesNotExist:
+            return Response({'error': 'Estrategia no encontrada o no pertenece a tu empresa.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if estrategia.solicita_mentoria:
+            return Response({'error': 'Esta estrategia ya tiene una solicitud de mentoría activa.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if estrategia.mentor_asignado:
+            return Response({'error': 'Esta estrategia ya tiene un mentor asignado.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Actualizar la estrategia
+        from django.utils import timezone
+        estrategia.solicita_mentoria = True
+        estrategia.especialidad_requerida = especialidad_requerida
+        estrategia.fecha_solicitud_mentoria = timezone.now()
+        estrategia.save()
+        
+        return Response({
+            'mensaje': 'Solicitud de mentoría enviada correctamente para la estrategia.',
+            'estrategia': estrategia.titulo,
+            'especialidad': especialidad_requerida
+        }, status=status.HTTP_200_OK)
+    
+    def delete(self, request):
+        estrategia_id = request.data.get('estrategia_id')
+        
+        if not estrategia_id:
+            return Response({'error': 'El ID de la estrategia es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            estrategia = Estrategia.objects.get(id=estrategia_id, empresa=request.user.empresa)
+        except Estrategia.DoesNotExist:
+            return Response({'error': 'Estrategia no encontrada.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if estrategia.mentor_asignado:
+            return Response({'error': 'No se puede cancelar la solicitud, ya hay un mentor asignado.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Cancelar solicitud
+        estrategia.solicita_mentoria = False
+        estrategia.especialidad_requerida = None
+        estrategia.fecha_solicitud_mentoria = None
+        estrategia.save()
+        
+        return Response({'mensaje': 'Solicitud de mentoría cancelada correctamente.'}, status=status.HTTP_200_OK)
   
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])
@@ -397,3 +441,91 @@ class ActividadListByEtapaView(generics.ListAPIView):
         else:
             return Actividad.objects.none()
         return qs.order_by('id')
+
+class EstrategiasSolicitanMentoriaAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.rol != 'mentor':
+            return Response({'error': 'Solo los mentores pueden acceder a esta información.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Filtrar por especialidad del mentor si tiene una
+        especialidad_mentor = request.user.especialidades
+        
+        if especialidad_mentor:
+            estrategias = Estrategia.objects.filter(
+                solicita_mentoria=True,
+                mentor_asignado__isnull=True,
+                especialidad_requerida=especialidad_mentor
+            ).select_related('empresa', 'usuario')
+        else:
+            # Si el mentor no tiene especialidad definida, mostrar todas
+            estrategias = Estrategia.objects.filter(
+                solicita_mentoria=True,
+                mentor_asignado__isnull=True
+            ).select_related('empresa', 'usuario')
+        
+        data = []
+        for estrategia in estrategias:
+            data.append({
+                'id': estrategia.id,
+                'titulo': estrategia.titulo,
+                'descripcion': estrategia.descripcion,
+                'categoria': estrategia.categoria,
+                'especialidad_requerida': estrategia.especialidad_requerida,
+                'fecha_solicitud': estrategia.fecha_solicitud_mentoria,
+                'empresa': {
+                    'id': estrategia.empresa.id,
+                    'razon_social': estrategia.empresa.razon_social,
+                    'ruc': estrategia.empresa.ruc
+                },
+                'usuario_solicitante': {
+                    'id': estrategia.usuario.id,
+                    'nombre': estrategia.usuario.nombre,
+                    'correo': estrategia.usuario.correo
+                } if estrategia.usuario else None
+            })
+        
+        return Response({
+            'estrategias': data,
+            'total': len(data),
+            'especialidad_mentor': especialidad_mentor
+        }, status=status.HTTP_200_OK)
+
+class AceptarMentoriaEstrategiaAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.rol != 'mentor':
+            return Response({'error': 'Solo los mentores pueden aceptar mentoría.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        estrategia_id = request.data.get('estrategia_id')
+        
+        if not estrategia_id:
+            return Response({'error': 'El ID de la estrategia es obligatorio.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            estrategia = Estrategia.objects.get(id=estrategia_id, solicita_mentoria=True, mentor_asignado__isnull=True)
+        except Estrategia.DoesNotExist:
+            return Response({'error': 'Estrategia no encontrada o ya tiene mentor asignado.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Verificar si el mentor tiene la especialidad requerida
+        if estrategia.especialidad_requerida and request.user.especialidades != estrategia.especialidad_requerida:
+            return Response({
+                'error': f'Tu especialidad ({request.user.especialidades}) no coincide con la requerida ({estrategia.especialidad_requerida}).'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Asignar mentor
+        from django.utils import timezone
+        estrategia.mentor_asignado = request.user
+        estrategia.fecha_asignacion_mentor = timezone.now()
+        estrategia.save()
+        
+        # También agregar la empresa a la lista de empresas asesoradas del mentor
+        estrategia.empresa.mentores.add(request.user)
+        
+        return Response({
+            'mensaje': 'Mentoría aceptada correctamente.',
+            'estrategia': estrategia.titulo,
+            'empresa': estrategia.empresa.razon_social
+        }, status=status.HTTP_200_OK)

@@ -26,7 +26,6 @@ class Empresa(models.Model):
     facebook = models.URLField(blank=True, null=True)
     instagram = models.URLField(blank=True, null=True)
     mentores = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='empresas_asesoradas', blank=True, limit_choices_to={'rol': 'mentor'} ) # Opcional: solo usuarios con rol mentor
-    solicita_mentoria = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.razon_social} (RUC: {self.ruc})"
@@ -46,6 +45,20 @@ class Estrategia(models.Model):
         ('completada', 'Completada'),
     ]
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    
+    # Nuevos campos para mentoría específica por estrategia
+    solicita_mentoria = models.BooleanField(default=False)
+    especialidad_requerida = models.CharField(max_length=100, null=True, blank=True)
+    mentor_asignado = models.ForeignKey(
+        'users.Usuario', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='estrategias_mentoreadas',
+        limit_choices_to={'rol': 'mentor'}
+    )
+    fecha_solicitud_mentoria = models.DateTimeField(null=True, blank=True)
+    fecha_asignacion_mentor = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.titulo

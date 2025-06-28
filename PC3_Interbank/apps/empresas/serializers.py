@@ -70,14 +70,20 @@ class EtapaSerializer(serializers.ModelSerializer):
 class EstrategiaSerializer(serializers.ModelSerializer):
     # Ahora EtapaSerializer está definido y puede ser usado aquí
     etapas = EtapaSerializer(many=True, required=False)
+    mentor_asignado_nombre = serializers.CharField(source='mentor_asignado.nombre', read_only=True)
+    empresa_nombre = serializers.CharField(source='empresa.razon_social', read_only=True)
 
     class Meta:
         model = Estrategia
         fields = [
             'id', 'titulo', 'descripcion', 'categoria', 
-            'fecha_cumplimiento', 'estado', 'etapas'
+            'fecha_cumplimiento', 'estado', 'etapas',
+            'solicita_mentoria', 'especialidad_requerida', 
+            'mentor_asignado', 'mentor_asignado_nombre',
+            'fecha_solicitud_mentoria', 'fecha_asignacion_mentor',
+            'empresa_nombre'
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'mentor_asignado_nombre', 'empresa_nombre', 'fecha_asignacion_mentor']
 
     def create(self, validated_data):
         """
@@ -169,9 +175,9 @@ class EmpresaPerfilSerializer(serializers.ModelSerializer):
         fields = [
             'razon_social', 'ruc', 'representante', 'correo', 'direccion', 
             'telefono', 'objetivo', 'mision', 'vision', 'historia', 'web', 
-            'facebook', 'instagram', 'solicita_mentoria', 'tiene_mentor'
+            'facebook', 'instagram', 'tiene_mentor'
         ]
-        read_only_fields = ('ruc', 'razon_social', 'solicita_mentoria', 'tiene_mentor')
+        read_only_fields = ('ruc', 'razon_social', 'tiene_mentor')
 
     def get_tiene_mentor(self, obj):
         return obj.mentores.exists()

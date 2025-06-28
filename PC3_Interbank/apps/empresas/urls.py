@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     ActividadListByEtapaView, EtapaListByEstrategiaView, home, registro_empresa, login_empresa,
-    EmpresaRegistroView,ActividadListByEstrategiaView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,SolicitarMentoriaAPIView,
+    EmpresaRegistroView,ActividadListByEstrategiaView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,
+    SolicitarMentoriaEstrategiaAPIView, EstrategiasSolicitanMentoriaAPIView, AceptarMentoriaEstrategiaAPIView,
     perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView, EtapaDetailView, ActividadDetailView, ActividadUpdateView
 )
 
@@ -15,7 +16,9 @@ urlpatterns = [
     path('api/login/', EmpresaLoginView.as_view(), name='empresa_login_api'),
     path('api/panel-empresa/', PanelEmpresaView.as_view(), name='panel_empresa_api'),
     path('api/perfil/', PerfilEmpresaAPIView.as_view(), name='perfil_empresa_api'),
-    path('api/solicitar-mentoria/', SolicitarMentoriaAPIView.as_view(), name='solicitar_mentoria_api'),
+    path('api/solicitar-mentoria-estrategia/', SolicitarMentoriaEstrategiaAPIView.as_view(), name='solicitar_mentoria_estrategia_api'),
+    path('api/estrategias-solicitan-mentoria/', EstrategiasSolicitanMentoriaAPIView.as_view(), name='estrategias_solicitan_mentoria_api'),
+    path('api/aceptar-mentoria-estrategia/', AceptarMentoriaEstrategiaAPIView.as_view(), name='aceptar_mentoria_estrategia_api'),
     path('api/estrategias/', EstrategiaListCreateView.as_view(), name='estrategias_api'),
     path('api/estrategias/<int:pk>/', EstrategiaDetailView.as_view(), name='estrategia_detail_api'),
      path('api/estrategias/<int:estrategia_pk>/actividades/', ActividadListByEstrategiaView.as_view(), name='actividad-list-by-estrategia'),

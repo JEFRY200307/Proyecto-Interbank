@@ -52,6 +52,27 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     clave_firma = models.CharField(max_length=128, blank=True, null=True)  # hash del PIN
+    
+    # Campo para especialidades de mentores
+    ESPECIALIDADES_CHOICES = [
+        ('marketing', 'Marketing Digital'),
+        ('finanzas', 'Finanzas y Contabilidad'),
+        ('recursos_humanos', 'Recursos Humanos'),
+        ('operaciones', 'Operaciones y Logística'),
+        ('tecnologia', 'Tecnología e Innovación'),
+        ('ventas', 'Ventas y Comercialización'),
+        ('legal', 'Legal y Compliance'),
+        ('estrategia', 'Estrategia Empresarial'),
+        ('liderazgo', 'Liderazgo y Gestión'),
+        ('internacional', 'Comercio Internacional'),
+    ]
+    especialidades = models.CharField(
+        max_length=50,
+        choices=ESPECIALIDADES_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Solo para usuarios con rol de mentor"
+    )
 
     def set_clave_firma(self, raw_pin):
         self.clave_firma = make_password(raw_pin)
