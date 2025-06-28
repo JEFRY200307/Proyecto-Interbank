@@ -36,15 +36,38 @@ function configurarModalSolicitudes() {
 async function cargarSolicitudes() {
     const container = document.getElementById('solicitudes-container');
     container.innerHTML = '<p>Cargando...</p>';
-    const response = await fetch('/mentor/api/empresas-solicitan/', { headers: { 'Authorization': `Bearer ${token}` } });
+    const response = await fetch('/mentor/api/estrategias-solicitan/', { headers: { 'Authorization': `Bearer ${token}` } });
     if (response.ok) {
-        const empresas = await response.json();
-        container.innerHTML = empresas.length === 0 ? '<p>No hay nuevas solicitudes de mentoría.</p>' :
-            empresas.map(e => `
-                <div class="tarjeta-solicitud">
-                  <h3>${e.razon_social}</h3>
-                  <p><strong>RUC:</strong> ${e.ruc}</p>
-                  <button class="btn btn-success" onclick="aceptarMentoria(${e.id})">Aceptar mentoría</button>
+        const estrategias = await response.json();
+        container.innerHTML = estrategias.length === 0 ? '<p>No hay nuevas solicitudes de mentoría.</p>' :
+            estrategias.map(e => `
+                <div class="tarjeta-solicitud-interbank">
+                  <div class="empresa-header">
+                    <h3 class="empresa-nombre">${e.empresa_nombre}</h3>
+                    <span class="empresa-ruc">RUC: ${e.empresa_ruc}</span>
+                  </div>
+                  <div class="empresa-contacto">
+                    <div class="contacto-item">
+                      <i class="icon-mail">✉</i>
+                      <span>${e.empresa_correo || 'No especificado'}</span>
+                    </div>
+                    <div class="contacto-item">
+                      <i class="icon-phone">📞</i>
+                      <span>${e.empresa_telefono || 'No especificado'}</span>
+                    </div>
+                  </div>
+                  <div class="estrategia-info">
+                    <h4 class="estrategia-titulo">${e.titulo}</h4>
+                    <p class="estrategia-descripcion">${e.descripcion}</p>
+                    <div class="estrategia-meta">
+                      <span class="categoria-badge">${e.categoria}</span>
+                      <span class="fecha-solicitud">Solicitado: ${new Date(e.fecha_solicitud_mentoria).toLocaleDateString('es-ES')}</span>
+                    </div>
+                  </div>
+                  <button class="btn btn-aceptar-interbank" onclick="aceptarMentoriaEstrategia(${e.id})">
+                    <i class="icon-check">✓</i>
+                    Aceptar Mentoría
+                  </button>
                 </div>
             `).join('');
     } else {
@@ -52,10 +75,10 @@ async function cargarSolicitudes() {
     }
 }
 
-async function aceptarMentoria(empresaId) {
-    if (!confirm('¿Estás seguro de que deseas aceptar la mentoría?')) return;
+async function aceptarMentoriaEstrategia(estrategiaId) {
+    if (!confirm('¿Estás seguro de que deseas aceptar la mentoría de esta estrategia?')) return;
     try {
-        const response = await fetch(`/mentor/api/empresas/${empresaId}/aceptar_mentoria/`, {
+        const response = await fetch(`/mentor/api/estrategias/${estrategiaId}/aceptar/`, {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -65,6 +88,11 @@ async function aceptarMentoria(empresaId) {
     } catch (error) {
         alert('Hubo un error al aceptar la mentoría.');
     }
+}
+
+async function aceptarMentoria(empresaId) {
+    // Esta función está obsoleta - mantenerla para compatibilidad
+    alert('Esta funcionalidad ha sido reemplazada por el nuevo sistema de mentoría por estrategias.');
 }
 
 // --- LÓGICA DE GESTIÓN DE EMPRESAS (TU CÓDIGO ORIGINAL) ---

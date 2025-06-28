@@ -3,7 +3,7 @@ from .views import (
     ActividadListByEtapaView, EtapaListByEstrategiaView, home, registro_empresa, login_empresa,
     EmpresaRegistroView,ActividadListByEstrategiaView, EmpresaLoginView, PanelEmpresaView,PerfilEmpresaAPIView,EmpresaLogoutView,
     SolicitarMentoriaEstrategiaAPIView, EstrategiasSolicitanMentoriaAPIView, AceptarMentoriaEstrategiaAPIView,
-    EstrategiasEmpresaConMentoriaAPIView,
+    EstrategiasEmpresaConMentoriaAPIView, EstrategiaSolicitarMentoriaAPIView, EstrategiaCancelarMentoriaAPIView,
     perfil_empresa, eliminar_empresa, lista_empresas, EstrategiaListCreateView, EstrategiaDetailView, EtapaDetailView, ActividadDetailView, ActividadUpdateView
 )
 
@@ -23,6 +23,8 @@ urlpatterns = [
     path('api/estrategias/', EstrategiaListCreateView.as_view(), name='estrategias_api'),
     path('api/estrategias-con-mentoria/', EstrategiasEmpresaConMentoriaAPIView.as_view(), name='estrategias_con_mentoria_api'),
     path('api/estrategias/<int:pk>/', EstrategiaDetailView.as_view(), name='estrategia_detail_api'),
+    path('api/estrategias/<int:estrategia_id>/solicitar-mentoria/', EstrategiaSolicitarMentoriaAPIView.as_view(), name='estrategia_solicitar_mentoria_api'),
+    path('api/estrategias/<int:estrategia_id>/cancelar-mentoria/', EstrategiaCancelarMentoriaAPIView.as_view(), name='estrategia_cancelar_mentoria_api'),
      path('api/estrategias/<int:estrategia_pk>/actividades/', ActividadListByEstrategiaView.as_view(), name='actividad-list-by-estrategia'),
     path('api/etapas/<int:pk>/', EtapaDetailView.as_view(), name='etapa_detail_api'),
     path('api/actividades/<int:pk>/', ActividadDetailView.as_view(), name='actividad_detail_api'),

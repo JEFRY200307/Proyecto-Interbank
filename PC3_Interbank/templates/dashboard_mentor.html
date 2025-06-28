@@ -161,6 +161,224 @@
     font-size: 1rem;
     width: 100%;
   }
+
+  /* Estilos para solicitudes de mentoría de estrategias - Diseño Interbank */
+  .tarjeta-solicitud-interbank {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 0;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .tarjeta-solicitud-interbank::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #00953b 0%, #02bb59 100%);
+  }
+
+  .tarjeta-solicitud-interbank:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 149, 59, 0.15);
+    border-color: #00953b;
+  }
+
+  .empresa-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  .empresa-nombre {
+    color: #00953b;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.5px;
+  }
+
+  .empresa-ruc {
+    background: #e9ecef;
+    color: #495057;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+  }
+
+  .empresa-contacto {
+    padding: 1.5rem 2rem;
+    background: #ffffff;
+    display: flex;
+    gap: 2rem;
+    border-bottom: 1px solid #f1f3f5;
+  }
+
+  .contacto-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #495057;
+    font-size: 0.95rem;
+  }
+
+  .contacto-item i {
+    font-size: 1.1rem;
+    color: #00953b;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .estrategia-info {
+    padding: 1.5rem 2rem;
+    background: #ffffff;
+  }
+
+  .estrategia-titulo {
+    color: #2d3748;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+  }
+
+  .estrategia-descripcion {
+    color: #6c757d;
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    font-size: 0.95rem;
+  }
+
+  .estrategia-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .categoria-badge {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .fecha-solicitud {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .btn-aceptar-interbank {
+    width: 100%;
+    background: linear-gradient(135deg, #00953b 0%, #02bb59 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-aceptar-interbank:hover {
+    background: linear-gradient(135deg, #007a2f 0%, #00953b 100%);
+    transform: translateY(-2px);
+  }
+
+  .btn-aceptar-interbank:active {
+    transform: translateY(0);
+  }
+
+  .btn-aceptar-interbank i {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  /* Responsive para dispositivos móviles */
+  @media (max-width: 768px) {
+    .tarjeta-solicitud-interbank {
+      margin-bottom: 1.5rem;
+    }
+    
+    .empresa-header, .empresa-contacto, .estrategia-info {
+      padding: 1rem 1.5rem;
+    }
+    
+    .empresa-contacto {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .estrategia-meta {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .btn-aceptar-interbank {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+    }
+  }
+
+  /* Estilos para las tarjetas de solicitudes del modal principal (compatibilidad) */
+  .tarjeta-solicitud {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .tarjeta-solicitud:hover {
+    border-color: #00953b;
+    box-shadow: 0 4px 12px rgba(0, 149, 59, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .tarjeta-solicitud h3 {
+    color: #00953b;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  .tarjeta-solicitud p {
+    margin-bottom: 0.5rem;
+    color: #495057;
+    line-height: 1.4;
+  }
+
+  .tarjeta-solicitud strong {
+    color: #343a40;
+  }
+
+  .tarjeta-solicitud .btn {
+    margin-top: 1rem;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+  }
 </style>
 
 <script>

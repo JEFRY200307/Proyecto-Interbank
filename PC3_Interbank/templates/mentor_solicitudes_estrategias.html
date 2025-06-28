@@ -220,6 +220,177 @@
     100% { transform: rotate(360deg); }
 }
 
+/* Estilos profesionales para tarjetas de solicitud - Interbank */
+.solicitud-card-interbank {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    padding: 0;
+    margin-bottom: 2rem;
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    position: relative;
+}
+
+.solicitud-card-interbank::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg, #00953b 0%, #02bb59 50%, #007a2f 100%);
+}
+
+.solicitud-card-interbank:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 149, 59, 0.15);
+    border-color: #00953b;
+}
+
+.solicitud-header-interbank {
+    background: linear-gradient(135deg, #f1f3f5 0%, #e9ecef 100%);
+    padding: 2rem;
+    border-bottom: 2px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.empresa-nombre-principal {
+    color: #00953b;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.empresa-ruc-badge {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    color: white;
+    padding: 0.5rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+}
+
+.empresa-contacto-info {
+    background: #ffffff;
+    padding: 1.8rem 2rem;
+    border-bottom: 1px solid #f1f3f5;
+}
+
+.contacto-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #f8f9fa;
+}
+
+.contacto-row:last-child {
+    border-bottom: none;
+}
+
+.contacto-row .icon {
+    font-size: 1.2rem;
+    color: #00953b;
+    min-width: 25px;
+    text-align: center;
+}
+
+.contacto-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 80px;
+}
+
+.contacto-value {
+    color: #2d3748;
+    font-weight: 500;
+}
+
+.estrategia-detalle {
+    background: #ffffff;
+    padding: 2rem;
+}
+
+.estrategia-titulo-secundario {
+    color: #2d3748;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    line-height: 1.4;
+}
+
+.estrategia-descripcion {
+    color: #6c757d;
+    line-height: 1.7;
+    margin: 0 0 1.5rem 0;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 50%, #f8f9fa 100%);
+    padding: 1.2rem;
+    border-radius: 12px;
+    border-left: 4px solid #00953b;
+}
+
+.estrategia-badges {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.categoria-badge-interbank {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+}
+
+.btn-aceptar-mentoria {
+    width: 100%;
+    background: linear-gradient(135deg, #00953b 0%, #02bb59 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 149, 59, 0.3);
+    border-radius: 0 0 20px 20px;
+}
+
+.btn-aceptar-mentoria:hover {
+    background: linear-gradient(135deg, #007a2f 0%, #00953b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 149, 59, 0.4);
+}
+
+.btn-aceptar-mentoria:active {
+    transform: translateY(0);
+}
+
+.btn-aceptar-mentoria:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .solicitudes-grid {
@@ -239,6 +410,31 @@
     .info-value {
         text-align: left;
         margin-top: 5px;
+    }
+    
+    /* Responsive para móviles */
+    .solicitud-card-interbank {
+        margin-bottom: 1.5rem;
+        border-radius: 16px;
+    }
+    
+    .solicitud-header-interbank {
+        padding: 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .empresa-nombre-principal {
+        font-size: 1.4rem;
+    }
+    
+    .empresa-contacto-info, .estrategia-detalle {
+        padding: 1.5rem;
+    }
+    
+    .btn-aceptar-mentoria {
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
     }
 }
 </style>
@@ -274,30 +470,32 @@ async function cargarSolicitudesMentoria() {
         }
         
         container.innerHTML = solicitudes.map(estrategia => `
-            <div class="solicitud-card">
-                <div class="solicitud-header">
-                    <h3 class="estrategia-titulo">${estrategia.titulo}</h3>
-                    <span class="estrategia-categoria">📊 ${estrategia.categoria || 'General'}</span>
+            <div class="solicitud-card-interbank">
+                <div class="solicitud-header-interbank">
+                    <h3 class="empresa-nombre-principal">${estrategia.empresa_nombre}</h3>
+                    <span class="empresa-ruc-badge">RUC: ${estrategia.empresa_ruc || 'No especificado'}</span>
                 </div>
                 
-                <div class="empresa-info">
-                    <h4>🏢 Información de la Empresa</h4>
-                    <div class="info-row">
-                        <span class="info-label">Empresa:</span>
-                        <span class="info-value">${estrategia.empresa_nombre}</span>
+                <div class="empresa-contacto-info">
+                    <div class="contacto-row">
+                        <i class="icon">✉</i>
+                        <span class="contacto-label">Correo:</span>
+                        <span class="contacto-value">${estrategia.empresa_correo || 'No especificado'}</span>
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">RUC:</span>
-                        <span class="info-value">${estrategia.empresa_ruc || 'No especificado'}</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Teléfono:</span>
-                        <span class="info-value">${estrategia.empresa_telefono || 'No especificado'}</span>
+                    <div class="contacto-row">
+                        <i class="icon">📞</i>
+                        <span class="contacto-label">Teléfono:</span>
+                        <span class="contacto-value">${estrategia.empresa_telefono || 'No especificado'}</span>
                     </div>
                 </div>
                 
-                <div class="estrategia-descripcion">
-                    <strong>Descripción:</strong> ${estrategia.descripcion}
+                <div class="estrategia-detalle">
+                    <h4 class="estrategia-titulo-secundario">${estrategia.titulo}</h4>
+                    <p class="estrategia-descripcion">${estrategia.descripcion}</p>
+                    <div class="estrategia-badges">
+                        <span class="categoria-badge-interbank">${estrategia.categoria || 'General'}</span>
+                    </div>
+                </div>
                 </div>
                 
                 <div class="fecha-solicitud">

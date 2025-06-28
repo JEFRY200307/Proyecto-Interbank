@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, DetailView
-from apps.empresas.models import Empresa, Estrategia
+from apps.empresas.models import Empresa, Estrategia as EstrategiaEmpresa, Etapa as EtapaEmpresa, Actividad as ActividadEmpresa
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,8 +8,9 @@ from rest_framework import status
 # CORRECCIÓN: Importamos el serializador correcto
 from apps.empresas.serializers import EmpresaParaMentorSerializer, EmpresaSerializer
 
-from apps.chat.models import ChatCategory, Estrategia, Etapa, Actividad  # Importa las categorías de bots
-from apps.chat.serializers import EstrategiaSerializer, EtapaSerializer, ActividadSerializer
+from apps.chat.models import ChatCategory, Estrategia as EstrategiaChat, Etapa as EtapaChat, Actividad as ActividadChat
+from apps.chat.serializers import EstrategiaSerializer as EstrategiaChatSerializer, EtapaSerializer as EtapaChatSerializer, ActividadSerializer as ActividadChatSerializer
+from apps.empresas.serializers import EstrategiaSerializer as EstrategiaEmpresaSerializer, EtapaSerializer as EtapaEmpresaSerializer, ActividadSerializer as ActividadEmpresaSerializer
 
 # API para listar empresas del mentor
 class EmpresasMentorAPIView(APIView):
@@ -17,7 +18,7 @@ class EmpresasMentorAPIView(APIView):
 
     def get(self, request):
         # En el nuevo sistema, obtener empresas a través de las estrategias que el mentor tiene asignadas
-        estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user)
+        estrategias_mentor = EstrategiaEmpresa.objects.filter(mentor_asignado=request.user)
         empresas_ids = estrategias_mentor.values_list('empresa_id', flat=True).distinct()
         empresas = Empresa.objects.filter(id__in=empresas_ids)
         serializer = EmpresaSerializer(empresas, many=True)
@@ -30,7 +31,7 @@ class EmpresaDetalleMentorAPIView(APIView):
     def get(self, request, pk):
         try:
             # Verificar que el mentor tenga al menos una estrategia asignada en esta empresa
-            estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user, empresa_id=pk)
+            estrategias_mentor = EstrategiaEmpresa.objects.filter(mentor_asignado=request.user, empresa_id=pk)
             if not estrategias_mentor.exists():
                 return Response({"error": "No tienes estrategias asignadas en esta empresa."}, status=status.HTTP_404_NOT_FOUND)
             
@@ -44,7 +45,7 @@ class EmpresaDetalleMentorAPIView(APIView):
     def put(self, request, pk):
         try:
             # Verificar que el mentor tenga al menos una estrategia asignada en esta empresa
-            estrategias_mentor = Estrategia.objects.filter(mentor_asignado=request.user, empresa_id=pk)
+            estrategias_mentor = EstrategiaEmpresa.objects.filter(mentor_asignado=request.user, empresa_id=pk)
             if not estrategias_mentor.exists():
                 return Response({"error": "No tienes estrategias asignadas en esta empresa."}, status=status.HTTP_404_NOT_FOUND)
             
@@ -71,11 +72,8 @@ class EstrategiasSolicitanMentoriaAPIView(APIView):
         if request.user.rol != 'mentor':
             return Response({'error': 'Solo los mentores pueden acceder a esta información.'}, status=status.HTTP_403_FORBIDDEN)
         
-        # Importar el modelo desde la app correcta
-        from apps.empresas.models import Estrategia
-        
         # Los mentores ven TODAS las solicitudes de mentoría
-        estrategias = Estrategia.objects.filter(
+        estrategias = EstrategiaEmpresa.objects.filter(
             solicita_mentoria=True,
             mentor_asignado__isnull=True
         ).select_related('empresa')
@@ -91,6 +89,8 @@ class EstrategiasSolicitanMentoriaAPIView(APIView):
                 'empresa_nombre': estrategia.empresa.razon_social,
                 'empresa_ruc': estrategia.empresa.ruc,
                 'empresa_telefono': estrategia.empresa.telefono,
+                'empresa_correo': estrategia.empresa.correo,
+                'empresa_sector': estrategia.empresa.sector if hasattr(estrategia.empresa, 'sector') else None,
             })
         
         return Response(data, status=status.HTTP_200_OK)
@@ -124,13 +124,11 @@ class AceptarMentoriaEstrategiaAPIView(APIView):
         if request.user.rol != 'mentor':
             return Response({'error': 'Solo los mentores pueden aceptar mentoría.'}, status=status.HTTP_403_FORBIDDEN)
         
-        # Importar el modelo desde la app correcta
-        from apps.empresas.models import Estrategia
         from django.utils import timezone
         
         try:
-            estrategia = Estrategia.objects.get(id=pk, solicita_mentoria=True, mentor_asignado__isnull=True)
-        except Estrategia.DoesNotExist:
+            estrategia = EstrategiaEmpresa.objects.get(id=pk, solicita_mentoria=True, mentor_asignado__isnull=True)
+        except EstrategiaEmpresa.DoesNotExist:
             return Response({'error': 'Estrategia no encontrada o ya tiene mentor asignado.'}, status=status.HTTP_404_NOT_FOUND)
         
         # Verificar si el mentor tiene la especialidad requerida
@@ -169,50 +167,51 @@ class DashboardMentorBotsDetailView(DetailView):
     context_object_name = "bot"
     pk_url_kwarg = "bot_id"
 
-# Estrategias de un bot
+# === VISTAS PARA SISTEMA DE CHATBOTS ===
+# Estrategias de un bot (Sistema de chatbots)
 class BotEstrategiasListCreateView(generics.ListCreateAPIView):
-    serializer_class = EstrategiaSerializer
+    serializer_class = EstrategiaChatSerializer
 
     def get_queryset(self):
         bot_id = self.kwargs['bot_id']
-        return Estrategia.objects.filter(chatbot_id=bot_id)
+        return EstrategiaChat.objects.filter(chatbot_id=bot_id)
 
     def perform_create(self, serializer):
         bot_id = self.kwargs['bot_id']
         serializer.save(chatbot_id=bot_id)
 
 class EstrategiaDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Estrategia.objects.all()
-    serializer_class = EstrategiaSerializer
+    queryset = EstrategiaChat.objects.all()
+    serializer_class = EstrategiaChatSerializer
 
-# Etapas de una estrategia
+# Etapas de una estrategia (Sistema de chatbots)
 class EstrategiaEtapasListCreateView(generics.ListCreateAPIView):
-    serializer_class = EtapaSerializer
+    serializer_class = EtapaChatSerializer
 
     def get_queryset(self):
         estrategia_id = self.kwargs['estrategia_id']
-        return Etapa.objects.filter(estrategia_id=estrategia_id)
+        return EtapaChat.objects.filter(estrategia_id=estrategia_id)
 
     def perform_create(self, serializer):
         estrategia_id = self.kwargs['estrategia_id']
         serializer.save(estrategia_id=estrategia_id)
 
 class EtapaDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Etapa.objects.all()
-    serializer_class = EtapaSerializer
+    queryset = EtapaChat.objects.all()
+    serializer_class = EtapaChatSerializer
 
-# Actividades de una etapa
+# Actividades de una etapa (Sistema de chatbots)
 class EtapaActividadesListCreateView(generics.ListCreateAPIView):
-    serializer_class = ActividadSerializer
+    serializer_class = ActividadChatSerializer
 
     def get_queryset(self):
         etapa_id = self.kwargs['etapa_id']
-        return Actividad.objects.filter(etapa_id=etapa_id)
+        return ActividadChat.objects.filter(etapa_id=etapa_id)
 
     def perform_create(self, serializer):
         etapa_id = self.kwargs['etapa_id']
         serializer.save(etapa_id=etapa_id)
 
 class ActividadDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Actividad.objects.all()
-    serializer_class = ActividadSerializer
+    queryset = ActividadChat.objects.all()
+    serializer_class = ActividadChatSerializer
