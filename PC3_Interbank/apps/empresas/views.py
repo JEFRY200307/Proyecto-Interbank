@@ -391,7 +391,14 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        empresa_id = self.request.query_params.get('empresa_id')
+        
+        # Manejar tanto Request (DRF) como HttpRequest (Django)
+        if hasattr(self.request, 'query_params'):
+            # Request de Django REST Framework
+            empresa_id = self.request.query_params.get('empresa_id')
+        else:
+            # HttpRequest de Django normal
+            empresa_id = self.request.GET.get('empresa_id')
 
         # Si un mentor pide las estrategias de una empresa específica...
         if empresa_id and user.rol == 'mentor':
@@ -399,7 +406,7 @@ class EstrategiaListCreateView(generics.ListCreateAPIView):
             return Estrategia.objects.filter(empresa_id=empresa_id, mentor_asignado=user).order_by('-fecha_registro')
         
         # Si un usuario de empresa pide sus propias estrategias...
-        elif hasattr(user, 'empresa'):
+        elif hasattr(user, 'empresa') and user.empresa:
             # ...devuelve solo las de su empresa (comportamiento original).
             return Estrategia.objects.filter(empresa=user.empresa).order_by('-fecha_registro')
 

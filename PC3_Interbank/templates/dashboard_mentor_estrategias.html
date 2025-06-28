@@ -1,0 +1,232 @@
+{% extends 'dashboard_base.html' %}
+{% load static %}
+
+{% block page_title %}
+    Mis Estrategias de Mentoría
+{% endblock %}
+
+{% block header_actions %}
+    <div class="header-actions">
+        <button id="volver-empresas" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Empresas
+        </button>
+        <button id="refresh-estrategias" class="btn btn-primary">
+            <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+    </div>
+{% endblock %}
+
+{% block content %}
+<div class="mentor-estrategias-container">
+    <!-- Header con estadísticas -->
+    <div class="estadisticas-header">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-estrategias">0</h3>
+                <p>Estrategias Asignadas</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="progreso-promedio">0%</h3>
+                <p>Progreso Promedio</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="total-empresas">0</h3>
+                <p>Empresas Atendidas</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <h3 id="actividades-completadas">0</h3>
+                <p>Actividades Completadas</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de estrategias -->
+    <div class="estrategias-lista" id="estrategias-container">
+        <div class="loading-spinner" id="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i> Cargando estrategias...
+        </div>
+    </div>
+
+    <!-- Vista detallada de estrategia -->
+    <div class="estrategia-detalle" id="estrategia-detalle" style="display: none;">
+        <div class="detalle-header">
+            <button id="volver-lista" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a la Lista
+            </button>
+            <div class="estrategia-info">
+                <h2 id="detalle-titulo"></h2>
+                <div class="empresa-info">
+                    <span id="detalle-empresa"></span> | 
+                    <span id="detalle-categoria"></span>
+                </div>
+            </div>
+            <div class="estrategia-actions">
+                <button id="editar-estrategia" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> Editar Estrategia
+                </button>
+            </div>
+        </div>
+
+        <div class="estrategia-content">
+            <!-- Información general -->
+            <div class="info-general">
+                <div class="info-card">
+                    <h3>Información General</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Estado:</label>
+                            <span id="detalle-estado" class="estado-badge"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Progreso:</label>
+                            <div class="progress-container">
+                                <div class="progress-bar">
+                                    <div id="detalle-progreso-bar" class="progress-fill"></div>
+                                </div>
+                                <span id="detalle-progreso-text">0%</span>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <label>Fecha Inicio:</label>
+                            <span id="detalle-fecha-inicio"></span>
+                        </div>
+                        <div class="info-item">
+                            <label>Fecha Fin:</label>
+                            <span id="detalle-fecha-fin"></span>
+                        </div>
+                    </div>
+                    <div class="descripcion">
+                        <label>Descripción:</label>
+                        <p id="detalle-descripcion"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Etapas y actividades -->
+            <div class="etapas-container" id="etapas-container">
+                <!-- Las etapas se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar estrategia -->
+<div id="modal-editar-estrategia" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Estrategia</h3>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="form-editar-estrategia">
+                <div class="form-group">
+                    <label for="edit-descripcion">Descripción:</label>
+                    <textarea id="edit-descripcion" name="descripcion" rows="4" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-fecha-fin">Fecha Fin:</label>
+                    <input type="date" id="edit-fecha-fin" name="fecha_fin" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-estado">Estado:</label>
+                    <select id="edit-estado" name="estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="en_progreso">En Progreso</option>
+                        <option value="completada">Completada</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelar-edicion">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="guardar-estrategia">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar etapa -->
+<div id="modal-editar-etapa" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Etapa</h3>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="form-editar-etapa">
+                <div class="form-group">
+                    <label for="edit-etapa-titulo">Título:</label>
+                    <input type="text" id="edit-etapa-titulo" name="titulo" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-etapa-descripcion">Descripción:</label>
+                    <textarea id="edit-etapa-descripcion" name="descripcion" rows="3" class="form-control"></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelar-edicion-etapa">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="guardar-etapa">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar actividad -->
+<div id="modal-editar-actividad" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Editar Actividad</h3>
+            <span class="close-button">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="form-editar-actividad">
+                <div class="form-group">
+                    <label for="edit-actividad-descripcion">Descripción:</label>
+                    <textarea id="edit-actividad-descripcion" name="descripcion" rows="3" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="edit-actividad-fecha-limite">Fecha Límite:</label>
+                    <input type="date" id="edit-actividad-fecha-limite" name="fecha_limite" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="edit-actividad-notas">Notas del Mentor:</label>
+                    <textarea id="edit-actividad-notas" name="notas_mentor" rows="3" class="form-control" placeholder="Agrega notas o comentarios sobre esta actividad..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="edit-actividad-completada" name="completada">
+                        <span class="checkmark"></span>
+                        Marcar como completada
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelar-edicion-actividad">Cancelar</button>
+            <button type="button" class="btn btn-primary" id="guardar-actividad">Guardar Cambios</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/mentor_estrategias.js' %}"></script>
+{% endblock %}

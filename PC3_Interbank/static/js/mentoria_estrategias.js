@@ -5,8 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initMentoriaEstrategias() {
-    // Cargar especialidades disponibles
-    cargarEspecialidades();
+    // Cargar especialidades desde API y luego inicializar
+    inicializarEspecialidades().then(() => {
+        console.log('Especialidades inicializadas');
+    });
     
     // Event listeners para botones de mentoría
     document.addEventListener('click', function(e) {
@@ -27,19 +29,35 @@ function initMentoriaEstrategias() {
     });
 }
 
-// Especialidades disponibles
-const ESPECIALIDADES = {
-    'marketing': 'Marketing Digital',
-    'finanzas': 'Finanzas y Contabilidad',
-    'recursos_humanos': 'Recursos Humanos',
-    'operaciones': 'Operaciones y Logística',
-    'tecnologia': 'Tecnología e Innovación',
-    'ventas': 'Ventas y Comercialización',
-    'legal': 'Legal y Compliance',
-    'estrategia': 'Estrategia Empresarial',
-    'liderazgo': 'Liderazgo y Gestión',
-    'internacional': 'Comercio Internacional'
+// Especialidades disponibles - Se cargan dinámicamente desde la API
+let ESPECIALIDADES = {
+    // Fallback en caso de que la API no esté disponible
+    'general': 'General (Todas las áreas)',
+    'marketing_digital': 'Marketing Digital',
+    'finanzas': 'Finanzas y Contabilidad'
 };
+
+// Cargar especialidades desde la API
+async function cargarEspecialidadesDesdeAPI() {
+    try {
+        const response = await fetch('/mentor/api/especialidades/');
+        if (response.ok) {
+            const data = await response.json();
+            ESPECIALIDADES = data.especialidades;
+            console.log('Especialidades cargadas desde API:', ESPECIALIDADES);
+        } else {
+            console.warn('No se pudieron cargar especialidades desde API, usando fallback');
+        }
+    } catch (error) {
+        console.warn('Error al cargar especialidades desde API:', error);
+    }
+}
+
+// Cargar especialidades disponibles al inicio
+async function inicializarEspecialidades() {
+    await cargarEspecialidadesDesdeAPI();
+    cargarEspecialidades();
+}
 
 // Funciones específicas para empresas
 async function cargarEstrategiasEmpresa() {
@@ -327,12 +345,20 @@ async function aceptarMentoriaEstrategia(estrategiaId) {
         return;
     }
     
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+        mostrarMensaje('Sesión expirada. Por favor inicia sesión nuevamente.', 'error');
+        window.location.href = '/login/';
+        return;
+    }
+    
     try {
-        const response = await fetch(`/mentor/api/estrategias/${estrategiaId}/aceptar_mentoria/`, {
+        const response = await fetch(`/mentor/api/aceptar-mentoria/${estrategiaId}/`, {
             method: 'POST',
             headers: {
+                'Authorization': 'Bearer ' + token,
                 'Content-Type': 'application/json',
-                'X-CSRFToken': getCSRFToken()
+                'Accept': 'application/json'
             }
         });
         
@@ -357,7 +383,7 @@ async function aceptarMentoriaEstrategia(estrategiaId) {
 // Cargar estrategias que solicitan mentoría (para mentores)
 async function cargarEstrategiasSolicitanMentoria() {
     try {
-        const response = await fetch('/mentor/api/estrategias-solicitan/');
+        const response = await fetch('/mentor/api/solicitudes-mentoria/');
         const data = await response.json();
         
         if (response.ok) {

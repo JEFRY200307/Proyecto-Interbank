@@ -48,7 +48,12 @@ class Estrategia(models.Model):
     
     # Nuevos campos para mentoría específica por estrategia
     solicita_mentoria = models.BooleanField(default=False)
-    especialidad_requerida = models.CharField(max_length=100, null=True, blank=True)
+    especialidad_requerida = models.CharField(
+        max_length=100, 
+        null=True, 
+        blank=True,
+        help_text="Especialidad requerida del mentor. Debe coincidir con las especialidades definidas en el modelo Usuario."
+    )
     mentor_asignado = models.ForeignKey(
         'users.Usuario', 
         on_delete=models.SET_NULL, 
@@ -65,14 +70,25 @@ class Estrategia(models.Model):
 
 class Etapa(models.Model):
     estrategia = models.ForeignKey(Estrategia, related_name='etapas', on_delete=models.CASCADE,default=None, null=True, blank=True)
-    nombre = models.CharField(max_length=255,default='Etapa sin nombre')
+    titulo = models.CharField(max_length=255,default='Etapa sin nombre')  # Cambiado de 'nombre' a 'titulo'
+    nombre = models.CharField(max_length=255,default='Etapa sin nombre')  # Mantener por compatibilidad
     descripcion = models.TextField(blank=True, null=True,default='Descripción de la etapa')
+    orden = models.IntegerField(default=0)  # Para ordenar las etapas
+
+    def __str__(self):
+        return self.titulo or self.nombre
 
 class Actividad(models.Model):
     etapa = models.ForeignKey('Etapa', related_name='actividades', on_delete=models.CASCADE, null=True, blank=True)
     descripcion = models.CharField(max_length=255)
     fecha_limite = models.DateField(null=True, blank=True)
     completada = models.BooleanField(default=False)
+    fecha_completada = models.DateTimeField(null=True, blank=True)
+    orden = models.IntegerField(default=0)  # Para ordenar las actividades
+    notas_mentor = models.TextField(blank=True, null=True, help_text="Notas del mentor sobre esta actividad")
+
+    def __str__(self):
+        return self.descripcion
 
 class TicketSoporte(models.Model):
     empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)

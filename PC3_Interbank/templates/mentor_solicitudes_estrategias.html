@@ -453,7 +453,7 @@ async function cargarSolicitudesMentoria() {
     const loading = document.getElementById('loading-spinner');
     
     try {
-        const response = await fetch('/mentor/api/estrategias-solicitan/', {
+        const response = await fetch('/mentor/api/solicitudes-mentoria/', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
         
@@ -530,7 +530,7 @@ async function aceptarMentoria(estrategiaId) {
     btn.textContent = 'Aceptando...';
     
     try {
-        const response = await fetch(`/mentor/api/estrategias/${estrategiaId}/aceptar/`, {
+        const response = await fetch(`/mentor/api/aceptar-mentoria/${estrategiaId}/`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,

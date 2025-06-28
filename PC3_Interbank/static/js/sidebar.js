@@ -61,7 +61,8 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (rol === 'mentor') {
         menu += `<li style="list-style:none;"><h3>Mentor</h3></li>
             <li><a href="/mentor/dashboard/">Gestión de empresas</a></li>
-            <li><a href="/mentor/solicitudes/">Solicitudes</a></li>
+            <li><a href="/mentor/dashboard/estrategias/">Mis Estrategias</a></li>
+            <li><a href="/mentor/dashboard/solicitudes/">Solicitudes de Mentoría</a></li>
             <li><a href="/mentor/dashboard/bots/">Alimentar al bot</a></li>`;
         }
         menu += `<li><a href="#" id="logout-link">Cerrar sesión</a></li>`;

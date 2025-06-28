@@ -53,9 +53,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     clave_firma = models.CharField(max_length=128, blank=True, null=True)  # hash del PIN
     
-    # Campo para especialidades de mentores
+    # Campo para especialidades de mentores - Alineado con categorías de chatbots
     ESPECIALIDADES_CHOICES = [
-        ('marketing', 'Marketing Digital'),
+        # Categorías basadas en los chatbots existentes
+        ('marketing_digital', 'Marketing Digital'),
+        ('acceso_a_financiamiento', 'Acceso a Financiamiento'),
+        ('innovacion_y_desarrollo_de_productos', 'Innovación y Desarrollo de Productos'),
+        ('branding', 'Branding'),
+        ('diseno_y_desarrollo_ux_ui', 'Diseño y Desarrollo UX/UI'),
+        ('seo_en_la_era_de_la_ia', 'SEO en la Era de la IA'),
+        # Especialidades tradicionales adicionales
         ('finanzas', 'Finanzas y Contabilidad'),
         ('recursos_humanos', 'Recursos Humanos'),
         ('operaciones', 'Operaciones y Logística'),
@@ -63,16 +70,32 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         ('ventas', 'Ventas y Comercialización'),
         ('legal', 'Legal y Compliance'),
         ('estrategia', 'Estrategia Empresarial'),
-        ('liderazgo', 'Liderazgo y Gestión'),
-        ('internacional', 'Comercio Internacional'),
+        # Especialidad especial que permite ver/tomar cualquier solicitud
+        ('general', 'General (Todas las áreas)'),
     ]
     especialidades = models.CharField(
         max_length=50,
         choices=ESPECIALIDADES_CHOICES,
         null=True,
         blank=True,
-        help_text="Solo para usuarios con rol de mentor"
+        help_text="Solo para usuarios con rol de mentor. 'General' permite ver todas las solicitudes."
     )
+
+    @classmethod
+    def get_especialidades_choices(cls):
+        """Retorna las opciones de especialidades disponibles para mentores."""
+        return cls.ESPECIALIDADES_CHOICES
+
+    @classmethod  
+    def get_especialidades_dict(cls):
+        """Retorna un diccionario de especialidades con código -> nombre."""
+        return dict(cls.ESPECIALIDADES_CHOICES)
+
+    def get_especialidad_display_name(self):
+        """Retorna el nombre para mostrar de la especialidad del usuario."""
+        if self.especialidades:
+            return dict(self.ESPECIALIDADES_CHOICES).get(self.especialidades, self.especialidades)
+        return None
 
     def set_clave_firma(self, raw_pin):
         self.clave_firma = make_password(raw_pin)
