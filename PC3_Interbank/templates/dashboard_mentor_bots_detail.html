@@ -6,6 +6,63 @@
 {% block content %}
 <h2>Estrategias del Bot: {{ bot.name }}</h2>
 
+<!-- Sección de Alimentar al Bot -->
+<div class="bot-feeding-section">
+    <h3>🍽️ Alimentar al Bot</h3>
+    <p>Proporciona información adicional para mejorar las respuestas del bot</p>
+    
+    <div class="feeding-options">
+        <button onclick="mostrarFormularioTextoLibre()" class="btn-alimentar">
+            📝 Texto Libre
+        </button>
+        <button onclick="mostrarFormularioEstrategiaReferencia()" class="btn-alimentar">
+            🎯 Usar Estrategia como Referencia
+        </button>
+    </div>
+</div>
+
+<!-- Formulario de Texto Libre -->
+<div id="formulario-texto-libre" class="formulario-alimentar" style="display: none;">
+    <div class="formulario-container">
+        <button class="formulario-close" onclick="cerrarFormularioTextoLibre()" type="button">&times;</button>
+        <h4>📝 Añadir Texto Libre</h4>
+        <form id="form-texto-libre">
+            <label>Contenido:
+                <textarea name="contenido" placeholder="Escribe aquí la información que quieres que el bot aprenda..." required></textarea>
+            </label>
+            <div class="form-buttons">
+                <button type="submit" class="btn-guardar">Alimentar Bot</button>
+                <button type="button" onclick="cerrarFormularioTextoLibre()" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Formulario de Estrategia como Referencia -->
+<div id="formulario-estrategia-referencia" class="formulario-alimentar" style="display: none;">
+    <div class="formulario-container">
+        <button class="formulario-close" onclick="cerrarFormularioEstrategiaReferencia()" type="button">&times;</button>
+        <h4>🎯 Usar Estrategia como Referencia</h4>
+        <form id="form-estrategia-referencia">
+            <label>Estrategia:
+                <select name="estrategia_id" required>
+                    <option value="">Selecciona una estrategia...</option>
+                </select>
+            </label>
+            <label>Contexto adicional (opcional):
+                <textarea name="contexto" placeholder="Información adicional sobre cómo debe usar esta estrategia..."></textarea>
+            </label>
+            <div class="form-buttons">
+                <button type="submit" class="btn-guardar">Usar como Referencia</button>
+                <button type="button" onclick="cerrarFormularioEstrategiaReferencia()" class="btn-cancelar">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<h3>📋 Estrategias del Bot</h3>
 <button onclick="mostrarFormularioNuevaEstrategia()">Añadir Estrategia</button>
 
 <div class="tabla-scroll">
@@ -138,28 +195,67 @@
 .btn-guardar:active {
   transform: translateY(0);
 }
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 2000;
-  left: 0; 
-  top: 0; 
-  width: 100vw; 
-  height: 100vh;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
+/* === ESTILOS DE MODAL CON MÁXIMA ESPECIFICIDAD === */
+#modal-estrategia.modal,
+#modal-etapas.modal,
+#modal-etapa.modal,
+#modal-actividad.modal {
+  display: none !important;
+  position: fixed !important;
+  z-index: 2000 !important;
+  left: 0 !important; 
+  top: 0 !important; 
+  width: 100vw !important; 
+  height: 100vh !important;
+  background: rgba(0,0,0,0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  justify-content: center !important;
+  align-items: center !important;
 }
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 4px 24px #388e3c55;
-  position: relative;
-  margin: auto;
-  transform: translateY(0);
+
+#modal-estrategia.modal[style*="display: flex"],
+#modal-etapas.modal[style*="display: flex"], 
+#modal-etapa.modal[style*="display: flex"],
+#modal-actividad.modal[style*="display: flex"] {
+  display: flex !important;
+}
+
+#modal-estrategia .modal-content,
+#modal-etapas .modal-content,
+#modal-etapa .modal-content,
+#modal-actividad .modal-content {
+  background: #fff !important;
+  padding: 2rem !important;
+  border-radius: 10px !important;
+  width: 90% !important;
+  max-width: 500px !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 4px 24px rgba(56, 142, 60, 0.3) !important;
+  position: relative !important;
+  margin: 0 !important;
+  transform: none !important;
+  top: auto !important;
+  left: auto !important;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  #modal-estrategia .modal-content,
+  #modal-etapas .modal-content,
+  #modal-etapa .modal-content,
+  #modal-actividad .modal-content {
+    width: 95% !important;
+    max-width: none !important;
+    margin: 1rem !important;
+    padding: 1.5rem !important;
+  }
+  
+  .formulario-container {
+    width: 95vw !important;
+    margin: 1rem !important;
+    padding: 1.5rem !important;
+  }
 }
 .modal-content form {
   display: flex;
@@ -173,6 +269,8 @@
   font-weight: 500;
   color: #2e7d32;
 }
+
+
 .modal-content input,
 .modal-content textarea {
   width: 100%;
@@ -198,6 +296,7 @@
   color: #388e3c;
   cursor: pointer;
 }
+
 .etapa-row {
   border-bottom: 1px solid #b2dfdb;
   margin-bottom: 1rem;
@@ -215,6 +314,215 @@
   padding: 0.3rem;
   font-size: 1rem;
 }
+
+/* === ESTILOS PARA ALIMENTAR AL BOT === */
+.bot-feeding-section {
+  background: linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%);
+  border: 2px solid #81c784;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.bot-feeding-section h3 {
+  color: #2e7d32;
+  margin-bottom: 0.5rem;
+  font-size: 1.4rem;
+}
+
+.bot-feeding-section p {
+  color: #4caf50;
+  margin-bottom: 1.5rem;
+}
+
+.feeding-options {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-alimentar {
+  background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
+  color: #fff;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
+  min-width: 200px;
+}
+
+.btn-alimentar:hover {
+  background: linear-gradient(135deg, #81c784 0%, #a5d6a7 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 187, 106, 0.4);
+}
+
+/* === ESTILOS PARA FORMULARIOS DE ALIMENTAR BOT === */
+.formulario-alimentar {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  z-index: 2000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.formulario-container {
+  background: #fff !important;
+  border: 2px solid #81c784 !important;
+  border-radius: 12px !important;
+  padding: 2rem !important;
+  max-width: 600px !important;
+  width: 90vw !important;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(46, 125, 50, 0.2);
+  position: relative;
+}
+
+.formulario-container h4 {
+  color: #2e7d32;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.formulario-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #666;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.formulario-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.formulario-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formulario-container label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.formulario-container textarea,
+.formulario-container select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 1rem;
+  border: 2px solid #c8e6c9;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: #fff;
+  transition: border-color 0.3s;
+  resize: vertical;
+  min-height: 120px;
+}
+
+.formulario-container select {
+  min-height: auto;
+  height: 50px;
+}
+
+.formulario-container textarea:focus,
+.formulario-container select:focus {
+  outline: none;
+  border-color: #66bb6a;
+  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-cancelar {
+  background: linear-gradient(135deg, #757575 0%, #9e9e9e 100%);
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(117, 117, 117, 0.3);
+}
+
+.btn-cancelar:hover {
+  background: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(117, 117, 117, 0.4);
+}
+
+.divider {
+  border-top: 2px solid #e0f2f1;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.divider::before {
+  content: "📋";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  padding: 0 1rem;
+  font-size: 1.2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .feeding-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .btn-alimentar {
+    min-width: 250px;
+  }
+  
+  .formulario-container {
+    padding: 1.5rem;
+  }
+  
+  .form-buttons {
+    flex-direction: column;
+  }
+}
 </style>
 
 <script>
@@ -222,9 +530,203 @@ const botId = "{{ bot.id|escapejs }}";
 let estrategiasBot = [];
 let estrategiaActualId = null;
 let etapaActualId = null;
+let estrategiasDisponibles = []; // Para el select de estrategias de referencia
 
 // Cargar estrategias al iniciar
-document.addEventListener('DOMContentLoaded', cargarEstrategiasBot);
+document.addEventListener('DOMContentLoaded', function() {
+    cargarEstrategiasBot();
+    cargarEstrategiasDisponibles();
+});
+
+// =============================================
+// === FUNCIONES PARA ALIMENTAR AL BOT ===
+// =============================================
+
+/**
+ * Muestra el formulario de texto libre para alimentar al bot
+ */
+function mostrarFormularioTextoLibre() {
+    // Ocultar el otro formulario
+    document.getElementById('formulario-estrategia-referencia').style.display = 'none';
+    // Mostrar este formulario
+    document.getElementById('formulario-texto-libre').style.display = 'flex';
+    // Limpiar el formulario
+    document.getElementById('form-texto-libre').reset();
+}
+
+/**
+ * Cierra el formulario de texto libre
+ */
+function cerrarFormularioTextoLibre() {
+    document.getElementById('formulario-texto-libre').style.display = 'none';
+}
+
+/**
+ * Muestra el formulario de estrategia como referencia
+ */
+function mostrarFormularioEstrategiaReferencia() {
+    // Ocultar el otro formulario
+    document.getElementById('formulario-texto-libre').style.display = 'none';
+    // Mostrar este formulario
+    document.getElementById('formulario-estrategia-referencia').style.display = 'flex';
+    // Limpiar el formulario
+    document.getElementById('form-estrategia-referencia').reset();
+    // Cargar estrategias en el select
+    cargarEstrategiasEnSelect();
+}
+
+/**
+ * Cierra el formulario de estrategia como referencia
+ */
+function cerrarFormularioEstrategiaReferencia() {
+    document.getElementById('formulario-estrategia-referencia').style.display = 'none';
+}
+
+/**
+ * Carga las estrategias del mentor en el select
+ */
+async function cargarEstrategiasEnSelect() {
+    const select = document.querySelector('#form-estrategia-referencia select[name="estrategia_id"]');
+    
+    if (estrategiasDisponibles.length === 0) {
+        select.innerHTML = '<option value="">No hay estrategias disponibles</option>';
+        return;
+    }
+    
+    // Limpiar opciones existentes excepto la primera
+    select.innerHTML = '<option value="">Selecciona una estrategia...</option>';
+    
+    // Añadir estrategias disponibles
+    estrategiasDisponibles.forEach(estrategia => {
+        const option = document.createElement('option');
+        option.value = estrategia.id;
+        option.textContent = `${estrategia.titulo} (${estrategia.empresa_nombre || 'Sin empresa'})`;
+        select.appendChild(option);
+    });
+}
+
+/**
+ * Carga las estrategias disponibles del mentor
+ */
+async function cargarEstrategiasDisponibles() {
+    const token = localStorage.getItem('access_token');
+    try {
+        const res = await fetch('/mentor/api/mis-estrategias/', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        if (res.ok) {
+            estrategiasDisponibles = await res.json();
+        } else {
+            estrategiasDisponibles = [];
+        }
+    } catch (error) {
+        console.error('Error al cargar estrategias disponibles:', error);
+        estrategiasDisponibles = [];
+    }
+}
+
+// Manejar envío del formulario de texto libre
+document.getElementById('form-texto-libre').onsubmit = async function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    
+    const data = {
+        tipo: 'texto_libre',
+        contenido: form.contenido.value,
+        bot_id: botId
+    };
+    
+    try {
+        const res = await fetch('/chat/api/alimentar-bot/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+            alert('¡Bot alimentado exitosamente con el texto!');
+            cerrarFormularioTextoLibre();
+        } else {
+            const errorData = await res.json();
+            alert('Error al alimentar el bot: ' + (errorData.error || 'Error desconocido'));
+        }
+    } catch (error) {
+        alert('Error de conexión al alimentar el bot');
+        console.error(error);
+    }
+};
+
+// Manejar envío del formulario de estrategia como referencia
+document.getElementById('form-estrategia-referencia').onsubmit = async function(e) {
+    e.preventDefault();
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    
+    const estrategiaId = form.estrategia_id.value;
+    if (!estrategiaId) {
+        alert('Por favor selecciona una estrategia');
+        return;
+    }
+    
+    const data = {
+        tipo: 'estrategia_referencia',
+        estrategia_id: parseInt(estrategiaId),
+        contexto: form.contexto.value || '',
+        bot_id: botId
+    };
+    
+    try {
+        const res = await fetch('/chat/api/alimentar-bot/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if (res.ok) {
+            alert('¡Bot alimentado exitosamente con la estrategia de referencia!');
+            cerrarFormularioEstrategiaReferencia();
+        } else {
+            const errorData = await res.json();
+            alert('Error al alimentar el bot: ' + (errorData.error || 'Error desconocido'));
+        }
+    } catch (error) {
+        alert('Error de conexión al alimentar el bot');
+        console.error(error);
+    }
+};
+
+// Event listeners para cerrar modales al hacer clic fuera de ellos
+document.getElementById('formulario-texto-libre').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarFormularioTextoLibre();
+    }
+});
+
+document.getElementById('formulario-estrategia-referencia').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarFormularioEstrategiaReferencia();
+    }
+});
+
+// Event listener para cerrar modales con la tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarFormularioTextoLibre();
+        cerrarFormularioEstrategiaReferencia();
+    }
+});
+
+// =============================================
+// === FUNCIONES EXISTENTES (SIN CAMBIOS) ===
+// =============================================
 
 async function cargarEstrategiasBot() {
     const token = localStorage.getItem('access_token');
@@ -530,5 +1032,34 @@ async function eliminarActividad(id) {
         alert('Error al eliminar actividad');
     }
 }
+
+// === FUNCIONES DE USABILIDAD PARA MODALES ===
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        // Cerrar modales de estrategias/etapas/actividades
+        const modales = ['modal-estrategia', 'modal-etapas', 'modal-etapa', 'modal-actividad'];
+        modales.forEach(modalId => {
+            const modal = document.getElementById(modalId);
+            if (modal && modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            }
+        });
+        // Cerrar formularios de alimentar bot
+        cerrarFormularioTextoLibre();
+        cerrarFormularioEstrategiaReferencia();
+    }
+});
+
+// Cerrar modal al hacer clic fuera del contenido
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal')) {
+        e.target.style.display = 'none';
+    }
+    if (e.target.classList.contains('formulario-alimentar')) {
+        cerrarFormularioTextoLibre();
+        cerrarFormularioEstrategiaReferencia();
+    }
+});
 </script>
 {% endblock %}

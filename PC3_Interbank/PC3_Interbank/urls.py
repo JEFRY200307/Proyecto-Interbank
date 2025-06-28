@@ -20,6 +20,7 @@ urlpatterns = [
     path('dashboard/', include('apps.dashboard.urls')),
     path('empresas/', include('apps.empresas.urls')),
     path('documentos/', include('apps.documentos.urls')),
+    path('chat/', include('apps.chat.urls')),  # Nueva ruta para acceso directo a chat APIs
     path('users/dashboard/estrategias/', DashboardEstrategiasView.as_view(), name='dashboard_estrategias'),
 ]
 

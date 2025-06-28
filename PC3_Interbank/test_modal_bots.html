@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Modal Bots - Centrado</title>
+    <style>
+        /* Copiar exactamente los estilos del template */
+        #modal-estrategia.modal,
+        #modal-etapas.modal,
+        #modal-etapa.modal,
+        #modal-actividad.modal {
+          display: none !important;
+          position: fixed !important;
+          z-index: 2000 !important;
+          left: 0 !important; 
+          top: 0 !important; 
+          width: 100vw !important; 
+          height: 100vh !important;
+          background: rgba(0,0,0,0.5) !important;
+          backdrop-filter: blur(4px) !important;
+          justify-content: center !important;
+          align-items: center !important;
+        }
+
+        #modal-estrategia.modal[style*="display: flex"],
+        #modal-etapas.modal[style*="display: flex"], 
+        #modal-etapa.modal[style*="display: flex"],
+        #modal-actividad.modal[style*="display: flex"] {
+          display: flex !important;
+        }
+
+        #modal-estrategia .modal-content,
+        #modal-etapas .modal-content,
+        #modal-etapa .modal-content,
+        #modal-actividad .modal-content {
+          background: #fff !important;
+          padding: 2rem !important;
+          border-radius: 10px !important;
+          width: 90% !important;
+          max-width: 500px !important;
+          max-height: 90vh !important;
+          overflow-y: auto !important;
+          box-shadow: 0 4px 24px rgba(56, 142, 60, 0.3) !important;
+          position: relative !important;
+          margin: 0 !important;
+          transform: none !important;
+          top: auto !important;
+          left: auto !important;
+        }
+
+        /* Responsive para pantallas pequeñas */
+        @media (max-width: 768px) {
+          #modal-estrategia .modal-content,
+          #modal-etapas .modal-content,
+          #modal-etapa .modal-content,
+          #modal-actividad .modal-content {
+            width: 95% !important;
+            max-width: none !important;
+            margin: 1rem !important;
+            padding: 1.5rem !important;
+          }
+        }
+
+        .btn-test {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1.2rem;
+            top: 1.2rem;
+            font-size: 2rem;
+            color: #388e3c;
+            cursor: pointer;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Modal Centrado - Bots</h1>
+        <p>Prueba que los modales aparezcan perfectamente centrados</p>
+        
+        <button class="btn-test" onclick="mostrarModalEstrategia()">
+            📝 Probar Modal Estrategia
+        </button>
+        
+        <button class="btn-test" onclick="mostrarModalEtapas()">
+            📋 Probar Modal Etapas
+        </button>
+        
+        <button class="btn-test" onclick="mostrarModalEtapa()">
+            🎯 Probar Modal Etapa
+        </button>
+        
+        <button class="btn-test" onclick="mostrarModalActividad()">
+            ✅ Probar Modal Actividad
+        </button>
+    </div>
+
+    <!-- Modal para añadir/editar estrategia -->
+    <div id="modal-estrategia" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close-modal" onclick="cerrarModal('modal-estrategia')">&times;</span>
+        <h3>🎯 Añadir Nueva Estrategia</h3>
+        <form>
+          <label>Título: <input name="titulo" placeholder="Título de la estrategia" required></label>
+          <label>Descripción: <textarea name="descripcion" placeholder="Descripción detallada" required></textarea></label>
+          <button type="button" onclick="cerrarModal('modal-estrategia')" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para etapas -->
+    <div id="modal-etapas" class="modal" style="display:none;">
+      <div class="modal-content" style="max-width:700px;">
+        <span class="close-modal" onclick="cerrarModal('modal-etapas')">&times;</span>
+        <h3>📋 Etapas y Actividades</h3>
+        <div>
+            <p>Este modal muestra la lista de etapas y actividades de una estrategia.</p>
+            <p>Debe aparecer perfectamente centrado en pantalla.</p>
+        </div>
+        <button onclick="cerrarModal('modal-etapas')" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Modal para añadir/editar etapa -->
+    <div id="modal-etapa" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close-modal" onclick="cerrarModal('modal-etapa')">&times;</span>
+        <h3>🎯 Nueva Etapa</h3>
+        <form>
+          <label>Nombre: <input name="nombre" placeholder="Nombre de la etapa" required></label>
+          <label>Descripción: <textarea name="descripcion" placeholder="Descripción de la etapa"></textarea></label>
+          <button type="button" onclick="cerrarModal('modal-etapa')" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para añadir/editar actividad -->
+    <div id="modal-actividad" class="modal" style="display:none;">
+      <div class="modal-content">
+        <span class="close-modal" onclick="cerrarModal('modal-actividad')">&times;</span>
+        <h3>✅ Nueva Actividad</h3>
+        <form>
+          <label>Descripción: <input name="descripcion" placeholder="Descripción de la actividad" required></label>
+          <button type="button" onclick="cerrarModal('modal-actividad')" style="background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+        function mostrarModalEstrategia() {
+            document.getElementById('modal-estrategia').style.display = 'flex';
+        }
+
+        function mostrarModalEtapas() {
+            document.getElementById('modal-etapas').style.display = 'flex';
+        }
+
+        function mostrarModalEtapa() {
+            document.getElementById('modal-etapa').style.display = 'flex';
+        }
+
+        function mostrarModalActividad() {
+            document.getElementById('modal-actividad').style.display = 'flex';
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera del contenido
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modales = document.querySelectorAll('.modal[style*="display: flex"]');
+                modales.forEach(modal => modal.style.display = 'none');
+            }
+        });
+    </script>
+</body>
+</html>

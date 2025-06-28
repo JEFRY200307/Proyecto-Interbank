@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Centrado de Modales</title>
+    <style>
+        /* Copiar los estilos del modal desde el template */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; 
+            top: 0; 
+            width: 100vw; 
+            height: 100vh;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.visible,
+        .modal[style*="display: block"],
+        .modal[style*="display: flex"] {
+            display: flex !important;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 24px rgba(56, 142, 60, 0.3);
+            position: relative;
+            margin: 0;
+            transform: none;
+        }
+
+        .btn-test {
+            background: #388e3c;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 1rem;
+            font-size: 1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Corrección universal */
+        .modal[style*="display: flex"],
+        .modal[style*="display: block"] {
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            flex-direction: row !important;
+        }
+
+        .modal-content {
+            display: block !important;
+            flex-direction: column;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Prueba de Centrado de Modales</h1>
+        <p>Haz clic en los botones para probar que los modales se centren correctamente:</p>
+        
+        <button class="btn-test" onclick="mostrarModal1()">📝 Modal Estrategia</button>
+        <button class="btn-test" onclick="mostrarModal2()">🎯 Modal Etapas</button>
+        <button class="btn-test" onclick="mostrarModal3()">📋 Modal Actividades</button>
+        
+        <h2>🎯 Resultado Esperado:</h2>
+        <ul>
+            <li>✅ Modal debe aparecer en el centro de la pantalla</li>
+            <li>✅ Fondo semi-transparente debe cubrir toda la pantalla</li>
+            <li>✅ Modal no debe desplazarse hacia la derecha</li>
+            <li>✅ Debe ser responsive en móviles</li>
+        </ul>
+    </div>
+
+    <!-- Modal 1: Estrategia -->
+    <div id="modal-estrategia" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModal('modal-estrategia')">&times;</button>
+            <h3>Nueva Estrategia</h3>
+            <form>
+                <label>Título: <input type="text" placeholder="Título de la estrategia" required></label>
+                <label>Descripción: <textarea placeholder="Descripción de la estrategia" required></textarea></label>
+                <button type="button" class="btn-test">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal 2: Etapas -->
+    <div id="modal-etapas" class="modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="close-modal" onclick="cerrarModal('modal-etapas')">&times;</button>
+            <h3>Etapas y Actividades</h3>
+            <div>
+                <p>📋 Lista de etapas:</p>
+                <ul>
+                    <li>Etapa 1: Planificación</li>
+                    <li>Etapa 2: Desarrollo</li>
+                    <li>Etapa 3: Implementación</li>
+                </ul>
+            </div>
+            <button type="button" class="btn-test">Añadir Etapa</button>
+        </div>
+    </div>
+
+    <!-- Modal 3: Actividades -->
+    <div id="modal-actividades" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="cerrarModal('modal-actividades')">&times;</button>
+            <h3>Actividades</h3>
+            <div>
+                <p>📝 Lista de actividades:</p>
+                <input type="text" placeholder="Nueva actividad" style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+            </div>
+            <button type="button" class="btn-test">Guardar Actividad</button>
+        </div>
+    </div>
+
+    <script>
+        function mostrarModal1() {
+            document.getElementById('modal-estrategia').style.display = 'flex';
+        }
+
+        function mostrarModal2() {
+            document.getElementById('modal-etapas').style.display = 'flex';
+        }
+
+        function mostrarModal3() {
+            document.getElementById('modal-actividades').style.display = 'flex';
+        }
+
+        function cerrarModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.style.display = 'none';
+            }
+        });
+
+        // Cerrar modal con tecla ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

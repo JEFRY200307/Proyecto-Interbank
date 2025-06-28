@@ -49,14 +49,20 @@ class ChatBotAPIView(APIView):
             chatbot=category.name
         ).order_by('fecha_creacion')
 
-        # 2. Construir la lista de mensajes para OpenAI
-        messages = [{"role": "system", "content": system_prompt}]
+        # 2. Obtener alimentaciones del bot (nueva funcionalidad)
+        alimentaciones = self._obtener_alimentaciones_bot(category)
+        
+        # 3. Construir el prompt del sistema con alimentaciones
+        system_prompt_completo = self._construir_prompt_con_alimentaciones(system_prompt, alimentaciones)
+
+        # 4. Construir la lista de mensajes para OpenAI
+        messages = [{"role": "system", "content": system_prompt_completo}]
         for conv in conversaciones:
             messages.append({"role": "user", "content": conv.mensaje_usuario})
             messages.append({"role": "assistant", "content": conv.respuesta_chatbot})
         messages.append({"role": "user", "content": message})
 
-        # 3. Llamar a OpenAI con el historial
+        # 5. Llamar a OpenAI con el historial
         try:
             client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
             response = client.chat.completions.create(
@@ -67,7 +73,7 @@ class ChatBotAPIView(APIView):
         except Exception as e:
             return Response({"error": f"Error al comunicarse con OpenAI: {str(e)}"}, status=500)
 
-        # 4. Guardar la conversación nueva
+        # 6. Guardar la conversación nueva
         Conversacion.objects.create(
             usuario=user,
             chatbot=category.name,
@@ -76,6 +82,38 @@ class ChatBotAPIView(APIView):
         )
 
         return Response({"response": respuesta_chatbot})
+    
+    def _obtener_alimentaciones_bot(self, category):
+        """
+        Obtiene todas las alimentaciones activas para esta categoría de bot
+        """
+        from .models import BotFeeding
+        return BotFeeding.objects.filter(
+            categoria=category,
+            activa=True
+        ).order_by('-fecha_creacion')
+    
+    def _construir_prompt_con_alimentaciones(self, system_prompt, alimentaciones):
+        """
+        Construye el prompt del sistema incluyendo las alimentaciones del bot
+        """
+        if not alimentaciones.exists():
+            return system_prompt
+        
+        prompt_completo = system_prompt + "\n\n"
+        prompt_completo += "=== INFORMACIÓN ADICIONAL PROPORCIONADA POR MENTORES ===\n"
+        prompt_completo += "Usa la siguiente información como referencia para generar respuestas más precisas y ejemplos reales:\n\n"
+        
+        for alimentacion in alimentaciones:
+            prompt_completo += f"--- {alimentacion.get_tipo_display()} (por {alimentacion.mentor.get_full_name() or alimentacion.mentor.username}) ---\n"
+            prompt_completo += f"{alimentacion.contenido}\n\n"
+        
+        prompt_completo += "=== FIN DE INFORMACIÓN ADICIONAL ===\n\n"
+        prompt_completo += "INSTRUCCIONES: Usa esta información de referencia cuando sea relevante para la consulta del usuario. "
+        prompt_completo += "Si hay estrategias de ejemplo, úsalas como inspiración para generar roadmaps similares. "
+        prompt_completo += "Siempre adapta las respuestas al contexto específico del usuario.\n"
+        
+        return prompt_completo
 
 def guardar_conversacion(user, category, mensaje, respuesta):
     from .models import Conversacion
@@ -130,4 +168,138 @@ class ConversacionesUsuarioAPIView(APIView):
             for conv in conversaciones
         ]
         return Response(data)
+
+
+class AlimentarBotAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """
+        Alimenta un bot con información adicional:
+        - texto_libre: Añade texto libre al conocimiento del bot
+        - estrategia_referencia: Usa una estrategia existente como referencia
+        """
+        try:
+            data = request.data
+            tipo = data.get('tipo')
+            bot_id = data.get('bot_id')
+            
+            if not tipo or not bot_id:
+                return Response({"error": "Faltan parámetros requeridos (tipo, bot_id)"}, status=400)
+            
+            # Verificar que el bot existe
+            try:
+                category = ChatCategory.objects.get(id=bot_id)
+            except ChatCategory.DoesNotExist:
+                return Response({"error": "Bot no encontrado"}, status=404)
+            
+            # Verificar que el usuario es mentor
+            if not hasattr(request.user, 'mentor_profile'):
+                return Response({"error": "Solo los mentores pueden alimentar bots"}, status=403)
+            
+            if tipo == 'texto_libre':
+                contenido = data.get('contenido')
+                if not contenido:
+                    return Response({"error": "El contenido no puede estar vacío"}, status=400)
+                
+                # Crear entrada de alimentación del bot
+                from .models import BotFeeding
+                alimentacion = BotFeeding.objects.create(
+                    categoria=category,
+                    mentor=request.user,
+                    tipo='texto_libre',
+                    contenido=contenido
+                )
+                
+                return Response({
+                    "message": "Bot alimentado exitosamente con texto libre",
+                    "id": alimentacion.id
+                })
+            
+            elif tipo == 'estrategia_referencia':
+                estrategia_id = data.get('estrategia_id')
+                contexto = data.get('contexto', '')
+                
+                if not estrategia_id:
+                    return Response({"error": "ID de estrategia requerido"}, status=400)
+                
+                # Verificar que la estrategia existe y pertenece al mentor
+                from apps.empresas.models import Estrategia
+                try:
+                    estrategia = Estrategia.objects.get(
+                        id=estrategia_id,
+                        mentor=request.user
+                    )
+                except Estrategia.DoesNotExist:
+                    return Response({"error": "Estrategia no encontrada o no tienes permisos"}, status=404)
+                
+                # Preparar el contenido de la estrategia para alimentar al bot
+                contenido_estrategia = self._preparar_contenido_estrategia(estrategia, contexto)
+                
+                # Crear entrada de alimentación del bot
+                from .models import BotFeeding
+                alimentacion = BotFeeding.objects.create(
+                    categoria=category,
+                    mentor=request.user,
+                    tipo='estrategia_referencia',
+                    contenido=contenido_estrategia,
+                    estrategia_referencia=estrategia
+                )
+                
+                return Response({
+                    "message": f"Bot alimentado exitosamente con la estrategia '{estrategia.titulo}'",
+                    "id": alimentacion.id
+                })
+            
+            else:
+                return Response({"error": "Tipo de alimentación no válido"}, status=400)
+                
+        except Exception as e:
+            return Response({"error": f"Error interno: {str(e)}"}, status=500)
+    
+    def _preparar_contenido_estrategia(self, estrategia, contexto=""):
+        """
+        Prepara el contenido de una estrategia para alimentar al bot
+        """
+        contenido = f"""
+ESTRATEGIA DE REFERENCIA: {estrategia.titulo}
+
+DESCRIPCIÓN: {estrategia.descripcion}
+
+EMPRESA: {estrategia.empresa.nombre if estrategia.empresa else 'No especificada'}
+
+CATEGORÍA: {estrategia.categoria or 'No especificada'}
+
+FECHA DE CUMPLIMIENTO: {estrategia.fecha_cumplimiento or 'No especificada'}
+
+ESTADO: {'Aceptada' if estrategia.estado == 'aceptada' else estrategia.estado}
+
+ETAPAS Y ACTIVIDADES:
+"""
+        
+        # Añadir etapas y actividades
+        for etapa in estrategia.etapas.all():
+            contenido += f"\n🔹 ETAPA: {etapa.nombre}"
+            if etapa.descripcion:
+                contenido += f"\n   Descripción: {etapa.descripcion}"
+            
+            actividades = etapa.actividades.all()
+            if actividades:
+                contenido += "\n   Actividades:"
+                for actividad in actividades:
+                    estado = "✅ Completada" if actividad.completada else "⏳ Pendiente"
+                    contenido += f"\n   - {actividad.descripcion} ({estado})"
+                    if actividad.fecha_limite:
+                        contenido += f" - Fecha límite: {actividad.fecha_limite}"
+                    if actividad.notas:
+                        contenido += f" - Notas: {actividad.notas}"
+            contenido += "\n"
+        
+        # Añadir contexto adicional si se proporcionó
+        if contexto:
+            contenido += f"\nCONTEXTO ADICIONAL DEL MENTOR:\n{contexto}"
+        
+        contenido += "\n\nEsta estrategia debe ser usada como referencia para generar roadmaps similares y responder preguntas relacionadas con el tema."
+        
+        return contenido
 

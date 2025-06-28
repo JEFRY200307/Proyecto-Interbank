@@ -55,3 +55,45 @@ class Actividad(models.Model):
 
     def __str__(self):
         return f"Actividad: {self.descripcion} - Etapa: {self.etapa.nombre if self.etapa else 'Sin etapa'}"
+
+
+class BotFeeding(models.Model):
+    """
+    Modelo para almacenar información adicional que se usa para alimentar/entrenar los bots
+    """
+    TIPO_CHOICES = [
+        ('texto_libre', 'Texto Libre'),
+        ('estrategia_referencia', 'Estrategia de Referencia'),
+    ]
+    
+    categoria = models.ForeignKey(ChatCategory, on_delete=models.CASCADE, related_name='alimentaciones')
+    mentor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='alimentaciones_bot')
+    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES)  # Aumenté el max_length para que sea suficiente
+    contenido = models.TextField(help_text="Contenido usado para alimentar al bot")
+    estrategia_referencia = models.ForeignKey(
+        'empresas.Estrategia', 
+        on_delete=models.CASCADE, 
+        null=True, 
+        blank=True,
+        help_text="Estrategia usada como referencia (solo si tipo es 'estrategia_referencia')"
+    )
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    activa = models.BooleanField(default=True, help_text="Si esta alimentación está activa para el bot")
+    
+    class Meta:
+        ordering = ['-fecha_creacion']
+        verbose_name = "Alimentación de Bot"
+        verbose_name_plural = "Alimentaciones de Bot"
+    
+    def __str__(self):
+        return f"Alimentación {self.get_tipo_display()} para {self.categoria.name} por {self.mentor.username}"
+    
+    def get_tipo_display_custom(self):
+        """
+        Método personalizado para obtener el tipo en español
+        """
+        tipo_map = {
+            'texto_libre': 'Texto Libre',
+            'estrategia_referencia': 'Estrategia de Referencia'
+        }
+        return tipo_map.get(self.tipo, self.tipo)
