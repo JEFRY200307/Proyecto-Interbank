@@ -387,6 +387,8 @@ function mostrarEtapasYActividades(etapas) {
         const actividadesCompletadas = etapa.actividades.filter(a => a.completada).length;
         const progresoEtapa = etapa.actividades.length > 0 
             ? (actividadesCompletadas / etapa.actividades.length * 100)
+            : 0;
+
         // === RETORNAR HTML COMPLETO DE LA ETAPA ===
         return `
             <div class="etapa-card">
