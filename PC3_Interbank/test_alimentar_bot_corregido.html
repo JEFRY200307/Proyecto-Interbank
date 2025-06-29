@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Alimentar Bot - Corregido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #02bb59;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+        
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #02bb59;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-right: 10px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #028a4a;
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        
+        .debug {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test API Alimentar Bot - CORREGIDO</h1>
+        
+        <!-- Configuración de Token y Bot ID -->
+        <div class="test-section">
+            <h3>🔧 Configuración</h3>
+            <div class="form-group">
+                <label>Token de Autenticación:</label>
+                <input type="text" id="token" placeholder="Bearer token aquí..." value="">
+            </div>
+            <div class="form-group">
+                <label>Bot ID:</label>
+                <input type="number" id="botId" placeholder="ID del bot" value="1">
+            </div>
+            <button onclick="verificarConfiguracion()">Verificar Configuración</button>
+            <div id="config-result"></div>
+        </div>
+        
+        <!-- Test 1: Texto Libre -->
+        <div class="test-section">
+            <h3>📝 Test 1: Alimentar con Texto Libre</h3>
+            <div class="form-group">
+                <label>Contenido:</label>
+                <textarea id="contenido" placeholder="Escribe aquí la información para alimentar al bot...">Esta es información de prueba para alimentar al bot. Incluye datos sobre estrategias empresariales y mejores prácticas de gestión.</textarea>
+            </div>
+            <button onclick="testTextoLibre()" id="btn-texto-libre">Enviar Texto Libre</button>
+            <div id="result-texto-libre"></div>
+        </div>
+        
+        <!-- Test 2: Estrategia como Referencia -->
+        <div class="test-section">
+            <h3>🎯 Test 2: Usar Estrategia como Referencia</h3>
+            <div class="form-group">
+                <label>Estrategia ID:</label>
+                <input type="number" id="estrategiaId" placeholder="ID de la estrategia" value="1">
+            </div>
+            <div class="form-group">
+                <label>Contexto adicional:</label>
+                <textarea id="contexto" placeholder="Información adicional sobre cómo usar esta estrategia...">Esta estrategia debe ser utilizada como ejemplo para empresas del sector tecnológico.</textarea>
+            </div>
+            <button onclick="testEstrategiaReferencia()" id="btn-estrategia">Usar como Referencia</button>
+            <div id="result-estrategia"></div>
+        </div>
+        
+        <!-- Test 3: Verificar API Endpoint -->
+        <div class="test-section">
+            <h3>🔍 Test 3: Verificar Endpoint API</h3>
+            <button onclick="verificarEndpoint()">Verificar /chat/api/alimentar-bot/</button>
+            <div id="result-endpoint"></div>
+        </div>
+        
+        <!-- Debug Info -->
+        <div class="test-section">
+            <h3>🐛 Información de Debug</h3>
+            <div id="debug-info" class="debug"></div>
+        </div>
+    </div>
+
+    <script>
+        // Función para mostrar resultados
+        function mostrarResultado(elementId, mensaje, tipo = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${tipo}">${mensaje}</div>`;
+        }
+        
+        // Función para debug
+        function debug(mensaje) {
+            const debugElement = document.getElementById('debug-info');
+            const timestamp = new Date().toLocaleTimeString();
+            debugElement.innerHTML += `[${timestamp}] ${mensaje}\n`;
+        }
+        
+        // Verificar configuración
+        function verificarConfiguracion() {
+            const token = document.getElementById('token').value.trim();
+            const botId = document.getElementById('botId').value.trim();
+            
+            if (!token) {
+                mostrarResultado('config-result', '❌ Token requerido', 'error');
+                return false;
+            }
+            
+            if (!botId) {
+                mostrarResultado('config-result', '❌ Bot ID requerido', 'error');
+                return false;
+            }
+            
+            // Verificar formato del token
+            if (!token.startsWith('Bearer ') && !token.match(/^[A-Za-z0-9\.\-_]+$/)) {
+                mostrarResultado('config-result', '⚠️ Formato de token puede ser incorrecto', 'info');
+            }
+            
+            mostrarResultado('config-result', '✅ Configuración válida', 'success');
+            debug(`Token configurado: ${token.substring(0, 20)}...`);
+            debug(`Bot ID: ${botId}`);
+            return true;
+        }
+        
+        // Test de texto libre
+        async function testTextoLibre() {
+            if (!verificarConfiguracion()) return;
+            
+            const token = document.getElementById('token').value.trim();
+            const botId = parseInt(document.getElementById('botId').value);
+            const contenido = document.getElementById('contenido').value.trim();
+            const btn = document.getElementById('btn-texto-libre');
+            
+            if (!contenido) {
+                mostrarResultado('result-texto-libre', '❌ El contenido no puede estar vacío', 'error');
+                return;
+            }
+            
+            // Deshabilitar botón
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            
+            const data = {
+                tipo: 'texto_libre',
+                contenido: contenido,
+                bot_id: botId
+            };
+            
+            debug(`Enviando datos de texto libre: ${JSON.stringify(data, null, 2)}`);
+            
+            try {
+                const response = await fetch('/chat/api/alimentar-bot/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                debug(`Respuesta HTTP: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    debug(`Respuesta exitosa: ${JSON.stringify(result, null, 2)}`);
+                    mostrarResultado('result-texto-libre', '✅ Bot alimentado exitosamente con texto libre!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    debug(`Error del servidor: ${JSON.stringify(errorData, null, 2)}`);
+                    mostrarResultado('result-texto-libre', `❌ Error del servidor: ${errorData.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                debug(`Error de conexión: ${error.message}`);
+                mostrarResultado('result-texto-libre', `❌ Error de conexión: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Enviar Texto Libre';
+            }
+        }
+        
+        // Test de estrategia como referencia
+        async function testEstrategiaReferencia() {
+            if (!verificarConfiguracion()) return;
+            
+            const token = document.getElementById('token').value.trim();
+            const botId = parseInt(document.getElementById('botId').value);
+            const estrategiaId = parseInt(document.getElementById('estrategiaId').value);
+            const contexto = document.getElementById('contexto').value.trim();
+            const btn = document.getElementById('btn-estrategia');
+            
+            if (!estrategiaId) {
+                mostrarResultado('result-estrategia', '❌ ID de estrategia requerido', 'error');
+                return;
+            }
+            
+            // Deshabilitar botón
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+            
+            const data = {
+                tipo: 'estrategia_referencia',
+                estrategia_id: estrategiaId,
+                contexto: contexto,
+                bot_id: botId
+            };
+            
+            debug(`Enviando datos de estrategia: ${JSON.stringify(data, null, 2)}`);
+            
+            try {
+                const response = await fetch('/chat/api/alimentar-bot/', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                debug(`Respuesta HTTP: ${response.status} ${response.statusText}`);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    debug(`Respuesta exitosa: ${JSON.stringify(result, null, 2)}`);
+                    mostrarResultado('result-estrategia', '✅ Bot alimentado exitosamente con estrategia de referencia!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    debug(`Error del servidor: ${JSON.stringify(errorData, null, 2)}`);
+                    mostrarResultado('result-estrategia', `❌ Error del servidor: ${errorData.error || 'Error desconocido'}`, 'error');
+                }
+            } catch (error) {
+                debug(`Error de conexión: ${error.message}`);
+                mostrarResultado('result-estrategia', `❌ Error de conexión: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Usar como Referencia';
+            }
+        }
+        
+        // Verificar endpoint
+        async function verificarEndpoint() {
+            const token = document.getElementById('token').value.trim();
+            
+            if (!token) {
+                mostrarResultado('result-endpoint', '❌ Token requerido para verificar endpoint', 'error');
+                return;
+            }
+            
+            debug('Verificando endpoint /chat/api/alimentar-bot/');
+            
+            try {
+                // Intentar un GET para ver si el endpoint existe
+                const response = await fetch('/chat/api/alimentar-bot/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
+                
+                debug(`Respuesta del endpoint: ${response.status} ${response.statusText}`);
+                
+                if (response.status === 405) {
+                    // Method Not Allowed es esperado para GET en un endpoint POST
+                    mostrarResultado('result-endpoint', '✅ Endpoint encontrado (solo acepta POST)', 'success');
+                } else if (response.status === 404) {
+                    mostrarResultado('result-endpoint', '❌ Endpoint no encontrado (404)', 'error');
+                } else if (response.status === 401 || response.status === 403) {
+                    mostrarResultado('result-endpoint', '✅ Endpoint encontrado (requiere autenticación)', 'success');
+                } else {
+                    mostrarResultado('result-endpoint', `ℹ️ Endpoint responde con código: ${response.status}`, 'info');
+                }
+            } catch (error) {
+                debug(`Error al verificar endpoint: ${error.message}`);
+                mostrarResultado('result-endpoint', `❌ Error al verificar endpoint: ${error.message}`, 'error');
+            }
+        }
+        
+        // Función para obtener CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            debug('🧪 Test de Alimentar Bot inicializado');
+            debug('Versión: Corregida y mejorada');
+            
+            // Intentar obtener token del localStorage si existe
+            const storedToken = localStorage.getItem('access_token');
+            if (storedToken) {
+                document.getElementById('token').value = storedToken;
+                debug('Token cargado desde localStorage');
+            }
+            
+            debug('Listo para realizar pruebas');
+        });
+    </script>
+</body>
+</html>

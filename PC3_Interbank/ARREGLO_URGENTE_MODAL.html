@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 ARREGLO URGENTE - Modal Mentoría Dashboard Actividades</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667e            const styles = `
+                <style id="modal-styles">`; 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .emergency-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .emergency-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #4caf50;
+        }
+        
+        .btn-test {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-test:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+        
+        .status-panel {
+            background: #263238;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .simulacion-dashboard {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .estrategia-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 15px 0;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #388e3c 0%, #43a047 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-container">
+        <div class="emergency-header">
+            <h1>🚨 ARREGLO URGENTE: Modal Mentoría Dashboard Actividades</h1>
+            <p><strong>Problema:</strong> El modal de "Solicitar Mentoría" no se puede cerrar</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 SIMULACIÓN DEL DASHBOARD ACTIVIDADES</h2>
+            <p>Esta es una replica exacta del problema que tienes en tu exposición:</p>
+            
+            <div class="simulacion-dashboard">
+                <div class="estrategia-card">
+                    <h3>📊 Estrategia de Ejemplo</h3>
+                    <p>Esta estrategia simula exactamente lo que tienes en tu dashboard</p>
+                    
+                    <div class="mentoria-cta">
+                        <h4>¿Necesitas ayuda?</h4>
+                        <p>Solicita la ayuda de un mentor experto</p>
+                        <button class="btn-primary" onclick="solicitarMentoriaEstrategia(123)">
+                            Solicitar Mentoría
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔧 CONTROLES DE PRUEBA</h2>
+            <button class="btn-test" onclick="testAbrirModal()">
+                🎯 Abrir Modal (Método Principal)
+            </button>
+            
+            <button class="btn-test btn-danger" onclick="cerrarTodosLosModales()">
+                ❌ CERRAR TODOS LOS MODALES (EMERGENCIA)
+            </button>
+            
+            <button class="btn-test" onclick="debugModal()">
+                🔍 Debuggear Estado del Modal
+            </button>
+            
+            <button class="btn-test" onclick="limpiarTodo()">
+                🧹 Limpiar Todo y Reiniciar
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 INSTRUCCIONES DE PRUEBA:</h3>
+            <ol>
+                <li><strong>Reproduce el problema:</strong> Haz clic en "Solicitar Mentoría"</li>
+                <li><strong>Intenta cerrar con cada método:</strong>
+                    <ul>
+                        <li>❌ Botón X (esquina superior derecha)</li>
+                        <li>⌨️ Tecla Escape</li>
+                        <li>🖱️ Clic en el fondo oscuro</li>
+                        <li>🔘 Botón "Cancelar"</li>
+                    </ul>
+                </li>
+                <li><strong>Si no se cierra:</strong> Usa el botón rojo "CERRAR TODOS LOS MODALES"</li>
+                <li><strong>Para debugging:</strong> Usa "Debuggear Estado del Modal"</li>
+            </ol>
+        </div>
+
+        <div class="status-panel" id="debugOutput">
+=== CONSOLA DE DEBUGGING ===
+Estado inicial: Listo para pruebas
+Haz clic en cualquier botón para comenzar las pruebas...
+        </div>
+    </div>
+
+    <script>
+        // Simulación completa del entorno original
+        
+        // Simular localStorage
+        localStorage.setItem('access_token', 'test-token-exposicion');
+        
+        // Función de logging
+        function log(message) {
+            const output = document.getElementById('debugOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            output.textContent += `\n[${timestamp}] ${message}`;
+            output.scrollTop = output.scrollHeight;
+            console.log(message);
+        }
+        
+        // Función de notificaciones
+        function showNotification(message, type = 'info') {
+            log(`NOTIFICACIÓN (${type}): ${message}`);
+        }
+        
+        // Función para simular getCookie
+        function getCookie(name) {
+            return 'test-csrf-token';
+        }
+        
+        // === CÓDIGO EXACTO DEL PROBLEMA ===
+        
+        // Funciones para gestión de mentoría por estrategia
+        function solicitarMentoriaEstrategia(estrategiaId) {
+            log('=== DEBUGGING MODAL ===');
+            log('Estrategia ID: ' + estrategiaId);
+            
+            // Mostrar modal para seleccionar especialidad
+            mostrarModalSolicitarMentoria(estrategiaId);
+            
+            // Debugging adicional
+            setTimeout(() => {
+                const modal = document.getElementById('modalSolicitarMentoria');
+                log('Modal encontrado: ' + (modal ? 'SÍ' : 'NO'));
+                log('Display del modal: ' + (modal ? modal.style.display : 'N/A'));
+                log('Estilos computados: ' + (modal ? window.getComputedStyle(modal).display : 'N/A'));
+            }, 100);
+        }
+
+        // Manejo universal de modales
+        document.addEventListener('click', function(e) {
+            // Cerrar modal si se hace clic en el fondo (no en el contenido)
+            if (e.target.classList.contains('modal') || e.target.classList.contains('formulario-alimentar')) {
+                log('Cerrando modal: clic en fondo');
+                cerrarTodosLosModales();
+            }
+            
+            // Cerrar modal con el botón X o close
+            if (e.target.classList.contains('close') || 
+                e.target.classList.contains('formulario-close') || 
+                e.target.textContent === '×' ||
+                e.target.innerHTML === '&times;') {
+                log('Cerrando modal: botón X');
+                cerrarTodosLosModales();
+            }
+            
+            // Botones de cancelar
+            if (e.target.classList.contains('btn-secondary') || 
+                e.target.textContent.toLowerCase().includes('cancelar')) {
+                log('Cerrando modal: botón Cancelar');
+                cerrarTodosLosModales();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                log('Cerrando modal: tecla Escape');
+                cerrarTodosLosModales();
+            }
+        });
+
+        function cerrarTodosLosModales() {
+            // Buscar y cerrar cualquier modal visible
+            const modales = document.querySelectorAll('.modal, .formulario-alimentar');
+            modales.forEach(modal => {
+                modal.style.display = 'none';
+                // Limpiar cualquier estilo inline que pudiera interferir
+                modal.style.justifyContent = '';
+                modal.style.alignItems = '';
+            });
+            
+            // Log para debugging
+            log('Modales cerrados: ' + modales.length);
+        }
+
+        function mostrarModalSolicitarMentoria(estrategiaId) {
+            log('Iniciando mostrarModalSolicitarMentoria...');
+            
+            // Verificar si el modal ya existe, si no, crearlo
+            let modal = document.getElementById('modalSolicitarMentoria');
+            
+            if (!modal) {
+                log('Creando modal dinámicamente...');
+                
+                // Crear el modal dinámicamente
+                const modalHTML = `
+                    <div id="modalSolicitarMentoria" class="modal" style="display: none;">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3>🎯 Solicitar Mentoría para Estrategia</h3>
+                                <span class="close" onclick="cerrarTodosLosModales()">&times;</span>
+                            </div>
+                            <div class="modal-body">
+                                <form id="formSolicitarMentoria">
+                                    <input type="hidden" id="estrategiaIdInput" value="${estrategiaId}" />
+                                    
+                                    <div class="form-group">
+                                        <label for="especialidadSelect">Especialidad Requerida:</label>
+                                        <select id="especialidadSelect" required>
+                                            <option value="">Selecciona una especialidad</option>
+                                            <option value="marketing_digital">Marketing Digital</option>
+                                            <option value="acceso_a_financiamiento">Acceso a Financiamiento</option>
+                                            <option value="innovacion_y_desarrollo_de_productos">Innovación y Desarrollo de Productos</option>
+                                            <option value="branding">Branding</option>
+                                            <option value="diseno_y_desarrollo_ux_ui">Diseño y Desarrollo UX/UI</option>
+                                            <option value="seo_en_la_era_de_la_ia">SEO en la Era de la IA</option>
+                                            <option value="general">General (Todas las áreas)</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="comentariosTextarea">Comentarios adicionales (opcional):</label>
+                                        <textarea id="comentariosTextarea" rows="4" placeholder="Describe qué tipo de ayuda específica necesitas..."></textarea>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="submit" class="btn-primary">Solicitar Mentoría</button>
+                                        <button type="button" class="btn-secondary" onclick="cerrarTodosLosModales()">Cancelar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHTML);
+                modal = document.getElementById('modalSolicitarMentoria');
+                log('Modal creado exitosamente');
+                
+                // Agregar event listener al formulario
+                document.getElementById('formSolicitarMentoria').addEventListener('submit', enviarSolicitudMentoriaTest);
+                
+                // Asegurar que el CSS se aplique correctamente
+                setTimeout(() => {
+                    modal.style.display = 'flex';
+                    modal.style.justifyContent = 'center';
+                    modal.style.alignItems = 'center';
+                    log('Modal mostrado con flex layout');
+                }, 10);
+            } else {
+                log('Modal ya existe, actualizando...');
+                // Solo actualizar el ID de estrategia
+                document.getElementById('estrategiaIdInput').value = estrategiaId;
+                // Mostrar el modal
+                modal.style.display = 'flex';
+                modal.style.justifyContent = 'center';
+                modal.style.alignItems = 'center';
+                log('Modal mostrado (existente)');
+            }
+        }
+
+        function enviarSolicitudMentoriaTest(e) {
+            e.preventDefault();
+            log('Formulario enviado - SIMULACIÓN');
+            
+            const estrategiaId = document.getElementById('estrategiaIdInput').value;
+            const especialidad = document.getElementById('especialidadSelect').value;
+            const comentarios = document.getElementById('comentariosTextarea').value;
+            
+            if (!especialidad) {
+                showNotification('Por favor selecciona una especialidad', 'error');
+                return;
+            }
+            
+            log('Datos del formulario: Estrategia ' + estrategiaId + ', Especialidad: ' + especialidad);
+            showNotification('Solicitud enviada exitosamente (SIMULACIÓN)', 'success');
+            cerrarTodosLosModales();
+            
+            // Limpiar formulario
+            document.getElementById('formSolicitarMentoria').reset();
+        }
+        
+        // === FUNCIONES DE PRUEBA ADICIONALES ===
+        
+        function testAbrirModal() {
+            log('=== TEST: Abrir Modal ===');
+            solicitarMentoriaEstrategia(999);
+        }
+        
+        function debugModal() {
+            log('=== DEBUG COMPLETO ===');
+            const modal = document.getElementById('modalSolicitarMentoria');
+            if (modal) {
+                log('Modal encontrado: SÍ');
+                log('Display: ' + modal.style.display);
+                log('Position: ' + window.getComputedStyle(modal).position);
+                log('Z-index: ' + window.getComputedStyle(modal).zIndex);
+                log('Visibility: ' + window.getComputedStyle(modal).visibility);
+                log('Opacity: ' + window.getComputedStyle(modal).opacity);
+            } else {
+                log('Modal encontrado: NO');
+            }
+            
+            const modales = document.querySelectorAll('.modal');
+            log('Total modales en DOM: ' + modales.length);
+        }
+        
+        function limpiarTodo() {
+            log('=== LIMPIEZA COMPLETA ===');
+            const modales = document.querySelectorAll('.modal');
+            modales.forEach(modal => modal.remove());
+            log('Todos los modales eliminados del DOM');
+            
+            const styles = document.getElementById('modal-styles');
+            if (styles) {
+                styles.remove();
+                log('Estilos de modal eliminados');
+            }
+        }
+
+        // Cargar estilos del modal (igual que en el original)
+        if (!document.getElementById('modal-styles')) {
+            const styles = \`
+                <style id="modal-styles">
+                    .modal {
+                        display: none !important;
+                        position: fixed !important;
+                        z-index: 2000 !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        background-color: rgba(0, 0, 0, 0.5) !important;
+                        backdrop-filter: blur(4px) !important;
+                        justify-content: center !important;
+                        align-items: center !important;
+                    }
+                    
+                    .modal[style*="flex"], .modal[style*="block"] {
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: center !important;
+                    }
+                    
+                    .modal-content {
+                        background: white !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+                        max-width: 500px !important;
+                        width: 90% !important;
+                        max-height: 90vh !important;
+                        overflow-y: auto !important;
+                        position: relative !important;
+                        margin: auto !important;
+                    }
+                    
+                    .modal-header {
+                        padding: 1.5rem !important;
+                        border-bottom: 1px solid #e5e7eb !important;
+                        display: flex !important;
+                        justify-content: space-between !important;
+                        align-items: center !important;
+                    }
+                    
+                    .modal-header h3 {
+                        margin: 0 !important;
+                        color: #2e7d32 !important;
+                    }
+                    
+                    .close {
+                        color: #aaa !important;
+                        font-size: 28px !important;
+                        font-weight: bold !important;
+                        cursor: pointer !important;
+                        border: none !important;
+                        background: none !important;
+                        line-height: 1 !important;
+                    }
+                    
+                    .close:hover {
+                        color: #000 !important;
+                    }
+                    
+                    .modal-body {
+                        padding: 1.5rem !important;
+                    }
+                    
+                    .form-group {
+                        margin-bottom: 1rem !important;
+                    }
+                    
+                    .form-group label {
+                        display: block !important;
+                        margin-bottom: 0.5rem !important;
+                        font-weight: 500 !important;
+                        color: #2e7d32 !important;
+                    }
+                    
+                    .form-group select,
+                    .form-group textarea {
+                        width: 100% !important;
+                        padding: 0.8rem !important;
+                        border: 1px solid #b2dfdb !important;
+                        border-radius: 8px !important;
+                        font-size: 1rem !important;
+                        box-sizing: border-box !important;
+                    }
+                    
+                    .form-group select:focus,
+                    .form-group textarea:focus {
+                        outline: none !important;
+                        border-color: #388e3c !important;
+                        box-shadow: 0 0 0 2px rgba(56, 142, 60, 0.1) !important;
+                    }
+                    
+                    .form-actions {
+                        display: flex !important;
+                        gap: 1rem !important;
+                        justify-content: flex-end !important;
+                        margin-top: 1.5rem !important;
+                    }
+                    
+                    .btn-primary, .btn-secondary {
+                        padding: 0.8rem 1.5rem !important;
+                        border: none !important;
+                        border-radius: 8px !important;
+                        font-size: 1rem !important;
+                        cursor: pointer !important;
+                        transition: all 0.3s ease !important;
+                    }
+                    
+                    .btn-primary {
+                        background: linear-gradient(135deg, #388e3c 0%, #43a047 100%) !important;
+                        color: white !important;
+                    }
+                    
+                    .btn-primary:hover {
+                        background: linear-gradient(135deg, #43a047 0%, #4caf50 100%) !important;
+                        transform: translateY(-2px) !important;
+                    }
+                    
+                    .btn-secondary {
+                        background: #6c757d !important;
+                        color: white !important;
+                    }
+                    
+                    .btn-secondary:hover {
+                        background: #5a6268 !important;
+                    }
+                </style>
+            \`;
+            document.head.insertAdjacentHTML('beforeend', styles);
+            log('Estilos de modal cargados');
+        }
+        
+        // Inicializar
+        log('Sistema inicializado - Listo para pruebas de exposición');
+    </script>
+</body>
+</html>

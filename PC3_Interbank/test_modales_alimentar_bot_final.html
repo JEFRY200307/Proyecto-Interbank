@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modales Alimentar Bot - Corregidos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-section {
+            background: #e3f2fd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .btn-test {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-test:hover {
+            background: #45a049;
+        }
+        
+        .btn-alimentar {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-alimentar:hover {
+            background: #f57c00;
+        }
+        
+        .api-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .api-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .api-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .api-loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        /* Estilos para modales - copiados del archivo original */
+        .formulario-alimentar {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .formulario-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .formulario-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .formulario-close:hover {
+            color: #000;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-guardar {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-cancelar {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            margin: 15px 0 5px 0;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+        
+        .log-success { color: #28a745; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #007bff; }
+        .log-warning { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Modales Alimentar Bot - Versión Final Corregida</h1>
+        
+        <div class="test-section">
+            <h3>📋 Estado de APIs</h3>
+            <div id="api-status-container">
+                <div id="api-status-auth" class="api-status api-loading">🔐 Verificando autenticación...</div>
+                <div id="api-status-estrategias" class="api-status api-loading">📚 Verificando estrategias...</div>
+                <div id="api-status-alimentar" class="api-status api-loading">🍽️ Verificando API alimentar bot...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎯 Pruebas de Funcionalidad</h3>
+            <button class="btn-test" onclick="testModalTextoLibre()">Probar Modal Texto Libre</button>
+            <button class="btn-test" onclick="testModalEstrategiaReferencia()">Probar Modal Estrategia Referencia</button>
+            <button class="btn-test" onclick="testCargarEstrategias()">Recargar Estrategias</button>
+            <button class="btn-test" onclick="testCerrarModales()">Test Cerrar Modales (ESC)</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🍽️ Alimentar Bot (Simulación)</h3>
+            <div class="feeding-options">
+                <button onclick="mostrarFormularioTextoLibre()" class="btn-alimentar">
+                    📝 Texto Libre
+                </button>
+                <button onclick="mostrarFormularioEstrategiaReferencia()" class="btn-alimentar">
+                    🎯 Usar Estrategia como Referencia
+                </button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Log de Actividad</h3>
+            <div id="log-container" class="log"></div>
+            <button class="btn-test" onclick="clearLog()">Limpiar Log</button>
+        </div>
+    </div>
+    
+    <!-- Formulario de Texto Libre -->
+    <div id="formulario-texto-libre" class="formulario-alimentar" style="display: none;">
+        <div class="formulario-container">
+            <button class="formulario-close" onclick="cerrarFormularioTextoLibre()" type="button">&times;</button>
+            <h4>📝 Añadir Texto Libre</h4>
+            <form id="form-texto-libre">
+                <label>Contenido:
+                    <textarea name="contenido" placeholder="Escribe aquí la información que quieres que el bot aprenda..." required></textarea>
+                </label>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-guardar">Alimentar Bot</button>
+                    <button type="button" onclick="cerrarFormularioTextoLibre()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Formulario de Estrategia como Referencia -->
+    <div id="formulario-estrategia-referencia" class="formulario-alimentar" style="display: none;">
+        <div class="formulario-container">
+            <button class="formulario-close" onclick="cerrarFormularioEstrategiaReferencia()" type="button">&times;</button>
+            <h4>🎯 Usar Estrategia como Referencia</h4>
+            <form id="form-estrategia-referencia">
+                <label>Estrategia:
+                    <select name="estrategia_id" required>
+                        <option value="">Selecciona una estrategia...</option>
+                    </select>
+                </label>
+                <label>Contexto adicional (opcional):
+                    <textarea name="contexto" placeholder="Información adicional sobre cómo debe usar esta estrategia..."></textarea>
+                </label>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-guardar">Usar como Referencia</button>
+                    <button type="button" onclick="cerrarFormularioEstrategiaReferencia()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let estrategiasDisponibles = [];
+        const botId = 1; // Bot de prueba
+        
+        // Función de logging mejorada
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+        
+        // === FUNCIONES DE PRUEBA ===
+        function testModalTextoLibre() {
+            log('🧪 Probando modal de texto libre', 'info');
+            mostrarFormularioTextoLibre();
+        }
+        
+        function testModalEstrategiaReferencia() {
+            log('🧪 Probando modal de estrategia como referencia', 'info');
+            mostrarFormularioEstrategiaReferencia();
+        }
+        
+        function testCargarEstrategias() {
+            log('🧪 Probando carga de estrategias', 'info');
+            cargarEstrategiasDisponibles();
+        }
+        
+        function testCerrarModales() {
+            log('🧪 Simulando tecla ESC para cerrar modales', 'info');
+            const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+            document.dispatchEvent(escEvent);
+        }
+        
+        // === FUNCIONES PRINCIPALES (COPIADAS Y MEJORADAS) ===
+        
+        /**
+         * Muestra el formulario de texto libre para alimentar al bot
+         */
+        function mostrarFormularioTextoLibre() {
+            log('📝 Abriendo formulario de texto libre', 'info');
+            
+            // Ocultar el otro formulario
+            const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+            if (formEstrategia) {
+                formEstrategia.style.display = 'none';
+            }
+            
+            // Mostrar este formulario
+            const formTexto = document.getElementById('formulario-texto-libre');
+            if (formTexto) {
+                formTexto.style.display = 'flex';
+                
+                // Limpiar el formulario
+                const form = document.getElementById('form-texto-libre');
+                if (form) {
+                    form.reset();
+                }
+                
+                // Enfocar el textarea
+                setTimeout(() => {
+                    const textarea = form.querySelector('textarea[name="contenido"]');
+                    if (textarea) {
+                        textarea.focus();
+                        log('✅ Textarea enfocado correctamente', 'success');
+                    }
+                }, 100);
+            } else {
+                log('❌ Formulario de texto libre no encontrado', 'error');
+            }
+        }
+        
+        /**
+         * Cierra el formulario de texto libre
+         */
+        function cerrarFormularioTextoLibre() {
+            log('❌ Cerrando formulario de texto libre', 'info');
+            const formulario = document.getElementById('formulario-texto-libre');
+            if (formulario) {
+                formulario.style.display = 'none';
+                log('✅ Formulario de texto libre cerrado', 'success');
+            }
+        }
+        
+        /**
+         * Muestra el formulario de estrategia como referencia
+         */
+        function mostrarFormularioEstrategiaReferencia() {
+            log('🎯 Abriendo formulario de estrategia como referencia', 'info');
+            
+            // Ocultar el otro formulario
+            const formTexto = document.getElementById('formulario-texto-libre');
+            if (formTexto) {
+                formTexto.style.display = 'none';
+            }
+            
+            // Mostrar este formulario
+            const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+            if (formEstrategia) {
+                formEstrategia.style.display = 'flex';
+                
+                // Limpiar el formulario
+                const form = document.getElementById('form-estrategia-referencia');
+                if (form) {
+                    form.reset();
+                }
+                
+                // Cargar estrategias en el select (siempre intentar cargar)
+                cargarEstrategiasEnSelect();
+            } else {
+                log('❌ Formulario de estrategia como referencia no encontrado', 'error');
+            }
+        }
+        
+        /**
+         * Cierra el formulario de estrategia como referencia
+         */
+        function cerrarFormularioEstrategiaReferencia() {
+            log('❌ Cerrando formulario de estrategia como referencia', 'info');
+            const formulario = document.getElementById('formulario-estrategia-referencia');
+            if (formulario) {
+                formulario.style.display = 'none';
+                log('✅ Formulario de estrategia como referencia cerrado', 'success');
+            }
+        }
+        
+        /**
+         * Carga las estrategias del mentor en el select
+         */
+        async function cargarEstrategiasEnSelect() {
+            log('📋 Cargando estrategias en el select', 'info');
+            const select = document.querySelector('#form-estrategia-referencia select[name="estrategia_id"]');
+            
+            if (!select) {
+                log('❌ Select de estrategias no encontrado', 'error');
+                return;
+            }
+            
+            // Mostrar loading
+            select.innerHTML = '<option value="">Cargando estrategias...</option>';
+            select.disabled = true;
+            
+            try {
+                // Siempre intentar cargar estrategias frescas del servidor
+                log('🔄 Cargando estrategias desde el servidor...', 'info');
+                await cargarEstrategiasDisponibles();
+                
+                // Verificar si se cargaron estrategias
+                if (!estrategiasDisponibles || estrategiasDisponibles.length === 0) {
+                    select.innerHTML = '<option value="">No hay estrategias disponibles</option>';
+                    select.disabled = true;
+                    log('⚠️ No se encontraron estrategias disponibles', 'warning');
+                    return;
+                }
+                
+                // Limpiar y llenar el select
+                select.innerHTML = '<option value="">Selecciona una estrategia...</option>';
+                
+                estrategiasDisponibles.forEach(estrategia => {
+                    const option = document.createElement('option');
+                    option.value = estrategia.id;
+                    option.textContent = `${estrategia.titulo} ${estrategia.empresa_nombre ? '(' + estrategia.empresa_nombre + ')' : ''}`;
+                    select.appendChild(option);
+                });
+                
+                select.disabled = false;
+                log(`✅ ${estrategiasDisponibles.length} estrategias cargadas en el select`, 'success');
+                
+            } catch (error) {
+                log(`💥 Error al cargar estrategias en select: ${error.message}`, 'error');
+                select.innerHTML = '<option value="">Error al cargar estrategias</option>';
+                select.disabled = true;
+            }
+        }
+        
+        /**
+         * Carga las estrategias disponibles del mentor
+         */
+        async function cargarEstrategiasDisponibles() {
+            log('🔄 Cargando estrategias disponibles del mentor', 'info');
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                log('❌ No hay token de autenticación - usando datos de prueba', 'warning');
+                // Usar datos de prueba para testing
+                estrategiasDisponibles = [
+                    { id: 1, titulo: 'Estrategia de Prueba 1', empresa_nombre: 'Empresa Test' },
+                    { id: 2, titulo: 'Estrategia de Prueba 2', empresa_nombre: 'Otra Empresa' },
+                    { id: 3, titulo: 'Estrategia Sin Empresa', empresa_nombre: null }
+                ];
+                updateApiStatus('estrategias', 'success', 'Datos de prueba cargados');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/mentor/api/mis-estrategias/', {
+                    headers: { 
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                log(`📡 Respuesta de mis-estrategias: ${response.status}`, 'info');
+                
+                if (response.ok) {
+                    estrategiasDisponibles = await response.json();
+                    log(`✅ ${estrategiasDisponibles.length} estrategias cargadas`, 'success');
+                    updateApiStatus('estrategias', 'success', `${estrategiasDisponibles.length} estrategias encontradas`);
+                } else {
+                    log(`❌ Error ${response.status}: ${response.statusText}`, 'error');
+                    estrategiasDisponibles = [];
+                    updateApiStatus('estrategias', 'error', `Error ${response.status}`);
+                }
+            } catch (error) {
+                log(`💥 Error al cargar estrategias disponibles: ${error.message}`, 'error');
+                estrategiasDisponibles = [];
+                updateApiStatus('estrategias', 'error', 'Error de conexión');
+            }
+        }
+        
+        /**
+         * Configura los event listeners para cerrar modales
+         */
+        function setupModalEventListeners() {
+            log('🔧 Configurando event listeners de modales', 'info');
+            
+            // Event listeners para cerrar formularios de alimentar bot al hacer clic fuera
+            const formularioTextoLibre = document.getElementById('formulario-texto-libre');
+            const formularioEstrategiaRef = document.getElementById('formulario-estrategia-referencia');
+            
+            if (formularioTextoLibre) {
+                formularioTextoLibre.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        cerrarFormularioTextoLibre();
+                    }
+                });
+                log('✅ Event listener para formulario texto libre configurado', 'success');
+            }
+            
+            if (formularioEstrategiaRef) {
+                formularioEstrategiaRef.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        cerrarFormularioEstrategiaReferencia();
+                    }
+                });
+                log('✅ Event listener para formulario estrategia referencia configurado', 'success');
+            }
+            
+            // Event listener para tecla Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    log('⌨️ Tecla ESC presionada - cerrando modales', 'info');
+                    cerrarFormularioTextoLibre();
+                    cerrarFormularioEstrategiaReferencia();
+                }
+            });
+            log('✅ Event listener para tecla ESC configurado', 'success');
+        }
+        
+        /**
+         * Actualiza el estado de las APIs en la interfaz
+         */
+        function updateApiStatus(api, status, message) {
+            const element = document.getElementById(`api-status-${api}`);
+            if (element) {
+                element.className = `api-status api-${status}`;
+                element.textContent = `${getApiIcon(api)} ${message}`;
+            }
+        }
+        
+        function getApiIcon(api) {
+            const icons = {
+                'auth': '🔐',
+                'estrategias': '📚',
+                'alimentar': '🍽️'
+            };
+            return icons[api] || '📋';
+        }
+        
+        /**
+         * Verifica el estado de autenticación
+         */
+        function checkAuthStatus() {
+            const token = localStorage.getItem('access_token');
+            if (token) {
+                updateApiStatus('auth', 'success', 'Token de autenticación encontrado');
+                log('✅ Token de autenticación disponible', 'success');
+            } else {
+                updateApiStatus('auth', 'warning', 'Sin token - usando modo de prueba');
+                log('⚠️ No hay token de autenticación - modo de prueba', 'warning');
+            }
+        }
+        
+        /**
+         * Verifica si la API de alimentar bot está disponible
+         */
+        async function checkAlimentarBotApi() {
+            const token = localStorage.getItem('access_token');
+            
+            if (!token) {
+                updateApiStatus('alimentar', 'warning', 'Sin autenticación - modo simulación');
+                log('⚠️ API alimentar bot - modo simulación', 'warning');
+                return;
+            }
+            
+            try {
+                // Hacer una petición de prueba (método OPTIONS o HEAD si está disponible)
+                const response = await fetch('/chat/api/alimentar-bot/', {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                    }
+                });
+                
+                if (response.ok || response.status === 405) { // 405 = Method not allowed es normal para OPTIONS
+                    updateApiStatus('alimentar', 'success', 'API disponible');
+                    log('✅ API alimentar bot disponible', 'success');
+                } else {
+                    updateApiStatus('alimentar', 'error', `API no disponible (${response.status})`);
+                    log(`❌ API alimentar bot no disponible: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                updateApiStatus('alimentar', 'error', 'Error de conexión');
+                log(`💥 Error al verificar API alimentar bot: ${error.message}`, 'error');
+            }
+        }
+        
+        // === INICIALIZACIÓN ===
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Iniciando test de modales alimentar bot', 'info');
+            
+            // Configurar event listeners
+            setupModalEventListeners();
+            
+            // Verificar estados
+            checkAuthStatus();
+            checkAlimentarBotApi();
+            cargarEstrategiasDisponibles();
+            
+            // Configurar formularios (simulación)
+            const formTextoLibre = document.getElementById('form-texto-libre');
+            const formEstrategiaRef = document.getElementById('form-estrategia-referencia');
+            
+            if (formTextoLibre) {
+                formTextoLibre.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    log('📝 Formulario texto libre enviado (simulación)', 'success');
+                    alert('✅ Formulario de texto libre enviado correctamente (simulación)');
+                    cerrarFormularioTextoLibre();
+                });
+            }
+            
+            if (formEstrategiaRef) {
+                formEstrategiaRef.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    log('🎯 Formulario estrategia referencia enviado (simulación)', 'success');
+                    alert('✅ Formulario de estrategia como referencia enviado correctamente (simulación)');
+                    cerrarFormularioEstrategiaReferencia();
+                });
+            }
+            
+            log('✅ Test inicializado correctamente', 'success');
+        });
+    </script>
+</body>
+</html>

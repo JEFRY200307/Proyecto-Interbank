@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 ARREGLO MODAL - Exposición</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .emergency {
+            background: #ff4444;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .btn-danger {
+            background: #f44336;
+        }
+        
+        .status {
+            background: #333;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        /* ESTILOS DEL MODAL - VERSIÓN CORREGIDA */
+        .modal {
+            display: none !important;
+            position: fixed !important;
+            z-index: 9999 !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background-color: rgba(0, 0, 0, 0.5) !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        
+        .modal.show {
+            display: flex !important;
+        }
+        
+        .modal-content {
+            background: white !important;
+            border-radius: 12px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+            max-width: 500px !important;
+            width: 90% !important;
+            max-height: 90vh !important;
+            overflow-y: auto !important;
+            position: relative !important;
+        }
+        
+        .modal-header {
+            padding: 1.5rem !important;
+            border-bottom: 1px solid #e5e7eb !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+        }
+        
+        .modal-header h3 {
+            margin: 0 !important;
+            color: #2e7d32 !important;
+        }
+        
+        .close {
+            color: #aaa !important;
+            font-size: 28px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            border: none !important;
+            background: none !important;
+            line-height: 1 !important;
+        }
+        
+        .close:hover {
+            color: #000 !important;
+        }
+        
+        .modal-body {
+            padding: 1.5rem !important;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem !important;
+        }
+        
+        .form-group label {
+            display: block !important;
+            margin-bottom: 0.5rem !important;
+            font-weight: 500 !important;
+            color: #2e7d32 !important;
+        }
+        
+        .form-group select,
+        .form-group textarea {
+            width: 100% !important;
+            padding: 0.8rem !important;
+            border: 1px solid #b2dfdb !important;
+            border-radius: 8px !important;
+            font-size: 1rem !important;
+            box-sizing: border-box !important;
+        }
+        
+        .form-actions {
+            display: flex !important;
+            gap: 1rem !important;
+            justify-content: flex-end !important;
+            margin-top: 1.5rem !important;
+        }
+        
+        .btn-primary {
+            background: #4caf50 !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.8rem 1.5rem !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+        }
+        
+        .btn-secondary {
+            background: #6c757d !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.8rem 1.5rem !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="emergency">
+            <h1>🚨 ARREGLO URGENTE PARA TU EXPOSICIÓN</h1>
+            <p>Modal de "Solicitar Mentoría" que no se puede cerrar</p>
+        </div>
+
+        <h2>🧪 Prueba el Modal Corregido</h2>
+        
+        <button class="btn" onclick="abrirModal()">
+            🎯 Abrir Modal "Solicitar Mentoría"
+        </button>
+        
+        <button class="btn btn-danger" onclick="cerrarTodosForzado()">
+            ❌ CERRAR MODAL (EMERGENCIA)
+        </button>
+        
+        <button class="btn" onclick="debugEstado()">
+            🔍 Ver Estado del Modal
+        </button>
+
+        <h3>📋 Métodos para cerrar el modal:</h3>
+        <ul>
+            <li>✅ Clic en la X</li>
+            <li>✅ Tecla Escape</li>
+            <li>✅ Clic en el fondo oscuro</li>
+            <li>✅ Botón "Cancelar"</li>
+        </ul>
+
+        <div class="status" id="debug">
+=== CONSOLA DE DEBUG ===
+Listo para pruebas...
+        </div>
+    </div>
+
+    <script>
+        function debug(msg) {
+            const output = document.getElementById('debug');
+            const time = new Date().toLocaleTimeString();
+            output.textContent += '\n[' + time + '] ' + msg;
+            output.scrollTop = output.scrollHeight;
+            console.log(msg);
+        }
+
+        function abrirModal() {
+            debug('Abriendo modal...');
+            
+            // Eliminar modal existente si hay uno
+            const existente = document.getElementById('modalSolicitarMentoria');
+            if (existente) {
+                existente.remove();
+                debug('Modal existente eliminado');
+            }
+            
+            // Crear modal
+            const modalHTML = `
+                <div id="modalSolicitarMentoria" class="modal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>🎯 Solicitar Mentoría para Estrategia</h3>
+                            <span class="close">&times;</span>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formSolicitarMentoria">
+                                <div class="form-group">
+                                    <label for="especialidadSelect">Especialidad Requerida:</label>
+                                    <select id="especialidadSelect" required>
+                                        <option value="">Selecciona una especialidad</option>
+                                        <option value="marketing_digital">Marketing Digital</option>
+                                        <option value="acceso_a_financiamiento">Acceso a Financiamiento</option>
+                                        <option value="innovacion_y_desarrollo_de_productos">Innovación y Desarrollo de Productos</option>
+                                        <option value="branding">Branding</option>
+                                        <option value="diseno_y_desarrollo_ux_ui">Diseño y Desarrollo UX/UI</option>
+                                        <option value="seo_en_la_era_de_la_ia">SEO en la Era de la IA</option>
+                                        <option value="general">General (Todas las áreas)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="comentariosTextarea">Comentarios adicionales (opcional):</label>
+                                    <textarea id="comentariosTextarea" rows="4" placeholder="Describe qué tipo de ayuda específica necesitas..."></textarea>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">Solicitar Mentoría</button>
+                                    <button type="button" class="btn-secondary">Cancelar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            const modal = document.getElementById('modalSolicitarMentoria');
+            modal.classList.add('show');
+            
+            debug('Modal creado y mostrado');
+            
+            // Event listeners
+            setupModalEvents();
+        }
+
+        function setupModalEvents() {
+            const modal = document.getElementById('modalSolicitarMentoria');
+            if (!modal) return;
+            
+            // Botón X
+            const closeBtn = modal.querySelector('.close');
+            if (closeBtn) {
+                closeBtn.onclick = function() {
+                    debug('Cerrando modal: botón X');
+                    cerrarModal();
+                };
+            }
+            
+            // Botón Cancelar
+            const cancelBtn = modal.querySelector('.btn-secondary');
+            if (cancelBtn) {
+                cancelBtn.onclick = function() {
+                    debug('Cerrando modal: botón Cancelar');
+                    cerrarModal();
+                };
+            }
+            
+            // Clic en fondo
+            modal.onclick = function(e) {
+                if (e.target === modal) {
+                    debug('Cerrando modal: clic en fondo');
+                    cerrarModal();
+                }
+            };
+            
+            // Formulario
+            const form = modal.querySelector('form');
+            if (form) {
+                form.onsubmit = function(e) {
+                    e.preventDefault();
+                    debug('Formulario enviado - SIMULACIÓN');
+                    const especialidad = document.getElementById('especialidadSelect').value;
+                    if (!especialidad) {
+                        debug('ERROR: Especialidad requerida');
+                        return;
+                    }
+                    debug('Datos: Especialidad = ' + especialidad);
+                    cerrarModal();
+                };
+            }
+        }
+
+        function cerrarModal() {
+            const modal = document.getElementById('modalSolicitarMentoria');
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.remove();
+                    debug('Modal eliminado del DOM');
+                }, 300);
+            }
+        }
+
+        function cerrarTodosForzado() {
+            debug('=== CIERRE FORZADO ===');
+            const modales = document.querySelectorAll('.modal');
+            modales.forEach(modal => {
+                modal.remove();
+                debug('Modal eliminado forzadamente');
+            });
+        }
+
+        function debugEstado() {
+            debug('=== ESTADO ACTUAL ===');
+            const modales = document.querySelectorAll('.modal');
+            debug('Modales encontrados: ' + modales.length);
+            
+            modales.forEach((modal, index) => {
+                debug('Modal ' + (index + 1) + ':');
+                debug('  ID: ' + modal.id);
+                debug('  Display: ' + window.getComputedStyle(modal).display);
+                debug('  Clases: ' + modal.className);
+            });
+        }
+
+        // Event listener global para Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                debug('Cerrando modal: tecla Escape');
+                cerrarModal();
+            }
+        });
+
+        debug('Sistema inicializado correctamente');
+    </script>
+</body>
+</html>

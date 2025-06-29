@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Botón Aceptar Mentoría</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Estilos corregidos para el botón - SUPER COMPACTO */
+        .btn-aceptar-mentoria {
+            width: auto;
+            max-width: 120px;
+            background: #02bb59;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+            margin: 8px 0 0 0;
+            display: inline-block;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+        }
+
+        .btn-aceptar-mentoria:hover {
+            background: #028a4a;
+            transform: translateY(-1px);
+        }
+
+        /* Tarjeta con posición relativa para el botón absoluto */
+        .solicitud-card {
+            background: #fff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            max-width: 400px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .empresa-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Prueba Botón "Aceptar" - VERSIÓN ABSOLUTA</h1>
+        
+        <div class="info-box">
+            <h3>✅ Nueva corrección - POSICIÓN ABSOLUTA:</h3>
+            <ul>
+                <li>Botón super compacto (`max-width: 120px`)</li>
+                <li>Posición absoluta (`position: absolute`)</li>
+                <li>En esquina superior derecha (`top: 15px; right: 15px`)</li>
+                <li>Padding mínimo (`6px 12px`)</li>
+                <li>Font-size muy pequeño (`0.8em`)</li>
+                <li>No interfiere con el contenido de la tarjeta</li>
+            </ul>
+        </div>
+
+        <h2>Vista previa:</h2>
+        
+        <!-- Tarjeta de ejemplo con botón reposicionado -->
+        <div class="solicitud-card">
+            <!-- Botón en la esquina superior derecha -->
+            <button class="btn-aceptar-mentoria" onclick="alert('¡Mentoría aceptada!')">
+                ✅ Aceptar
+            </button>
+            
+            <div class="empresa-info">
+                <h3>CONSTRUCTORA HBA E.I.R.L.</h3>
+                <p><strong>RUC:</strong> 20522634680</p>
+                <p><strong>Correo:</strong> becueva749@gmail.com</p>
+                <p><strong>Teléfono:</strong> No especificado</p>
+            </div>
+            
+            <div class="estrategia-info">
+                <h4>Estrategia de Mejora en Diseño y Desarrollo UX/UI</h4>
+                <p>Implementación de mejoras en la usabilidad, diseño y desarrollo de productos digitales para optimizar la experiencia del usuario de manera efectiva.</p>
+            </div>
+            
+            <div class="fecha-solicitud">
+                📅 Solicitado el: 28/06/2025
+            </div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h3>🎯 Cambios realizados - VERSIÓN ABSOLUTA:</h3>
+            <ol>
+                <li><strong>Posición absoluta:</strong> El botón flota en esquina superior derecha</li>
+                <li><strong>Super compacto:</strong> Tamaño mínimo sin interferir con contenido</li>
+                <li><strong>Texto ultra corto:</strong> Solo "Aceptar" con emoji</li>
+                <li><strong>No afecta layout:</strong> El contenido fluye normalmente debajo</li>
+                <li><strong>Visualmente discreto:</strong> Presente pero no dominante</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>

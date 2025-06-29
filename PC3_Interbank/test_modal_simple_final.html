@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Modal Mentoría Simple</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn-test {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        .btn-test:hover {
+            background: #45a049;
+        }
+        .info-box {
+            background: #e8f5e8;
+            border-left: 4px solid #4CAF50;
+            padding: 15px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Prueba Modal de Mentoría Simplificado</h1>
+        
+        <div class="info-box">
+            <h3>✅ Cambios realizados:</h3>
+            <ul>
+                <li>Template `dashboard_actividades.html` ahora carga `actividades_fixed.js`</li>
+                <li>Modal sin formularios complejos - Solo confirmación</li>
+                <li>Usuario NO selecciona especialidad</li>
+                <li>CSS inline para evitar conflictos de layout</li>
+                <li>Backend preparado para solicitudes simples</li>
+            </ul>
+        </div>
+
+        <h2>Prueba el modal:</h2>
+        <button class="btn-test" onclick="solicitarMentoriaEstrategia(123)">
+            🎓 Solicitar Mentoría (ID: 123)
+        </button>
+        
+        <div style="margin-top: 30px;">
+            <h3>🎯 Comportamiento esperado:</h3>
+            <ol>
+                <li>Modal se abre centrado sin descuadrar el layout</li>
+                <li>Solo muestra mensaje de confirmación (sin formularios)</li>
+                <li>Botones: "Sí, solicitar mentoría" y "No, cancelar"</li>
+                <li>Se puede cerrar con X, ESC o clic fuera</li>
+                <li>NO pide especialidad ni comentarios adicionales</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Simular localStorage para la prueba -->
+    <script>
+        localStorage.setItem('access_token', 'test-token-123');
+        
+        function getCookie(name) {
+            return 'test-csrf-token';
+        }
+        
+        function showNotification(message, type) {
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+    </script>
+    
+    <!-- Cargar el archivo JS fijo -->
+    <script src="static/js/actividades_fixed.js"></script>
+</body>
+</html>

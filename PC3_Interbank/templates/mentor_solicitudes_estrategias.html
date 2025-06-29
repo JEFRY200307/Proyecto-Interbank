@@ -2,17 +2,31 @@
 {% load static %}
 
 {% block page_title %}
-    Solicitudes de Mentoría por Estrategias
+    Solicitudes de Mentoría
 {% endblock %}
 
 {% block content %}
 <div class="mentor-solicitudes-container">
-    <h2>📋 Solicitudes de Mentoría por Estrategias</h2>
-    <p class="descripcion">Aquí puedes ver todas las estrategias que han solicitado mentoría y aceptar las que desees.</p>
+    <div class="header-section">
+        <p class="descripcion">Lista de estrategias que han solicitado mentoría</p>
+    </div>
 
-    <!-- Contenedor de tarjetas de solicitudes -->
-    <div id="solicitudes-container" class="solicitudes-grid">
-        <!-- Las tarjetas se cargarán dinámicamente -->
+    <!-- Tabla de solicitudes en lugar de tarjetas -->
+    <div class="solicitudes-table-container">
+        <table id="solicitudes-table" class="solicitudes-table">
+            <thead>
+                <tr>
+                    <th>Empresa</th>
+                    <th>Estrategia</th>
+                    <th>Categoría</th>
+                    <th>Fecha Solicitud</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="solicitudes-tbody">
+                <!-- Las filas se cargarán dinámicamente -->
+            </tbody>
+        </table>
     </div>
 
     <!-- Mensaje cuando no hay solicitudes -->
@@ -33,51 +47,289 @@
 
 {% block extra_css %}
 <style>
-/* Estilos específicos para solicitudes de mentoría */
+/* Estilos para tabla de solicitudes */
 .mentor-solicitudes-container {
     padding: 20px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
-.mentor-solicitudes-container h2 {
+.header-section {
+    margin-bottom: 30px;
+}
+
+.header-section h2 {
     color: #333;
     margin-bottom: 10px;
+    font-size: 1.8em;
 }
 
 .descripcion {
     color: #666;
     font-size: 1.1em;
-    margin-bottom: 30px;
-    line-height: 1.6;
+    margin-bottom: 0;
 }
 
-.solicitudes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 25px;
-    margin-bottom: 30px;
-}
-
-/* Tarjeta de solicitud */
-.solicitud-card {
+/* Contenedor de tabla */
+.solicitudes-table-container {
     background: #fff;
-    border: 2px solid #e9ecef;
     border-radius: 12px;
-    padding: 25px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
-    position: relative;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
 }
 
-.solicitud-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.15);
-    border-color: #02bb59;
+/* Tabla de solicitudes */
+.solicitudes-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
 }
 
-.solicitud-header {
-    border-bottom: 2px solid #f8f9fa;
+.solicitudes-table thead {
+    background: linear-gradient(135deg, #02bb59 0%, #00953b 100%);
+    color: white;
+}
+
+.solicitudes-table th {
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #007a2f;
+}
+
+.solicitudes-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+    transition: background-color 0.2s ease;
+}
+
+.solicitudes-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.solicitudes-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.solicitudes-table td {
+    padding: 15px 12px;
+    vertical-align: top;
+}
+
+/* Columnas específicas */
+.empresa-info {
+    font-weight: 600;
+    color: #333;
+}
+
+.empresa-ruc {
+    display: block;
+    font-size: 0.85em;
+    color: #666;
+    margin-top: 4px;
+}
+
+.estrategia-info {
+    max-width: 300px;
+}
+
+.estrategia-titulo {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.estrategia-descripcion {
+    font-size: 0.9em;
+    color: #666;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.categoria-badge {
+    background: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 500;
+}
+
+.fecha-solicitud {
+    color: #666;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+/* Botón de aceptar */
+.btn-aceptar {
+    background: #02bb59;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-aceptar:hover {
+    background: #00953b;
+}
+
+.btn-aceptar:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* No solicitudes */
+.no-solicitudes {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.no-solicitudes-content h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #02bb59;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos mejorados para la tabla */
+.empresa-info strong {
+    color: #02bb59;
+    font-size: 1.1em;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.empresa-details {
+    color: #666;
+    font-size: 0.85em;
+    line-height: 1.3;
+}
+
+.empresa-details small {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.estrategia-info .estrategia-titulo {
+    color: #333;
+    font-size: 1em;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.estrategia-descripcion {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mentor-solicitudes-container {
+        padding: 15px;
+    }
+    
+    .solicitudes-table {
+        font-size: 0.85em;
+    }
+    
+    .solicitudes-table th,
+    .solicitudes-table td {
+        padding: 10px 8px;
+    }
+    
+    .estrategia-info {
+        max-width: 200px;
+    }
+    
+    .btn-aceptar {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 600px) {
+    .solicitudes-table-container {
+        overflow-x: auto;
+    }
+    
+    .solicitudes-table {
+        min-width: 700px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .solicitudes-table {
+        font-size: 0.9em;
+    }
+    
+    .estrategia-descripcion {
+        -webkit-line-clamp: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .solicitudes-table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .solicitudes-table {
+        min-width: 800px;
+        font-size: 0.85em;
+    }
+    
+    .solicitudes-table th,
+    .solicitudes-table td {
+        padding: 10px 8px;
+    }
+    
+    .btn-aceptar {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+}
+
+/* Estilos adicionales que estaban fuera del bloque */
+.estrategia-header {
     padding-bottom: 15px;
     margin-bottom: 20px;
 }
@@ -154,16 +406,19 @@
 }
 
 .btn-aceptar-mentoria {
-    width: 100%;
+    width: auto;
+    max-width: 200px;
     background: #02bb59;
     color: white;
     border: none;
-    padding: 15px;
+    padding: 12px 20px;
     border-radius: 8px;
-    font-size: 1.1em;
+    font-size: 1em;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.3s, transform 0.2s;
+    margin: 15px auto 0 auto;
+    display: block;
 }
 
 .btn-aceptar-mentoria:hover {
@@ -231,6 +486,12 @@
     box-shadow: 0 6px 25px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     position: relative;
+}
+
+.solicitud-card-interbank::after {
+    content: "";
+    display: table;
+    clear: both;
 }
 
 .solicitud-card-interbank::before {
@@ -359,19 +620,22 @@
 }
 
 .btn-aceptar-mentoria {
-    width: 100%;
-    background: linear-gradient(135deg, #00953b 0%, #02bb59 100%);
+    width: auto;
+    max-width: 120px;
+    background: #02bb59;
     color: white;
     border: none;
-    padding: 1.2rem 2rem;
-    font-size: 1.2rem;
-    font-weight: 700;
+    padding: 6px 12px;
+    font-size: 0.8em;
+    font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 15px rgba(0, 149, 59, 0.3);
-    border-radius: 0 0 20px 20px;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    margin: 8px 0 0 0;
+    display: inline-block;
+    position: absolute;
+    top: 15px;
+    right: 15px;
 }
 
 .btn-aceptar-mentoria:hover {
@@ -433,8 +697,13 @@
     }
     
     .btn-aceptar-mentoria {
-        padding: 1rem 1.5rem;
-        font-size: 1.1rem;
+        width: auto;
+        max-width: 100px;
+        padding: 5px 10px;
+        font-size: 0.75em;
+        margin: 5px 0 0 0;
+        top: 10px;
+        right: 10px;
     }
 }
 </style>
@@ -448,7 +717,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function cargarSolicitudesMentoria() {
     const token = localStorage.getItem('access_token');
-    const container = document.getElementById('solicitudes-container');
+    const tbody = document.getElementById('solicitudes-tbody');
     const noSolicitudes = document.getElementById('no-solicitudes');
     const loading = document.getElementById('loading-spinner');
     
@@ -466,92 +735,124 @@ async function cargarSolicitudesMentoria() {
         
         if (solicitudes.length === 0) {
             noSolicitudes.style.display = 'block';
+            document.querySelector('.solicitudes-table-container').style.display = 'none';
             return;
         }
         
-        container.innerHTML = solicitudes.map(estrategia => `
-            <div class="solicitud-card-interbank">
-                <div class="solicitud-header-interbank">
-                    <h3 class="empresa-nombre-principal">${estrategia.empresa_nombre}</h3>
-                    <span class="empresa-ruc-badge">RUC: ${estrategia.empresa_ruc || 'No especificado'}</span>
-                </div>
-                
-                <div class="empresa-contacto-info">
-                    <div class="contacto-row">
-                        <i class="icon">✉</i>
-                        <span class="contacto-label">Correo:</span>
-                        <span class="contacto-value">${estrategia.empresa_correo || 'No especificado'}</span>
+        // Mostrar tabla y ocultar mensaje de no solicitudes
+        document.querySelector('.solicitudes-table-container').style.display = 'block';
+        noSolicitudes.style.display = 'none';
+        
+        // Llenar tabla con solicitudes
+        tbody.innerHTML = solicitudes.map(estrategia => `
+            <tr>
+                <td>
+                    <div class="empresa-info">
+                        <strong>${estrategia.empresa_nombre}</strong>
+                        <div class="empresa-details">
+                            <small>RUC: ${estrategia.empresa_ruc || 'No especificado'}</small>
+                            <br><small>📧 ${estrategia.empresa_correo || 'No especificado'}</small>
+                            <br><small>📞 ${estrategia.empresa_telefono || 'No especificado'}</small>
+                        </div>
                     </div>
-                    <div class="contacto-row">
-                        <i class="icon">📞</i>
-                        <span class="contacto-label">Teléfono:</span>
-                        <span class="contacto-value">${estrategia.empresa_telefono || 'No especificado'}</span>
+                </td>
+                <td>
+                    <div class="estrategia-info">
+                        <strong class="estrategia-titulo">${estrategia.titulo}</strong>
+                        <p class="estrategia-descripcion">${estrategia.descripcion}</p>
                     </div>
-                </div>
-                
-                <div class="estrategia-detalle">
-                    <h4 class="estrategia-titulo-secundario">${estrategia.titulo}</h4>
-                    <p class="estrategia-descripcion">${estrategia.descripcion}</p>
-                    <div class="estrategia-badges">
-                        <span class="categoria-badge-interbank">${estrategia.categoria || 'General'}</span>
-                    </div>
-                </div>
-                </div>
-                
-                <div class="fecha-solicitud">
-                    📅 Solicitado el: ${new Date(estrategia.fecha_solicitud_mentoria).toLocaleDateString('es-ES')}
-                </div>
-                
-                <button class="btn-aceptar-mentoria" onclick="aceptarMentoria(${estrategia.id})">
-                    ✅ Aceptar Mentoría
-                </button>
-            </div>
+                </td>
+                <td>
+                    <span class="categoria-badge">${estrategia.categoria || 'General'}</span>
+                </td>
+                <td class="fecha-solicitud">
+                    ${new Date(estrategia.fecha_solicitud_mentoria).toLocaleDateString('es-ES')}
+                </td>
+                <td>
+                    <button class="btn-aceptar" onclick="aceptarMentoria(${estrategia.id})" id="btn-${estrategia.id}">
+                        ✅ Aceptar
+                    </button>
+                </td>
+            </tr>
         `).join('');
         
     } catch (error) {
         loading.style.display = 'none';
-        container.innerHTML = `
-            <div class="error-message">
-                <p style="color: red;">❌ Error al cargar las solicitudes: ${error.message}</p>
-            </div>
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; color: red; padding: 20px;">
+                    ❌ Error al cargar las solicitudes: ${error.message}
+                </td>
+            </tr>
         `;
     }
 }
 
 async function aceptarMentoria(estrategiaId) {
     const token = localStorage.getItem('access_token');
-    const btn = event.target;
+    const btn = document.getElementById(`btn-${estrategiaId}`);
     
     if (!confirm('¿Estás seguro de que quieres aceptar la mentoría para esta estrategia?')) {
         return;
     }
     
-    btn.disabled = true;
-    btn.textContent = 'Aceptando...';
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Aceptando...';
+        btn.style.background = '#6c757d';
+    }
     
     try {
         const response = await fetch(`/mentor/api/aceptar-mentoria/${estrategiaId}/`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
             }
         });
         
         const result = await response.json();
         
         if (response.ok) {
+            // Mostrar mensaje de éxito
             alert('✅ ' + result.mensaje);
-            cargarSolicitudesMentoria(); // Recargar la lista
+            
+            // Recargar la lista para reflejar cambios
+            setTimeout(() => {
+                cargarSolicitudesMentoria();
+            }, 1000);
         } else {
             throw new Error(result.error || 'Error al aceptar la mentoría');
         }
         
     } catch (error) {
+        console.error('Error al aceptar mentoría:', error);
         alert('❌ Error: ' + error.message);
-        btn.disabled = false;
-        btn.textContent = '✅ Aceptar Mentoría';
+        
+        // Restaurar botón en caso de error
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = '✅ Aceptar';
+            btn.style.background = '#02bb59';
+        }
     }
+}
+
+// Función auxiliar para obtener CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
 {% endblock %}

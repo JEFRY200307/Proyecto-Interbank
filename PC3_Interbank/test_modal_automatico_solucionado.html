@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Modal Automático - Solucionado</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-section {
+            background: #e3f2fd;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .btn-test {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-test:hover {
+            background: #45a049;
+        }
+        
+        .btn-alimentar {
+            background: #ff9800;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .btn-alimentar:hover {
+            background: #f57c00;
+        }
+        
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Estilos para modales corregidos */
+        .formulario-alimentar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            backdrop-filter: blur(4px) !important;
+            z-index: 2000 !important;
+            justify-content: center !important;
+            align-items: center !important;
+            /* NO display: flex por defecto - se controla por JavaScript */
+        }
+        
+        .formulario-alimentar.activo {
+            display: flex !important;
+        }
+        
+        .formulario-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .formulario-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .formulario-close:hover {
+            color: #000;
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-guardar {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .btn-cancelar {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        label {
+            display: block;
+            margin: 15px 0 5px 0;
+            font-weight: bold;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 5px;
+        }
+        
+        .log-success { color: #28a745; }
+        .log-error { color: #dc3545; }
+        .log-info { color: #007bff; }
+        .log-warning { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test Modal Automático - PROBLEMA SOLUCIONADO</h1>
+        
+        <div class="test-section">
+            <h3>✅ Estado de Modales al Cargar Página</h3>
+            <div id="modal-status-container">
+                <div id="status-texto-libre" class="status">📝 Modal Texto Libre: Verificando...</div>
+                <div id="status-estrategia-ref" class="status">🎯 Modal Estrategia Referencia: Verificando...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 Pruebas de Funcionalidad</h3>
+            <button class="btn-test" onclick="verificarEstadoModales()">Verificar Estado de Modales</button>
+            <button class="btn-test" onclick="testAbrirYCerrarModales()">Test Abrir/Cerrar Modales</button>
+            <button class="btn-test" onclick="testCerrarConEsc()">Test Cerrar con ESC</button>
+            <button class="btn-test" onclick="testCerrarConClick()">Test Cerrar con Click Fuera</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎯 Controles Manuales</h3>
+            <div class="feeding-options">
+                <button onclick="mostrarFormularioTextoLibre()" class="btn-alimentar">
+                    📝 Abrir Modal Texto Libre
+                </button>
+                <button onclick="mostrarFormularioEstrategiaReferencia()" class="btn-alimentar">
+                    🎯 Abrir Modal Estrategia Referencia
+                </button>
+                <button onclick="cerrarTodosModales()" class="btn-test" style="background: #f44336;">
+                    ❌ Cerrar Todos los Modales
+                </button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Log de Actividad</h3>
+            <div id="log-container" class="log"></div>
+            <button class="btn-test" onclick="clearLog()">Limpiar Log</button>
+        </div>
+    </div>
+    
+    <!-- Formulario de Texto Libre -->
+    <div id="formulario-texto-libre" class="formulario-alimentar" style="display: none;">
+        <div class="formulario-container">
+            <button class="formulario-close" onclick="cerrarFormularioTextoLibre()" type="button">&times;</button>
+            <h4>📝 Añadir Texto Libre</h4>
+            <form id="form-texto-libre">
+                <label>Contenido:
+                    <textarea name="contenido" placeholder="Escribe aquí la información que quieres que el bot aprenda..." required></textarea>
+                </label>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-guardar">Alimentar Bot</button>
+                    <button type="button" onclick="cerrarFormularioTextoLibre()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Formulario de Estrategia como Referencia -->
+    <div id="formulario-estrategia-referencia" class="formulario-alimentar" style="display: none;">
+        <div class="formulario-container">
+            <button class="formulario-close" onclick="cerrarFormularioEstrategiaReferencia()" type="button">&times;</button>
+            <h4>🎯 Usar Estrategia como Referencia</h4>
+            <form id="form-estrategia-referencia">
+                <label>Estrategia:
+                    <select name="estrategia_id" required>
+                        <option value="">Selecciona una estrategia...</option>
+                        <option value="1">Estrategia de Prueba 1</option>
+                        <option value="2">Estrategia de Prueba 2</option>
+                    </select>
+                </label>
+                <label>Contexto adicional (opcional):
+                    <textarea name="contexto" placeholder="Información adicional sobre cómo debe usar esta estrategia..."></textarea>
+                </label>
+                <div class="form-buttons">
+                    <button type="submit" class="btn-guardar">Usar como Referencia</button>
+                    <button type="button" onclick="cerrarFormularioEstrategiaReferencia()" class="btn-cancelar">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Función de logging
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('log-container').innerHTML = '';
+        }
+        
+        // === FUNCIONES PRINCIPALES (VERSIÓN CORREGIDA) ===
+        
+        /**
+         * Inicializa todos los modales asegurando que estén cerrados
+         */
+        function inicializarModales() {
+            log('🔧 Inicializando estado de modales', 'info');
+            
+            // Cerrar formularios de alimentar bot
+            const formularioTextoLibre = document.getElementById('formulario-texto-libre');
+            const formularioEstrategiaRef = document.getElementById('formulario-estrategia-referencia');
+            
+            if (formularioTextoLibre) {
+                formularioTextoLibre.style.display = 'none';
+                formularioTextoLibre.classList.remove('activo');
+                log('✅ Modal texto libre inicializado (cerrado)', 'success');
+            }
+            
+            if (formularioEstrategiaRef) {
+                formularioEstrategiaRef.style.display = 'none';
+                formularioEstrategiaRef.classList.remove('activo');
+                log('✅ Modal estrategia referencia inicializado (cerrado)', 'success');
+            }
+            
+            log('✅ Todos los modales inicializados correctamente', 'success');
+            verificarEstadoModales();
+        }
+        
+        /**
+         * Muestra el formulario de texto libre para alimentar al bot
+         */
+        function mostrarFormularioTextoLibre() {
+            log('📝 Abriendo formulario de texto libre', 'info');
+            
+            // Ocultar el otro formulario
+            const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+            if (formEstrategia) {
+                formEstrategia.style.display = 'none';
+                formEstrategia.classList.remove('activo');
+            }
+            
+            // Mostrar este formulario
+            const formTexto = document.getElementById('formulario-texto-libre');
+            if (formTexto) {
+                formTexto.style.display = 'flex';
+                formTexto.classList.add('activo');
+                
+                // Limpiar el formulario
+                const form = document.getElementById('form-texto-libre');
+                if (form) {
+                    form.reset();
+                }
+                
+                log('✅ Modal texto libre abierto correctamente', 'success');
+                verificarEstadoModales();
+                
+                // Enfocar el textarea
+                setTimeout(() => {
+                    const textarea = form.querySelector('textarea[name="contenido"]');
+                    if (textarea) {
+                        textarea.focus();
+                    }
+                }, 100);
+            } else {
+                log('❌ Formulario de texto libre no encontrado', 'error');
+            }
+        }
+        
+        /**
+         * Cierra el formulario de texto libre
+         */
+        function cerrarFormularioTextoLibre() {
+            log('❌ Cerrando formulario de texto libre', 'info');
+            const formulario = document.getElementById('formulario-texto-libre');
+            if (formulario) {
+                formulario.style.display = 'none';
+                formulario.classList.remove('activo');
+                log('✅ Modal texto libre cerrado correctamente', 'success');
+                verificarEstadoModales();
+            }
+        }
+        
+        /**
+         * Muestra el formulario de estrategia como referencia
+         */
+        function mostrarFormularioEstrategiaReferencia() {
+            log('🎯 Abriendo formulario de estrategia como referencia', 'info');
+            
+            // Ocultar el otro formulario
+            const formTexto = document.getElementById('formulario-texto-libre');
+            if (formTexto) {
+                formTexto.style.display = 'none';
+                formTexto.classList.remove('activo');
+            }
+            
+            // Mostrar este formulario
+            const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+            if (formEstrategia) {
+                formEstrategia.style.display = 'flex';
+                formEstrategia.classList.add('activo');
+                
+                // Limpiar el formulario
+                const form = document.getElementById('form-estrategia-referencia');
+                if (form) {
+                    form.reset();
+                }
+                
+                log('✅ Modal estrategia referencia abierto correctamente', 'success');
+                verificarEstadoModales();
+            } else {
+                log('❌ Formulario de estrategia como referencia no encontrado', 'error');
+            }
+        }
+        
+        /**
+         * Cierra el formulario de estrategia como referencia
+         */
+        function cerrarFormularioEstrategiaReferencia() {
+            log('❌ Cerrando formulario de estrategia como referencia', 'info');
+            const formulario = document.getElementById('formulario-estrategia-referencia');
+            if (formulario) {
+                formulario.style.display = 'none';
+                formulario.classList.remove('activo');
+                log('✅ Modal estrategia referencia cerrado correctamente', 'success');
+                verificarEstadoModales();
+            }
+        }
+        
+        /**
+         * Cierra todos los modales
+         */
+        function cerrarTodosModales() {
+            log('🛑 Cerrando todos los modales', 'info');
+            cerrarFormularioTextoLibre();
+            cerrarFormularioEstrategiaReferencia();
+        }
+        
+        // === FUNCIONES DE PRUEBA ===
+        
+        function verificarEstadoModales() {
+            const textoLibre = document.getElementById('formulario-texto-libre');
+            const estrategiaRef = document.getElementById('formulario-estrategia-referencia');
+            
+            const statusTextoLibre = document.getElementById('status-texto-libre');
+            const statusEstrategiaRef = document.getElementById('status-estrategia-ref');
+            
+            // Verificar modal texto libre
+            const textoLibreVisible = textoLibre && (
+                textoLibre.style.display === 'flex' || 
+                textoLibre.classList.contains('activo') ||
+                window.getComputedStyle(textoLibre).display === 'flex'
+            );
+            
+            if (textoLibreVisible) {
+                statusTextoLibre.textContent = '📝 Modal Texto Libre: VISIBLE (PROBLEMA)';
+                statusTextoLibre.className = 'status status-error';
+                log('❌ Modal texto libre está visible cuando debería estar oculto', 'error');
+            } else {
+                statusTextoLibre.textContent = '📝 Modal Texto Libre: OCULTO (OK)';
+                statusTextoLibre.className = 'status status-success';
+                log('✅ Modal texto libre correctamente oculto', 'success');
+            }
+            
+            // Verificar modal estrategia referencia
+            const estrategiaRefVisible = estrategiaRef && (
+                estrategiaRef.style.display === 'flex' || 
+                estrategiaRef.classList.contains('activo') ||
+                window.getComputedStyle(estrategiaRef).display === 'flex'
+            );
+            
+            if (estrategiaRefVisible) {
+                statusEstrategiaRef.textContent = '🎯 Modal Estrategia Referencia: VISIBLE (PROBLEMA)';
+                statusEstrategiaRef.className = 'status status-error';
+                log('❌ Modal estrategia referencia está visible cuando debería estar oculto', 'error');
+            } else {
+                statusEstrategiaRef.textContent = '🎯 Modal Estrategia Referencia: OCULTO (OK)';
+                statusEstrategiaRef.className = 'status status-success';
+                log('✅ Modal estrategia referencia correctamente oculto', 'success');
+            }
+        }
+        
+        function testAbrirYCerrarModales() {
+            log('🧪 Iniciando test de abrir/cerrar modales', 'info');
+            
+            // Test modal texto libre
+            setTimeout(() => {
+                mostrarFormularioTextoLibre();
+                setTimeout(() => {
+                    cerrarFormularioTextoLibre();
+                    
+                    // Test modal estrategia referencia
+                    setTimeout(() => {
+                        mostrarFormularioEstrategiaReferencia();
+                        setTimeout(() => {
+                            cerrarFormularioEstrategiaReferencia();
+                            log('✅ Test de abrir/cerrar completado', 'success');
+                        }, 1000);
+                    }, 500);
+                }, 1000);
+            }, 500);
+        }
+        
+        function testCerrarConEsc() {
+            log('🧪 Iniciando test de cerrar con ESC', 'info');
+            
+            // Abrir modal
+            mostrarFormularioEstrategiaReferencia();
+            
+            setTimeout(() => {
+                // Simular ESC
+                const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+                document.dispatchEvent(escEvent);
+                
+                setTimeout(() => {
+                    verificarEstadoModales();
+                    log('✅ Test ESC completado', 'success');
+                }, 500);
+            }, 1000);
+        }
+        
+        function testCerrarConClick() {
+            log('🧪 Iniciando test de cerrar con click fuera', 'info');
+            
+            // Abrir modal
+            mostrarFormularioTextoLibre();
+            
+            setTimeout(() => {
+                // Simular click en el fondo del modal
+                const modal = document.getElementById('formulario-texto-libre');
+                if (modal) {
+                    const clickEvent = new MouseEvent('click', { bubbles: true });
+                    Object.defineProperty(clickEvent, 'target', { value: modal });
+                    modal.dispatchEvent(clickEvent);
+                }
+                
+                setTimeout(() => {
+                    verificarEstadoModales();
+                    log('✅ Test click fuera completado', 'success');
+                }, 500);
+            }, 1000);
+        }
+        
+        // Event listeners
+        function setupEventListeners() {
+            log('🔧 Configurando event listeners', 'info');
+            
+            // Event listeners para cerrar formularios de alimentar bot al hacer clic fuera
+            const formularioTextoLibre = document.getElementById('formulario-texto-libre');
+            const formularioEstrategiaRef = document.getElementById('formulario-estrategia-referencia');
+            
+            if (formularioTextoLibre) {
+                formularioTextoLibre.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        cerrarFormularioTextoLibre();
+                    }
+                });
+            }
+            
+            if (formularioEstrategiaRef) {
+                formularioEstrategiaRef.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        cerrarFormularioEstrategiaReferencia();
+                    }
+                });
+            }
+            
+            // Event listener para tecla Escape
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    log('⌨️ Tecla ESC presionada', 'info');
+                    cerrarFormularioTextoLibre();
+                    cerrarFormularioEstrategiaReferencia();
+                }
+            });
+            
+            // Configurar formularios
+            const formTextoLibre = document.getElementById('form-texto-libre');
+            const formEstrategiaRef = document.getElementById('form-estrategia-referencia');
+            
+            if (formTextoLibre) {
+                formTextoLibre.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    log('📝 Formulario texto libre enviado (simulación)', 'success');
+                    alert('✅ Formulario de texto libre enviado correctamente (simulación)');
+                    cerrarFormularioTextoLibre();
+                });
+            }
+            
+            if (formEstrategiaRef) {
+                formEstrategiaRef.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    log('🎯 Formulario estrategia referencia enviado (simulación)', 'success');
+                    alert('✅ Formulario de estrategia como referencia enviado correctamente (simulación)');
+                    cerrarFormularioEstrategiaReferencia();
+                });
+            }
+            
+            log('✅ Event listeners configurados correctamente', 'success');
+        }
+        
+        // === INICIALIZACIÓN ===
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 Iniciando test de modal automático solucionado', 'info');
+            
+            // PRIMERO: Asegurar que todos los modales estén cerrados
+            inicializarModales();
+            
+            // Configurar event listeners
+            setupEventListeners();
+            
+            log('✅ Test inicializado correctamente - Los modales NO deberían aparecer automáticamente', 'success');
+        });
+    </script>
+</body>
+</html>

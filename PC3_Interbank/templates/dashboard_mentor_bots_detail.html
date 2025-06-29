@@ -373,9 +373,13 @@
   background: rgba(0, 0, 0, 0.5) !important;
   backdrop-filter: blur(4px) !important;
   z-index: 2000 !important;
-  display: flex !important;
   justify-content: center !important;
   align-items: center !important;
+  /* NO display: flex por defecto - se controla por JavaScript */
+}
+
+.formulario-alimentar.activo {
+  display: flex !important;
 }
 
 .formulario-container {
@@ -532,11 +536,74 @@ let estrategiaActualId = null;
 let etapaActualId = null;
 let estrategiasDisponibles = []; // Para el select de estrategias de referencia
 
+// Debugging - verificar variables importantes
+console.log('=== DEBUG ALIMENTAR BOT ===');
+console.log('Bot ID:', botId);
+console.log('Token:', localStorage.getItem('access_token') ? 'EXISTE' : 'NO EXISTE');
+console.log('========================');
+
 // Cargar estrategias al iniciar
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 Dashboard Bot Detail cargado');
+    
+    // PRIMERO: Asegurar que todos los modales estén cerrados
+    inicializarModales();
+    
     cargarEstrategiasBot();
     cargarEstrategiasDisponibles();
+    
+    // Configurar event listeners de formularios de forma segura
+    const formTextoLibre = document.getElementById('form-texto-libre');
+    const formEstrategiaRef = document.getElementById('form-estrategia-referencia');
+    
+    if (formTextoLibre) {
+        formTextoLibre.addEventListener('submit', handleSubmitTextoLibre);
+    }
+    
+    if (formEstrategiaRef) {
+        formEstrategiaRef.addEventListener('submit', handleSubmitEstrategiaReferencia);
+    }
+    
+    // Event listeners para cerrar modales
+    setupModalEventListeners();
 });
+
+/**
+ * Inicializa todos los modales asegurando que estén cerrados
+ */
+function inicializarModales() {
+    console.log('🔧 Inicializando estado de modales');
+    
+    // Cerrar formularios de alimentar bot
+    const formularioTextoLibre = document.getElementById('formulario-texto-libre');
+    const formularioEstrategiaRef = document.getElementById('formulario-estrategia-referencia');
+    
+    if (formularioTextoLibre) {
+        formularioTextoLibre.style.display = 'none';
+        formularioTextoLibre.classList.remove('activo');
+        console.log('✅ Modal texto libre inicializado (cerrado)');
+    }
+    
+    if (formularioEstrategiaRef) {
+        formularioEstrategiaRef.style.display = 'none';
+        formularioEstrategiaRef.classList.remove('activo');
+        console.log('✅ Modal estrategia referencia inicializado (cerrado)');
+    }
+    
+    // Cerrar otros modales también
+    const modalEstrategia = document.getElementById('modal-estrategia');
+    const modalEtapas = document.getElementById('modal-etapas');
+    const modalEtapa = document.getElementById('modal-etapa');
+    const modalActividad = document.getElementById('modal-actividad');
+    
+    [modalEstrategia, modalEtapas, modalEtapa, modalActividad].forEach(modal => {
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    });
+    
+    console.log('✅ Todos los modales inicializados correctamente');
+}
 
 // =============================================
 // === FUNCIONES PARA ALIMENTAR AL BOT ===
@@ -546,183 +613,433 @@ document.addEventListener('DOMContentLoaded', function() {
  * Muestra el formulario de texto libre para alimentar al bot
  */
 function mostrarFormularioTextoLibre() {
+    console.log('📝 Abriendo formulario de texto libre');
+    
     // Ocultar el otro formulario
-    document.getElementById('formulario-estrategia-referencia').style.display = 'none';
+    const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+    if (formEstrategia) {
+        formEstrategia.style.display = 'none';
+        formEstrategia.classList.remove('activo');
+    }
+    
     // Mostrar este formulario
-    document.getElementById('formulario-texto-libre').style.display = 'flex';
-    // Limpiar el formulario
-    document.getElementById('form-texto-libre').reset();
+    const formTexto = document.getElementById('formulario-texto-libre');
+    if (formTexto) {
+        formTexto.style.display = 'flex';
+        formTexto.classList.add('activo');
+        
+        // Limpiar el formulario
+        const form = document.getElementById('form-texto-libre');
+        if (form) {
+            form.reset();
+        }
+        
+        // Enfocar el textarea
+        setTimeout(() => {
+            const textarea = form.querySelector('textarea[name="contenido"]');
+            if (textarea) {
+                textarea.focus();
+            }
+        }, 100);
+    } else {
+        console.error('❌ Formulario de texto libre no encontrado');
+    }
 }
 
 /**
  * Cierra el formulario de texto libre
  */
 function cerrarFormularioTextoLibre() {
-    document.getElementById('formulario-texto-libre').style.display = 'none';
+    console.log('❌ Cerrando formulario de texto libre');
+    const formulario = document.getElementById('formulario-texto-libre');
+    if (formulario) {
+        formulario.style.display = 'none';
+        formulario.classList.remove('activo');
+    }
 }
 
 /**
  * Muestra el formulario de estrategia como referencia
  */
 function mostrarFormularioEstrategiaReferencia() {
+    console.log('🎯 Abriendo formulario de estrategia como referencia');
+    
     // Ocultar el otro formulario
-    document.getElementById('formulario-texto-libre').style.display = 'none';
+    const formTexto = document.getElementById('formulario-texto-libre');
+    if (formTexto) {
+        formTexto.style.display = 'none';
+        formTexto.classList.remove('activo');
+    }
+    
     // Mostrar este formulario
-    document.getElementById('formulario-estrategia-referencia').style.display = 'flex';
-    // Limpiar el formulario
-    document.getElementById('form-estrategia-referencia').reset();
-    // Cargar estrategias en el select
-    cargarEstrategiasEnSelect();
+    const formEstrategia = document.getElementById('formulario-estrategia-referencia');
+    if (formEstrategia) {
+        formEstrategia.style.display = 'flex';
+        formEstrategia.classList.add('activo');
+        
+        // Limpiar el formulario
+        const form = document.getElementById('form-estrategia-referencia');
+        if (form) {
+            form.reset();
+        }
+        
+        // Cargar estrategias en el select (siempre intentar cargar)
+        cargarEstrategiasEnSelect();
+    } else {
+        console.error('❌ Formulario de estrategia como referencia no encontrado');
+    }
 }
 
 /**
  * Cierra el formulario de estrategia como referencia
  */
 function cerrarFormularioEstrategiaReferencia() {
-    document.getElementById('formulario-estrategia-referencia').style.display = 'none';
+    console.log('❌ Cerrando formulario de estrategia como referencia');
+    const formulario = document.getElementById('formulario-estrategia-referencia');
+    if (formulario) {
+        formulario.style.display = 'none';
+        formulario.classList.remove('activo');
+    }
 }
 
 /**
  * Carga las estrategias del mentor en el select
  */
 async function cargarEstrategiasEnSelect() {
+    console.log('📋 Cargando estrategias en el select');
     const select = document.querySelector('#form-estrategia-referencia select[name="estrategia_id"]');
     
-    if (estrategiasDisponibles.length === 0) {
-        select.innerHTML = '<option value="">No hay estrategias disponibles</option>';
+    if (!select) {
+        console.error('❌ Select de estrategias no encontrado');
         return;
     }
     
-    // Limpiar opciones existentes excepto la primera
-    select.innerHTML = '<option value="">Selecciona una estrategia...</option>';
+    // Mostrar loading
+    select.innerHTML = '<option value="">Cargando estrategias...</option>';
+    select.disabled = true;
     
-    // Añadir estrategias disponibles
-    estrategiasDisponibles.forEach(estrategia => {
-        const option = document.createElement('option');
-        option.value = estrategia.id;
-        option.textContent = `${estrategia.titulo} (${estrategia.empresa_nombre || 'Sin empresa'})`;
-        select.appendChild(option);
-    });
+    try {
+        // Siempre intentar cargar estrategias frescas del servidor
+        console.log('🔄 Cargando estrategias desde el servidor...');
+        await cargarEstrategiasDisponibles();
+        
+        // Verificar si se cargaron estrategias
+        if (!estrategiasDisponibles || estrategiasDisponibles.length === 0) {
+            select.innerHTML = '<option value="">No hay estrategias disponibles</option>';
+            select.disabled = true;
+            console.warn('⚠️ No se encontraron estrategias disponibles');
+            return;
+        }
+        
+        // Limpiar y llenar el select
+        select.innerHTML = '<option value="">Selecciona una estrategia...</option>';
+        
+        estrategiasDisponibles.forEach(estrategia => {
+            const option = document.createElement('option');
+            option.value = estrategia.id;
+            option.textContent = `${estrategia.titulo} ${estrategia.empresa_nombre ? '(' + estrategia.empresa_nombre + ')' : ''}`;
+            select.appendChild(option);
+        });
+        
+        select.disabled = false;
+        console.log(`✅ ${estrategiasDisponibles.length} estrategias cargadas en el select`);
+        
+    } catch (error) {
+        console.error('💥 Error al cargar estrategias en select:', error);
+        select.innerHTML = '<option value="">Error al cargar estrategias</option>';
+        select.disabled = true;
+    }
 }
 
 /**
  * Carga las estrategias disponibles del mentor
  */
 async function cargarEstrategiasDisponibles() {
+    console.log('🔄 Cargando estrategias disponibles del mentor');
     const token = localStorage.getItem('access_token');
+    
+    if (!token) {
+        console.error('❌ No hay token de autenticación');
+        estrategiasDisponibles = [];
+        return;
+    }
+    
     try {
-        const res = await fetch('/mentor/api/mis-estrategias/', {
-            headers: { 'Authorization': 'Bearer ' + token }
+        const response = await fetch('/mentor/api/mis-estrategias/', {
+            headers: { 
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            }
         });
         
-        if (res.ok) {
-            estrategiasDisponibles = await res.json();
+        console.log(`📡 Respuesta de mis-estrategias: ${response.status}`);
+        
+        if (response.ok) {
+            estrategiasDisponibles = await response.json();
+            console.log(`✅ ${estrategiasDisponibles.length} estrategias cargadas`);
         } else {
+            console.error(`❌ Error ${response.status}: ${response.statusText}`);
             estrategiasDisponibles = [];
         }
     } catch (error) {
-        console.error('Error al cargar estrategias disponibles:', error);
+        console.error('💥 Error al cargar estrategias disponibles:', error);
         estrategiasDisponibles = [];
     }
 }
 
-// Manejar envío del formulario de texto libre
-document.getElementById('form-texto-libre').onsubmit = async function(e) {
-    e.preventDefault();
-    const token = localStorage.getItem('access_token');
-    const form = e.target;
-    
-    const data = {
-        tipo: 'texto_libre',
-        contenido: form.contenido.value,
-        bot_id: botId
-    };
-    
-    try {
-        const res = await fetch('/chat/api/alimentar-bot/', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-        
-        if (res.ok) {
-            alert('¡Bot alimentado exitosamente con el texto!');
-            cerrarFormularioTextoLibre();
-        } else {
-            const errorData = await res.json();
-            alert('Error al alimentar el bot: ' + (errorData.error || 'Error desconocido'));
-        }
-    } catch (error) {
-        alert('Error de conexión al alimentar el bot');
-        console.error(error);
-    }
-};
+// === FUNCIONES PARA MANEJAR FORMULARIOS ===
 
-// Manejar envío del formulario de estrategia como referencia
-document.getElementById('form-estrategia-referencia').onsubmit = async function(e) {
+/**
+ * Maneja el envío del formulario de texto libre
+ */
+/**
+ * Maneja el envío del formulario de texto libre
+ */
+async function handleSubmitTextoLibre(e) {
     e.preventDefault();
+    console.log('📝 Enviando formulario de texto libre');
+    
     const token = localStorage.getItem('access_token');
     const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
     
-    const estrategiaId = form.estrategia_id.value;
-    if (!estrategiaId) {
-        alert('Por favor selecciona una estrategia');
+    if (!token) {
+        mostrarNotificacion('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.', 'error');
         return;
     }
     
+    // Validación básica
+    const contenido = form.contenido.value.trim();
+    if (!contenido) {
+        mostrarNotificacion('Por favor ingresa algún contenido para alimentar al bot.', 'error');
+        return;
+    }
+    
+    // Mostrar estado de carga
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Alimentando bot...';
+    submitBtn.disabled = true;
+    
     const data = {
-        tipo: 'estrategia_referencia',
-        estrategia_id: parseInt(estrategiaId),
-        contexto: form.contexto.value || '',
-        bot_id: botId
+        tipo: 'texto_libre',
+        contenido: contenido,
+        bot_id: parseInt(botId)
     };
     
+    console.log('📤 Enviando datos:', data);
+    
     try {
-        const res = await fetch('/chat/api/alimentar-bot/', {
+        const response = await fetch('/chat/api/alimentar-bot/', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
             },
             body: JSON.stringify(data)
         });
         
-        if (res.ok) {
-            alert('¡Bot alimentado exitosamente con la estrategia de referencia!');
-            cerrarFormularioEstrategiaReferencia();
+        console.log('📥 Respuesta:', response.status, response.statusText);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Éxito:', result);
+            
+            // Notificación de éxito elegante
+            mostrarNotificacion(
+                'Bot alimentado exitosamente con el texto. El bot ahora tiene más información para mejorar sus respuestas.',
+                'success',
+                4000
+            );
+            
+            // Limpiar formulario y cerrar modal
+            form.reset();
+            cerrarFormularioTextoLibre();
+            
+            // Opcional: Recargar estrategias si el alimentar bot afecta las estrategias
+            // cargarEstrategiasBot();
+            
         } else {
-            const errorData = await res.json();
-            alert('Error al alimentar el bot: ' + (errorData.error || 'Error desconocido'));
+            const errorData = await response.json();
+            console.error('❌ Error del servidor:', errorData);
+            mostrarNotificacion(
+                `Error: ${errorData.error || errorData.message || 'Error desconocido'}`,
+                'error'
+            );
         }
     } catch (error) {
-        alert('Error de conexión al alimentar el bot');
-        console.error(error);
+        console.error('💥 Error de conexión:', error);
+        mostrarNotificacion('Error de conexión. Por favor, inténtalo de nuevo.', 'error');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
-};
+}
 
-// Event listeners para cerrar modales al hacer clic fuera de ellos
-document.getElementById('formulario-texto-libre').addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarFormularioTextoLibre();
+/**
+ * Maneja el envío del formulario de estrategia como referencia
+ */
+async function handleSubmitEstrategiaReferencia(e) {
+    e.preventDefault();
+    console.log('🎯 Enviando formulario de estrategia como referencia');
+    
+    const token = localStorage.getItem('access_token');
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    if (!token) {
+        mostrarNotificacion('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.', 'error');
+        return;
     }
-});
+    
+    // Validación
+    const estrategiaId = parseInt(form.estrategia_id.value);
+    if (!estrategiaId) {
+        mostrarNotificacion('Por favor selecciona una estrategia antes de continuar.', 'error');
+        return;
+    }
+    
+    // Obtener información de la estrategia seleccionada para el mensaje
+    const estrategiaSeleccionada = estrategiasDisponibles.find(e => e.id === estrategiaId);
+    const nombreEstrategia = estrategiaSeleccionada ? estrategiaSeleccionada.titulo : 'la estrategia seleccionada';
+    
+    // Mostrar estado de carga
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = '⏳ Procesando...';
+    submitBtn.disabled = true;
+    
+    const data = {
+        tipo: 'estrategia_referencia',
+        estrategia_id: estrategiaId,
+        contexto: form.contexto.value.trim() || '',
+        bot_id: parseInt(botId)
+    };
+    
+    console.log('📤 Enviando datos de estrategia:', data);
+    
+    try {
+        const response = await fetch('/chat/api/alimentar-bot/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        });
+        
+        console.log('📥 Respuesta:', response.status, response.statusText);
+        
+        if (response.ok) {
+            const result = await response.json();
+            console.log('✅ Éxito:', result);
+            
+            // Notificación de éxito elegante
+            mostrarNotificacion(
+                `Bot alimentado exitosamente! El bot ahora puede usar "${nombreEstrategia}" como referencia para mejorar sus respuestas.`,
+                'success',
+                4000
+            );
+            
+            // Limpiar formulario y cerrar modal
+            form.reset();
+            cerrarFormularioEstrategiaReferencia();
+            
+            // Opcional: Recargar estrategias si el alimentar bot afecta las estrategias
+            // cargarEstrategiasBot();
+            
+        } else {
+            const errorData = await response.json();
+            console.error('❌ Error del servidor:', errorData);
+            mostrarNotificacion(
+                `Error: ${errorData.error || errorData.message || 'Error desconocido'}`,
+                'error'
+            );
+        }
+    } catch (error) {
+        console.error('💥 Error de conexión:', error);
+        mostrarNotificacion('Error de conexión. Por favor, inténtalo de nuevo.', 'error');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
+}
 
-document.getElementById('formulario-estrategia-referencia').addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarFormularioEstrategiaReferencia();
+/**
+ * Configura los event listeners para cerrar modales
+ */
+function setupModalEventListeners() {
+    console.log('🔧 Configurando event listeners de modales');
+    
+    // Event listeners para cerrar formularios de alimentar bot al hacer clic fuera
+    const formularioTextoLibre = document.getElementById('formulario-texto-libre');
+    const formularioEstrategiaRef = document.getElementById('formulario-estrategia-referencia');
+    
+    if (formularioTextoLibre) {
+        formularioTextoLibre.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarFormularioTextoLibre();
+            }
+        });
     }
-});
+    
+    if (formularioEstrategiaRef) {
+        formularioEstrategiaRef.addEventListener('click', function(e) {
+            if (e.target === this) {
+                cerrarFormularioEstrategiaReferencia();
+            }
+        });
+    }
+    
+    // Event listener para tecla Escape - cerrar todos los modales
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            // Cerrar formularios de alimentar bot
+            cerrarFormularioTextoLibre();
+            cerrarFormularioEstrategiaReferencia();
+            
+            // Cerrar modales de estrategias/etapas/actividades
+            const modales = ['modal-estrategia', 'modal-etapas', 'modal-etapa', 'modal-actividad'];
+            modales.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal && modal.style.display === 'flex') {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    });
+    
+    // Event listener para cerrar modales al hacer clic fuera del contenido
+    document.addEventListener('click', function(e) {
+        // Cerrar modales de estrategias si se hace clic en el fondo
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+        // Cerrar formularios de alimentar bot si se hace clic en el fondo
+        if (e.target.classList.contains('formulario-alimentar')) {
+            cerrarFormularioTextoLibre();
+            cerrarFormularioEstrategiaReferencia();
+        }
+    });
+}
 
-// Event listener para cerrar modales con la tecla Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        cerrarFormularioTextoLibre();
-        cerrarFormularioEstrategiaReferencia();
+/**
+ * Función auxiliar para obtener CSRF token
+ */
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-});
+    return cookieValue;
+}
 
 // =============================================
 // === FUNCIONES EXISTENTES (SIN CAMBIOS) ===
@@ -771,32 +1088,98 @@ function cerrarModalEstrategia() {
 }
 document.getElementById('form-estrategia').onsubmit = async function(e) {
     e.preventDefault();
+    console.log('💾 Guardando estrategia del bot');
+    
     const token = localStorage.getItem('access_token');
     const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    
+    if (!token) {
+        mostrarNotificacion('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.', 'error');
+        return;
+    }
+    
+    // Validación
+    const titulo = form.titulo.value.trim();
+    const descripcion = form.descripcion.value.trim();
+    
+    if (!titulo) {
+        mostrarNotificacion('Por favor ingresa un título para la estrategia.', 'error');
+        return;
+    }
+    
+    if (!descripcion) {
+        mostrarNotificacion('Por favor ingresa una descripción para la estrategia.', 'error');
+        return;
+    }
+    
+    // Mostrar estado de carga
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = estrategiaActualId ? '⏳ Actualizando...' : '⏳ Guardando...';
+    submitBtn.disabled = true;
+    
     const data = {
-        titulo: form.titulo.value,
-        descripcion: form.descripcion.value,
+        titulo: titulo,
+        descripcion: descripcion,
         chatbot: botId
     };
+    
     let url = `/mentor/api/bots/${botId}/estrategias/`;
     let method = 'POST';
+    let accion = 'creada';
+    
     if (estrategiaActualId) {
         url = `/mentor/api/estrategias/${estrategiaActualId}/`;
         method = 'PUT';
+        accion = 'actualizada';
     }
-    const res = await fetch(url, {
-        method,
-        headers: {
-            'Authorization': 'Bearer ' + token,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-    if (res.ok) {
-        cerrarModalEstrategia();
-        cargarEstrategiasBot();
-    } else {
-        alert('Error al guardar estrategia');
+    
+    console.log(`📤 ${method === 'POST' ? 'Creando' : 'Actualizando'} estrategia:`, data);
+    
+    try {
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        });
+        
+        console.log('📥 Respuesta:', res.status, res.statusText);
+        
+        if (res.ok) {
+            const result = await res.json();
+            console.log('✅ Éxito:', result);
+            
+            // Notificación de éxito elegante
+            mostrarNotificacion(
+                `Estrategia "${titulo}" ${accion} exitosamente`,
+                'success'
+            );
+            
+            // Cerrar modal y recargar lista
+            cerrarModalEstrategia();
+            cargarEstrategiasBot();
+            
+            // Limpiar variables
+            estrategiaActualId = null;
+            
+        } else {
+            const errorData = await res.json();
+            console.error('❌ Error del servidor:', errorData);
+            mostrarNotificacion(
+                `Error al ${method === 'POST' ? 'crear' : 'actualizar'} la estrategia: ${errorData.error || errorData.message || 'Error desconocido'}`,
+                'error'
+            );
+        }
+    } catch (error) {
+        console.error('💥 Error de conexión:', error);
+        mostrarNotificacion('Error de conexión. Por favor, inténtalo de nuevo.', 'error');
+    } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
     }
 };
 async function editarEstrategia(id) {
@@ -810,16 +1193,37 @@ async function editarEstrategia(id) {
     document.getElementById('modal-estrategia').style.display = 'flex';
 }
 async function eliminarEstrategia(id) {
-    if (!confirm('¿Eliminar esta estrategia?')) return;
+    if (!confirm('¿Estás seguro de que deseas eliminar esta estrategia?')) return;
+    
     const token = localStorage.getItem('access_token');
-    const res = await fetch(`/mentor/api/estrategias/${id}/`, {
-        method: 'DELETE',
-        headers: { 'Authorization': 'Bearer ' + token }
-    });
-    if (res.ok) {
-        cargarEstrategiasBot();
-    } else {
-        alert('Error al eliminar estrategia');
+    if (!token) {
+        mostrarNotificacion('No se encontró token de autenticación. Por favor, inicia sesión nuevamente.', 'error');
+        return;
+    }
+    
+    try {
+        console.log('🗑️ Eliminando estrategia:', id);
+        const res = await fetch(`/mentor/api/estrategias/${id}/`, {
+            method: 'DELETE',
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        
+        console.log('📥 Respuesta eliminación:', res.status, res.statusText);
+        
+        if (res.ok) {
+            mostrarNotificacion('Estrategia eliminada exitosamente.', 'success');
+            cargarEstrategiasBot();
+        } else {
+            const errorData = await res.json().catch(() => ({}));
+            console.error('❌ Error del servidor:', errorData);
+            mostrarNotificacion(
+                `Error al eliminar la estrategia: ${errorData.error || errorData.message || 'Error desconocido'}`,
+                'error'
+            );
+        }
+    } catch (error) {
+        console.error('💥 Error de conexión:', error);
+        mostrarNotificacion('Error de conexión. Por favor, inténtalo de nuevo.', 'error');
     }
 }
 
@@ -888,10 +1292,11 @@ document.getElementById('form-etapa').onsubmit = async function(e) {
         body: JSON.stringify(data)
     });
     if (res.ok) {
+        mostrarNotificacion('Etapa guardada exitosamente.', 'success');
         cerrarModalEtapa();
         cargarEtapasEstrategia(estrategiaActualId);
     } else {
-        alert('Error al guardar etapa');
+        mostrarNotificacion('Error al guardar la etapa. Por favor, inténtalo de nuevo.', 'error');
     }
 };
 async function editarEtapa(id) {
@@ -916,9 +1321,10 @@ async function eliminarEtapa(id) {
         headers: { 'Authorization': 'Bearer ' + token }
     });
     if (res.ok) {
+        mostrarNotificacion('Etapa eliminada exitosamente.', 'success');
         cargarEtapasEstrategia(estrategiaActualId);
     } else {
-        alert('Error al eliminar etapa');
+        mostrarNotificacion('Error al eliminar la etapa. Por favor, inténtalo de nuevo.', 'error');
     }
 }
 
@@ -982,11 +1388,12 @@ document.getElementById('form-actividad').onsubmit = async function(e) {
         body: JSON.stringify(data)
     });
     if (res.ok) {
+        mostrarNotificacion('Actividad guardada exitosamente.', 'success');
         cerrarModalActividad();
         cargarActividadesEtapa(etapaActualId);
         form.removeAttribute('data-edit-id');
     } else {
-        alert('Error al guardar actividad');
+        mostrarNotificacion('Error al guardar la actividad. Por favor, inténtalo de nuevo.', 'error');
     }
 };
 function editarActividad(id, descripcion) {
@@ -1012,11 +1419,12 @@ async function guardarActividad(id) {
         body: JSON.stringify(data)
     });
     if (res.ok) {
+        mostrarNotificacion('Actividad actualizada exitosamente.', 'success');
         cerrarModalActividad();
         cargarActividadesEtapa(etapaActualId);
         form.removeAttribute('data-edit-id');
     } else {
-        alert('Error al actualizar actividad');
+        mostrarNotificacion('Error al actualizar la actividad. Por favor, inténtalo de nuevo.', 'error');
     }
 }
 async function eliminarActividad(id) {
@@ -1027,39 +1435,96 @@ async function eliminarActividad(id) {
         headers: { 'Authorization': 'Bearer ' + token }
     });
     if (res.ok) {
+        mostrarNotificacion('Actividad eliminada exitosamente.', 'success');
         cargarActividadesEtapa(etapaActualId);
     } else {
-        alert('Error al eliminar actividad');
+        mostrarNotificacion('Error al eliminar la actividad. Por favor, inténtalo de nuevo.', 'error');
     }
 }
 
-// === FUNCIONES DE USABILIDAD PARA MODALES ===
-// Cerrar modal con ESC
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        // Cerrar modales de estrategias/etapas/actividades
-        const modales = ['modal-estrategia', 'modal-etapas', 'modal-etapa', 'modal-actividad'];
-        modales.forEach(modalId => {
-            const modal = document.getElementById(modalId);
-            if (modal && modal.style.display === 'flex') {
-                modal.style.display = 'none';
+/**
+ * Muestra una notificación temporal más elegante
+ */
+function mostrarNotificacion(mensaje, tipo = 'success', duracion = 3000) {
+    // Remover notificaciones existentes
+    const notificacionExistente = document.querySelector('.notificacion-temporal');
+    if (notificacionExistente) {
+        notificacionExistente.remove();
+    }
+    
+    // Crear nueva notificación
+    const notificacion = document.createElement('div');
+    notificacion.className = `notificacion-temporal notificacion-${tipo}`;
+    notificacion.innerHTML = `
+        <div class="notificacion-contenido">
+            <span class="notificacion-icono">${tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : 'ℹ️'}</span>
+            <span class="notificacion-mensaje">${mensaje}</span>
+        </div>
+    `;
+    
+    // Estilos inline para la notificación
+    notificacion.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: ${tipo === 'success' ? '#d4edda' : tipo === 'error' ? '#f8d7da' : '#d1ecf1'};
+        color: ${tipo === 'success' ? '#155724' : tipo === 'error' ? '#721c24' : '#0c5460'};
+        border: 1px solid ${tipo === 'success' ? '#c3e6cb' : tipo === 'error' ? '#f5c6cb' : '#bee5eb'};
+        border-radius: 8px;
+        padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        max-width: 400px;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    `;
+    
+    const contenido = notificacion.querySelector('.notificacion-contenido');
+    contenido.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    `;
+    
+    const icono = notificacion.querySelector('.notificacion-icono');
+    icono.style.cssText = `
+        font-size: 16px;
+        flex-shrink: 0;
+    `;
+    
+    const mensaje_elem = notificacion.querySelector('.notificacion-mensaje');
+    mensaje_elem.style.cssText = `
+        font-weight: 500;
+        line-height: 1.4;
+    `;
+    
+    // Añadir al DOM
+    document.body.appendChild(notificacion);
+    
+    // Animar entrada
+    setTimeout(() => {
+        notificacion.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto-remover después de la duración especificada
+    setTimeout(() => {
+        notificacion.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.remove();
             }
-        });
-        // Cerrar formularios de alimentar bot
-        cerrarFormularioTextoLibre();
-        cerrarFormularioEstrategiaReferencia();
-    }
-});
-
-// Cerrar modal al hacer clic fuera del contenido
-document.addEventListener('click', function(e) {
-    if (e.target.classList.contains('modal')) {
-        e.target.style.display = 'none';
-    }
-    if (e.target.classList.contains('formulario-alimentar')) {
-        cerrarFormularioTextoLibre();
-        cerrarFormularioEstrategiaReferencia();
-    }
-});
+        }, 300);
+    }, duracion);
+    
+    // Permitir cerrar con click
+    notificacion.addEventListener('click', () => {
+        notificacion.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            if (notificacion.parentNode) {
+                notificacion.remove();
+            }
+        }, 300);
+    });
+}
 </script>
 {% endblock %}

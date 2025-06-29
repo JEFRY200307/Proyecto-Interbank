@@ -24,7 +24,7 @@ CATEGORY_PROMPTS = {
 }
 
 # Configuración de la API de OpenAI
-# OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+
 
 
 
@@ -184,6 +184,13 @@ class AlimentarBotAPIView(APIView):
             tipo = data.get('tipo')
             bot_id = data.get('bot_id')
             
+            # Logging para debugging
+            print(f"=== ALIMENTAR BOT DEBUG ===")
+            print(f"Usuario: {request.user}")
+            print(f"Rol del usuario: {request.user.rol}")
+            print(f"Datos recibidos: {data}")
+            print(f"========================")
+            
             if not tipo or not bot_id:
                 return Response({"error": "Faltan parámetros requeridos (tipo, bot_id)"}, status=400)
             
@@ -194,7 +201,7 @@ class AlimentarBotAPIView(APIView):
                 return Response({"error": "Bot no encontrado"}, status=404)
             
             # Verificar que el usuario es mentor
-            if not hasattr(request.user, 'mentor_profile'):
+            if request.user.rol != 'mentor':
                 return Response({"error": "Solo los mentores pueden alimentar bots"}, status=403)
             
             if tipo == 'texto_libre':
@@ -228,7 +235,7 @@ class AlimentarBotAPIView(APIView):
                 try:
                     estrategia = Estrategia.objects.get(
                         id=estrategia_id,
-                        mentor=request.user
+                        mentor_asignado=request.user
                     )
                 except Estrategia.DoesNotExist:
                     return Response({"error": "Estrategia no encontrada o no tienes permisos"}, status=404)
@@ -266,7 +273,7 @@ ESTRATEGIA DE REFERENCIA: {estrategia.titulo}
 
 DESCRIPCIÓN: {estrategia.descripcion}
 
-EMPRESA: {estrategia.empresa.nombre if estrategia.empresa else 'No especificada'}
+EMPRESA: {estrategia.empresa.razon_social if estrategia.empresa else 'No especificada'}
 
 CATEGORÍA: {estrategia.categoria or 'No especificada'}
 
@@ -291,8 +298,8 @@ ETAPAS Y ACTIVIDADES:
                     contenido += f"\n   - {actividad.descripcion} ({estado})"
                     if actividad.fecha_limite:
                         contenido += f" - Fecha límite: {actividad.fecha_limite}"
-                    if actividad.notas:
-                        contenido += f" - Notas: {actividad.notas}"
+                    if actividad.notas_mentor:
+                        contenido += f" - Notas: {actividad.notas_mentor}"
             contenido += "\n"
         
         # Añadir contexto adicional si se proporcionó
